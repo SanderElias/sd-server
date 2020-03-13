@@ -1,5 +1,6 @@
 import {exec} from 'child_process';
 import open from 'open';
+import {puppeteer} from 'puppeteer-core';
 import {FluffyNode, i3, I3Tree, PurpleNode, TentacledNode} from './i3';
 import {installCommand} from './installCommand';
 
@@ -51,3 +52,64 @@ installCommand({
     open('https://github.com/scullyio/scully/pulls');
   },
 });
+
+installCommand({
+  tile: 10,
+  image: 'terminal-icon.png',
+  action: () => {
+    i3.command('workspace number 1');
+  },
+});
+installCommand({
+  tile: 12,
+  image: 'visual-studio-code-insiders-icon.png',
+  action: () => {
+    i3.command('workspace number 3');
+  },
+});
+installCommand({
+  tile: 11,
+  image: 'Chrome-icon.png',
+  action: () => {
+    i3.command('workspace number 2');
+  },
+});
+
+installCommand({
+  tile: 13,
+  image: 'Chrome-icon.png',
+  action: () => {
+    console.log('try to launch')
+    exec('/usr/bin/google-chrome --remote-debugging-port=19222 "http://127.0.0.1:19222"').unref();
+    // chromeConnect();
+  },
+});
+
+import {Browser, launch, LaunchOptions} from 'puppeteer-core';
+
+async function chromeConnect() {
+  console.log('run crhime');
+  const browser = await launch({headless: false,executablePath:'/usr/bin/google-chrome'});
+  const page = await browser.newPage();
+  await page.goto('https://google.com');
+
+  // Type "JavaScript" into the search bar
+  await page.evaluate(() => {
+    if (document) {
+      (document.querySelector('input[name="q"]') as HTMLInputElement).value =
+        'JavaScript';
+    }
+  });
+
+  // Click on the "Google Search" button and wait for the page to load
+  const waitForLoad = new Promise(resolve => page.on('load', () => resolve()));
+  await page.evaluate(() => {
+    (document.querySelector(
+      'input[value="Google Search"]'
+    ) as HTMLInputElement).click();
+  });
+  await waitForLoad;
+
+  await new Promise(resolve => setTimeout(resolve, 5000));
+  await browser.close();
+}
