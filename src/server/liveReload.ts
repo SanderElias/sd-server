@@ -1,17 +1,15 @@
-import {Server} from 'ws';
+import WebSocket, {Server, MessageEvent} from 'ws';
 import {log, logError, yellow} from '../utils/log';
 import {settings} from './settings';
 
-let wss;
+let wss: Server | undefined;
 async function enableLiveReloadServer() {
   try {
     log('enable reload on port', settings.reloadPort);
     // tslint:disable-next-line:only-arrow-functions
     wss = new Server({port: settings.reloadPort, noServer: true});
     wss.on('connection', client => {
-      client.on('message', message => {
-        // console.log(`Received message => ${message}`);
-      });
+      client.on('message', handleMesage);
       client.send('Hello! Message From Server!!');
     });
   } catch (e) {
@@ -31,4 +29,10 @@ export function reloadAll() {
   if (wss) {
     wss.clients.forEach(client => client.send('reload'));
   }
+}
+
+
+
+function handleMesage(message: MessageEvent) {
+  console.log('from client', message);
 }

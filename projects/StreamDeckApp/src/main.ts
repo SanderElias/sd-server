@@ -8,45 +8,6 @@ if (environment.production) {
   enableProdMode();
 }
 
-let wSocket;
-let tries = 0;
-const connect = () => {
-  try {
-    wSocket = new WebSocket('ws://localhost:3001');
-    wSocket.addEventListener('open', () => {
-      try {
-        wSocket.send('hello');
-      } catch (e) {}
-    });
-
-    wSocket.addEventListener('message', evt => {
-      if (evt && evt.data === 'reload') {
-        console.log('Reload command received');
-        document.location.reload();
-      }
-    });
-
-    wSocket.addEventListener('close', () => {
-      wSocket = undefined;
-      if (++tries < 15) {
-        setTimeout(connect, 1500);
-      }
-    });
-
-    wSocket.addEventListener('error', e => {
-      try {
-        wSocket.close();
-      } catch (e) {}
-      wSocket = undefined;
-      if (++tries < 15) {
-        setTimeout(connect, 1500);
-      }
-    });
-  } catch (e) {
-    setTimeout(connect, 1500);
-  }
-};
-connect();
 
 platformBrowserDynamic()
   .bootstrapModule(AppModule)
