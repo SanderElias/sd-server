@@ -18,9 +18,7 @@ installCommand({
   action: () => {
     i3.tree((_err: any, r: I3Tree) => {
       // r.nodes.forEach(node => console.log(node.name))
-      const logNodes = (
-        node: I3Tree | PurpleNode | FluffyNode | TentacledNode
-      ) => {
+      const logNodes = (node: I3Tree | PurpleNode | FluffyNode | TentacledNode) => {
         node.type.includes('con') && console.log(node.name, '|', node.type);
         node.nodes.forEach(logNodes as any);
       };
@@ -75,41 +73,38 @@ installCommand({
   },
 });
 
-
 installCommand({
-  tile: 13,
-  image: 'Chrome-icon.png',
+  tile: 14,
+  image: 'refresh.png',
   action: () => {
-    console.log('try to launch')
-    // exec('/usr/bin/google-chrome --remote-debugging-port=19222 "http://127.0.0.1:19222"').unref();
-    // chromeConnect();
     reloadAll();
   },
 });
 
 import {Browser, launch, LaunchOptions} from 'puppeteer-core';
-import { reloadAll } from './server';
+import {reloadAll} from './server';
 
 async function chromeConnect() {
   console.log('run crhime');
-  const browser = await launch({headless: false,executablePath:'/usr/bin/google-chrome',defaultViewport:null});
+  const browser = await launch({
+    headless: false,
+    executablePath: '/usr/bin/google-chrome',
+    defaultViewport: null,
+  });
   const page = await browser.newPage();
   await page.goto('https://google.com');
 
   // Type "JavaScript" into the search bar
   await page.evaluate(() => {
     if (document) {
-      (document.querySelector('input[name="q"]') as HTMLInputElement).value =
-        'JavaScript';
+      (document.querySelector('input[name="q"]') as HTMLInputElement).value = 'JavaScript';
     }
   });
 
   // Click on the "Google Search" button and wait for the page to load
   const waitForLoad = new Promise(resolve => page.on('load', () => resolve()));
   await page.evaluate(() => {
-    (document.querySelector(
-      'input[value="Google Search"]'
-    ) as HTMLInputElement).click();
+    (document.querySelector('input[value="Google Search"]') as HTMLInputElement).click();
   });
   await waitForLoad;
 

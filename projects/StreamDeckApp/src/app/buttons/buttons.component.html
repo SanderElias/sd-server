@@ -1,1 +1,13 @@
-<p>buttons works!</p>
+
+
+<sd-button *ngFor="let button of buttons" [image]="button.image"></sd-button>
+
+<style>
+  :host {
+    display: grid;
+    grid-template-columns: repeat(5, 72px);
+    grid-auto-rows: 72px;
+    gap:5px;
+    padding:20px;
+  }
+</style>
