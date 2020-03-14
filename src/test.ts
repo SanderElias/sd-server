@@ -1,8 +1,8 @@
 import {exec} from 'child_process';
 import open from 'open';
 import {puppeteer} from 'puppeteer-core';
-import {FluffyNode, i3, I3Tree, PurpleNode, TentacledNode} from './i3';
-import {installCommand} from './installCommand';
+import {FluffyNode, i3, I3Tree, PurpleNode, TentacledNode} from './utils/i3';
+import {installCommand} from './streamDeck/installCommand';
 
 installCommand({
   tile: 0,
@@ -75,21 +75,24 @@ installCommand({
   },
 });
 
+
 installCommand({
   tile: 13,
   image: 'Chrome-icon.png',
   action: () => {
     console.log('try to launch')
-    exec('/usr/bin/google-chrome --remote-debugging-port=19222 "http://127.0.0.1:19222"').unref();
+    // exec('/usr/bin/google-chrome --remote-debugging-port=19222 "http://127.0.0.1:19222"').unref();
     // chromeConnect();
+    reloadAll();
   },
 });
 
 import {Browser, launch, LaunchOptions} from 'puppeteer-core';
+import { reloadAll } from './server';
 
 async function chromeConnect() {
   console.log('run crhime');
-  const browser = await launch({headless: false,executablePath:'/usr/bin/google-chrome'});
+  const browser = await launch({headless: false,executablePath:'/usr/bin/google-chrome',defaultViewport:null});
   const page = await browser.newPage();
   await page.goto('https://google.com');
 

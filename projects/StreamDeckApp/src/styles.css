@@ -1,0 +1,177 @@
+@import url('https://fonts.googleapis.com/css?family=Comfortaa|PT+Mono&display=swap');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+@charset "UTF-8";
+.tabs label,
+.text-center {
+  text-align: center;
+}
+
+/* VARS */
+
+:root {
+  /* COLORS */
+  --scully-green: #3aa860;
+  --scully-brightgreen: #6cce7a;
+  --scully-night: #232d2a;
+  --scully-darkgray: #4c615b;
+  --scully-lightgray: #d3d3d3;
+  --scully-offwhite: #fafbfc;
+  --scully-white: #ffffff;
+  --scully-black: #000000;
+  --scully-green-wash: rgba(58, 168, 96, 0.05);
+}
+
+/* reset */
+a,
+aside,
+body,
+div,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+header,
+input,
+label,
+menu,
+p {
+  font-family: Comfortaa, Roboto, sans-serif;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-bottom: 0.8em;
+  line-height: 130%;
+}
+p {
+  margin-bottom: 20px;
+}
+h1 {
+  font-size: 24px;
+  font-weight: bold;
+}
+h2 {
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+h3 {
+  font-size: 18px;
+  font-weight: bold;
+}
+h4 {
+  font-size: 24.8px;
+}
+h5 {
+  font-size: 20.8px;
+}
+h6 {
+  font-size: 18px;
+}
+a,
+p {
+  font-size: 16px;
+}
+
+body {
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+playground-host {
+  display: block;
+  padding: 50px;
+  background-image: linear-gradient(
+    45deg,
+    #fcfcfc 16.67%,
+    #858585 16.67%,
+    #858585 33.33%,
+    #fff 33.33%,
+    #fff 50%,
+    #fcfcfc 50%,
+    #fcfcfc 66.67%,
+    #858585 66.67%,
+    #858585 83.33%,
+    #fff 83.33%,
+    #fff 100%
+  );
+  background-size: 8.49px 8.49px;
+}
+
+/* BUTTONS */
+
+nav > a,
+nav > app-button > a {
+  display: inline-block;
+  padding: 12px;
+  margin: 10px 3px;
+  width: 100px;
+  border-radius: 4px;
+  height: 40px;
+  min-width: 168px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+nav > a.btn-secondary,
+nav > app-button > a.btn-secondary {
+  display: inline-block;
+  padding: 12px;
+  margin: 10px 3px;
+  width: 80px;
+  border-radius: 4px;
+  height: 40px;
+  min-width: 60px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+nav > a.btn-invert,
+nav > app-button > a.btn-invert {
+  border: 1px solid #fff;
+  border-radius: 4px;
+  display: inline-block;
+  padding: 12px;
+  margin: 10px 3px;
+  width: 100px;
+  border-radius: 4px;
+  height: 40px;
+  min-width: 168px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.router-link-active {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+nav > a:hover,
+nav > app-button > a.router-link-active:hover {
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+}
+
+nav > a:active,
+nav > app-button > a.router-link-active:active {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.invert {
+  filter: invert(1);
+}

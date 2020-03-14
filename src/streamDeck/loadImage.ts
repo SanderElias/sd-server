@@ -5,7 +5,7 @@ import {streamDeck} from './streamDeck';
 
 export function loadImage(cmd: Command) {
   const {tile, image: fileName} = cmd;
-  const asset = resolve(__dirname, '../assets', fileName);
+  const asset = resolve(__dirname, '../../../assets', fileName);
   //   const textSVG = `<svg>
   //   <rect x="0" y="0" width="${streamDeck.ICON_SIZE}" height="${streamDeck.ICON_SIZE}" />
   //   <text x="0" y="50" font-size="12" fill="#fff">test</text>

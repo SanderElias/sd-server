@@ -1,0 +1,50 @@
+<header>
+  <h1>Stream Deck App</h1>
+</header>
+<main>
+  <router-outlet></router-outlet>
+</main>
+<footer>
+  <h3>
+    With ☺ by Sander
+  </h3>
+</footer>
+
+
+<style>
+  :host {
+    display: grid;
+    height:100vh;
+    grid-template-rows: 80px 1fr 60px;
+  }
+
+  :host > header {
+    display: grid;
+    background-color: darkmagenta;
+    color: whitesmoke;
+    margin: 0;
+    padding: 0px 10px;
+    grid-template-columns: 1fr 40px;
+    place-items: center center;
+  }
+
+  header h1,
+  footer h3 {
+    margin: 0;
+  }
+  :host > footer {
+    display: grid;
+    background-color: darkmagenta;
+    color: whitesmoke;
+    margin: 0;
+    padding-right: 10px;
+    justify-content: right;
+    align-content: center;
+  }
+
+  main {
+    background-color: whitesmoke;
+    color: rgb(4, 12, 36);
+    padding: 10px;
+  }
+</style>

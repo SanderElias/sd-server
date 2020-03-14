@@ -1,4 +1,4 @@
-import {streamDeck} from './streamDeck';
+import {streamDeck} from '../streamDeck/streamDeck';
 
 /**
  * The following code is to make sure puppeteer will be closed properly.
@@ -16,7 +16,6 @@ function exitHandler(options, exitCode) {
   if (streamDeck) {
     // streamDeck.clearAllKeys();
     // streamDeck.close();
-    
   }
   if (options.exit) {
     process.exit();
