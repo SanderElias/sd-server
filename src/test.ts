@@ -6,23 +6,21 @@ import {installCommand} from './streamDeck/installCommand';
 import {dblClick} from './streamDeck/streamDeck';
 import {i3} from './utils/i3';
 
-
 installCommand({
   tile: 0,
   image: 'angular.png',
   action: () => {
     i3.command('workspace number 2');
-    exec('xdotool key alt+1')
+    exec('xdotool key alt+1');
   },
 });
-
 
 installCommand({
   tile: 1,
   image: 'mo.png',
   action: () => {
     i3.command('workspace number 2');
-    exec('xdotool key alt+7')
+    exec('xdotool key alt+7');
   },
 });
 
@@ -31,14 +29,24 @@ installCommand({
   image: 'hero-devs-logo-400x400.jpg',
   action: () => {
     i3.command('workspace number 2');
-    exec('xdotool key alt+2')
+    exec('xdotool key alt+2');
   },
 });
 installCommand({
   tile: 3,
-  image: 'flameshot.png',
+  image: 'dag.png',
   action: () => {
-    exec('flameshot gui').unref();
+    i3.command('workspace number 2');
+    exec('xdotool key alt+3');
+  },
+});
+
+
+installCommand({
+  tile: 4,
+  image: 'left.png',
+  action: () => {
+    i3.command('move workspace to output left');
   },
 });
 
@@ -47,14 +55,6 @@ installCommand({
   image: 'dev.png',
   action: () => {
     exec('google-chrome -incognito --new-window http://localhost:3000').unref();
-  },
-});
-
-installCommand({
-  tile: 4,
-  image: 'left.png',
-  action: () => {
-    i3.command('move workspace to output left');
   },
 });
 
@@ -71,6 +71,14 @@ installCommand({
   image: 'Octocat.png',
   action: () => {
     open('https://github.com/scullyio/scully/pulls');
+  },
+});
+
+installCommand({
+  tile: 8,
+  image: 'flameshot.png',
+  action: () => {
+    exec('flameshot gui').unref();
   },
 });
 
