@@ -1,11 +1,41 @@
 import {exec} from 'child_process';
 import open from 'open';
-import {puppeteer} from 'puppeteer-core';
-import {FluffyNode, i3, I3Tree, PurpleNode, TentacledNode} from './utils/i3';
+import {launch} from 'puppeteer-core';
+import {reloadAll} from './server';
 import {installCommand} from './streamDeck/installCommand';
+import {dblClick} from './streamDeck/streamDeck';
+import {i3} from './utils/i3';
+
 
 installCommand({
   tile: 0,
+  image: 'angular.png',
+  action: () => {
+    i3.command('workspace number 2');
+    exec('xdotool key alt+1')
+  },
+});
+
+
+installCommand({
+  tile: 1,
+  image: 'mo.png',
+  action: () => {
+    i3.command('workspace number 2');
+    exec('xdotool key alt+7')
+  },
+});
+
+installCommand({
+  tile: 2,
+  image: 'hero-devs-logo-400x400.jpg',
+  action: () => {
+    i3.command('workspace number 2');
+    exec('xdotool key alt+2')
+  },
+});
+installCommand({
+  tile: 3,
   image: 'flameshot.png',
   action: () => {
     exec('flameshot gui').unref();
@@ -13,17 +43,10 @@ installCommand({
 });
 
 installCommand({
-  tile: 1,
-  image: 'checklist-icon.png',
+  tile: 5,
+  image: 'dev.png',
   action: () => {
-    i3.tree((_err: any, r: I3Tree) => {
-      // r.nodes.forEach(node => console.log(node.name))
-      const logNodes = (node: I3Tree | PurpleNode | FluffyNode | TentacledNode) => {
-        node.type.includes('con') && console.log(node.name, '|', node.type);
-        node.nodes.forEach(logNodes as any);
-      };
-      logNodes(r);
-    });
+    exec('google-chrome -incognito --new-window http://localhost:3000').unref();
   },
 });
 
@@ -72,6 +95,15 @@ installCommand({
     i3.command('workspace number 2');
   },
 });
+installCommand({
+  tile: 11,
+  modifier: dblClick,
+  image: 'Chrome-icon.png',
+  action: () => {
+    i3.command('workspace number 2');
+    exec('google-chrome http://localhost:3000/buttons');
+  },
+});
 
 installCommand({
   tile: 14,
@@ -80,10 +112,6 @@ installCommand({
     reloadAll();
   },
 });
-
-import {Browser, launch, LaunchOptions} from 'puppeteer-core';
-import {reloadAll} from './server';
-
 
 async function chromeConnect() {
   console.log('run crhime');

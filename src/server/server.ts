@@ -1,9 +1,9 @@
 import {logError, yellow, log} from '../utils/log';
 import express from 'express';
 import compression from 'compression';
-import {join} from 'path';
+import {join, resolve} from 'path';
 import {settings} from './settings';
-import { injectReloadMiddleware } from './injectReloadMiddleware';
+import {injectReloadMiddleware} from './injectReloadMiddleware';
 
 export async function sdServer() {
   try {
@@ -18,16 +18,21 @@ export async function sdServer() {
       setHeaders(res, path, stat) {
         res.set('x-timestamp', Date.now());
       },
+
     };
     const hostFolder = join(__dirname, settings.publicFolder);
     console.log(hostFolder);
 
     const server = express();
     server.use(compression());
-    server.use(injectReloadMiddleware)
+    // server.use(injectReloadMiddleware)
+    server.get('/image/:fileName', function(req, res) {
+      const asset = resolve(__dirname, '../../../assets', req.params.fileName);
+      console.log(asset);
+      res.sendFile(asset);
+    });
     server.use(express.static(hostFolder, options));
     server.get('*', (req, res) => res.sendFile(join(hostFolder, '/index.html')));
-
 
     server.listen(settings.port, settings.hostName, x => {
       log(
@@ -40,6 +45,3 @@ export async function sdServer() {
     logError(e);
   }
 }
-
-
-

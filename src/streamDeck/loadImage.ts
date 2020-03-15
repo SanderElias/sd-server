@@ -1,6 +1,6 @@
 import {resolve} from 'path';
 import sharp from 'sharp';
-import {Command} from './installCommand';
+import { Command } from "./Command.interface";
 import {streamDeck} from './streamDeck';
 
 export function loadImage(cmd: Command) {

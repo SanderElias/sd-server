@@ -1,17 +1,15 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { Command } from 'src/streamDeck/Command.interface';
 
 @Component({
   selector: 'sd-button',
   templateUrl: './button.component.html',
-  styleUrls: ['./button.component.css']
+  styleUrls: ['./button.component.css'],
 })
 export class SdButtonComponent implements OnInit {
-  @Input() image = "terminal-icon.png"
+  @Input() buttonData: Command;
 
-  constructor() {
-  }
+  constructor() {}
 
-  ngOnInit(): void {
-  }
-
+  ngOnInit(): void {}
 }

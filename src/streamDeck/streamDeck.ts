@@ -41,9 +41,7 @@ const cycle$ = down$.pipe(
 const longPress$ = down$.pipe(
   switchMap(key => {
     const start = Date.now();
-    return interval(25).pipe(
-      map(() => ({key, delay: Date.now() - start, double: false, long: true}))
-    );
+    return interval(25).pipe(map(() => ({key, delay: Date.now() - start, double: false, long: true})));
   }),
   filter(r => r.delay > 210),
   takeUntil(up$),
@@ -68,26 +66,29 @@ const gate$ = race(interClick$, limit$, longPress$).pipe(
   filter(k => !k.long)
 );
 
-export const click = (key: number) =>
-  gate$.pipe(
+export function click(key: number) {
+  return gate$.pipe(
     filter(k => !k.double && k.key === key),
     map(k => k.delay)
   );
-export const dblClick = (key: number) =>
-  gate$.pipe(
+}
+
+export function dblClick(key: number) {
+  return gate$.pipe(
     filter(k => k.double && k.key === key),
     map(k => k.delay)
   );
+}
 
-export const longClick = (key: number) =>
-  longPress$.pipe(
+export function longClick(key: number) {
+  return longPress$.pipe(
     filter(k => k.key === key),
     first(),
     map(k => k.delay),
     repeat()
   );
+}
 
-export const longPress = (key: number) =>
-  longPress$.pipe(filter(k => k.key === key));
-
-
+export function longPress(key: number) {
+  return longPress$.pipe(filter(k => k.key === key));
+}
