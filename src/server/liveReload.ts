@@ -24,7 +24,7 @@ async function enableLiveReloadServer() {
   } catch (e) {
     logError(`
 -----------------------------------
-The port "${yellow(settings.reloadPort)}" is not available for the live-reload server.
+The port "${yellow(settings.reloadPort)}" is not available for the websocket server.
 live reload will not be available. You can configure a different port in the config file.
 -----------------------------------`);
     wss = undefined;

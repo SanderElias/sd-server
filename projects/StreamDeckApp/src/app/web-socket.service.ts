@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {Subject} from 'rxjs';
 import {filter} from 'rxjs/operators';
 import {decode, encode} from 'src/utils/cbor';
-import { WsMessage } from 'src/server/WsMessage';
+import {WsMessage} from 'src/server/WsMessage';
 
 interface WSocketHandlers {
   type: string;
@@ -34,6 +34,7 @@ export class WebSocketService {
     }
   }
 
+  /** crude, blindly retry on anything websocket connection. */
   private hookUp() {
     try {
       this.wSocket = new WebSocket('ws://localhost:3001');
@@ -43,6 +44,8 @@ export class WebSocketService {
       this.wSocket.addEventListener('open', () => {
         try {
           this.wSocket.send(encode('hello'));
+          /** successful, reset retry count. */
+          this.tries = 0;
         } catch (e) {
           console.error(e);
         }
@@ -64,10 +67,7 @@ export class WebSocketService {
 
       /** reattach on close */
       this.wSocket.addEventListener('close', () => {
-        this.wSocket = undefined;
-        if (++this.tries < 15) {
-          setTimeout(() => this.hookUp(), 750);
-        }
+        this.reConnect();
       });
 
       /** reattach on error */
@@ -75,12 +75,16 @@ export class WebSocketService {
         try {
           this.wSocket.close();
         } catch (e) {}
-        this.wSocket = undefined;
-        if (++this.tries < 15) {
-          setTimeout(() => this.hookUp(), 750);
-        }
+        this.reConnect();
       });
     } catch (e) {
+      this.reConnect();
+    }
+  }
+
+  reConnect() {
+    this.wSocket = undefined;
+    if (++this.tries < 100) {
       setTimeout(() => this.hookUp(), 750);
     }
   }

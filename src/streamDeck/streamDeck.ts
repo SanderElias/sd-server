@@ -1,32 +1,55 @@
-import {openStreamDeck, getStreamDeckInfo} from 'elgato-stream-deck';
-import {race, Subject, interval} from 'rxjs';
-import {
-  bufferCount,
-  debounceTime,
-  filter,
-  first,
-  map,
-  repeat,
-  switchMap,
-  tap,
-  takeUntil,
-} from 'rxjs/operators';
+import {listStreamDecks, openStreamDeck, StreamDeck} from 'elgato-stream-deck';
+import {interval, race, Subject, ReplaySubject} from 'rxjs';
+import {bufferCount, debounceTime, filter, first, map, repeat, switchMap, takeUntil} from 'rxjs/operators';
+import {logWarn} from '../utils/log';
 // const i3 = I3
-export const streamDeck = openStreamDeck();
-streamDeck.clearAllKeys();
+const deck = new ReplaySubject<StreamDeck>();
+export const deck$ = deck.asObservable();
+let currentDeck: StreamDeck | undefined;
 
-// console.log(getStreamDeckInfo(''))
+export const getStreamDeck = () => currentDeck;
 
-// Fired whenever an error is detected by the `node-hid` library.
-// Always add a listener for this event! If you don't, errors will be silently dropped.
-streamDeck.on('error', (error: any) => {
-  console.error(error);
-});
+function pollIt() {
+  const decks = listStreamDecks();
+  if (decks.length === 0) {
+    setTimeout(() => pollIt(), 250);
+    return;
+  }
+
+  // TODO: add support for multiple decks!
+  const {path} = decks[0];
+  let sd: StreamDeck;
+  try {
+    sd = openStreamDeck(path);
+  } catch (e) {
+    console.error(e);
+    setTimeout(() => pollIt(), 250);
+    return;
+  }
+  deck.next(sd);
+}
+
+pollIt();
 
 const down$ = new Subject<number>();
-streamDeck.on('down', (keyNumber: number) => down$.next(keyNumber));
 const up$ = new Subject<number>();
-streamDeck.on('up', (keyNumber: number) => up$.next(keyNumber));
+
+deck$.subscribe({
+  next: strDeck => {
+    strDeck.clearAllKeys();
+    strDeck.on('down', (keyNumber: number) => down$.next(keyNumber));
+    strDeck.on('up', (keyNumber: number) => up$.next(keyNumber));
+    strDeck.on('error', (error: any) => {
+      logWarn('stream-deck Error, start polling for device');
+      currentDeck = undefined;
+      try {
+        strDeck.close();
+      } catch {}
+      pollIt();
+    });
+    currentDeck = strDeck;
+  },
+});
 
 const cycle$ = down$.pipe(
   switchMap(key => {

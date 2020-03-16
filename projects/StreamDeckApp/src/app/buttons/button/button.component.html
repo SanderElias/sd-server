@@ -1,5 +1,5 @@
 <div>
-  <img [src]="'image/' + buttonData.image" alt="" />
+  <img  *ngIf="buttonData.image" [src]="'image/' + buttonData.image" alt="" />
 </div>
 
 <style>
