@@ -4,6 +4,6 @@ export interface Command {
   id?: string;
   modifier?: (n: number) => Observable<number>;
   title?: string;
-  image: string;
+  image?: string;
   action: () => void;
 }

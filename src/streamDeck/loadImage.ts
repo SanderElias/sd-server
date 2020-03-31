@@ -3,15 +3,21 @@ import {take} from 'rxjs/operators';
 import sharp from 'sharp';
 import {Command} from './Command.interface';
 import {deck$} from './streamDeck';
+import {drawText} from './drawtext';
 
 export async function loadImage(cmd: Command) {
-  const {tile, image: fileName} = cmd;
+  const {tile, image: fileName, title}: {tile: number; image?: string; title?: string} = cmd;
+  if (title) {
+    return drawText(title, tile);
+  }
+  if (fileName===undefined) {
+    return;
+  }
   const asset = resolve(__dirname, '../../../assets', fileName);
-  //   const textSVG = `<svg>
-  //   <rect x="0" y="0" width="${streamDeck.ICON_SIZE}" height="${streamDeck.ICON_SIZE}" />
-  //   <text x="0" y="50" font-size="12" fill="#fff">test</text>
-  // </svg>`;
+
   const streamDeck = await deck$.pipe(take(1)).toPromise();
+
+  // const writableStreamBuffer = drawText('hello',1)
 
   sharp(asset)
     .flatten() // Eliminate alpha channel, if any.
