@@ -1,14 +1,12 @@
 import {exec} from 'child_process';
 import open from 'open';
-import {launch} from 'puppeteer-core';
-import {reloadAll} from './server';
-import {installCommand, reset} from './streamDeck/installCommand';
-import {dblClick} from './streamDeck/streamDeck';
-import {i3} from './utils/i3';
-import {drawText} from './streamDeck/drawtext';
-import {readdir} from 'fs';
-import {basename} from 'path';
 import {Command} from './streamDeck/Command.interface';
+import {reset} from './streamDeck/installCommand';
+import {dblClick} from './streamDeck/streamDeck';
+import {activateNextPage, activatePage} from './utils/activePage';
+import {getFiles} from './utils/getFiles';
+import {i3} from './utils/i3';
+import {clearCountDown, countDown} from './utils/timer';
 
 const commands = [
   {
@@ -119,13 +117,26 @@ const commands = [
   },
 ];
 
-const page2: Command[] = [
+const page2Base: Command[] = [
   {
     tile: 13,
-    title:'13',
+    image: 'alarm.png',
+    action: countDown,
+  },
+  {
+    tile: 13,
+    modifier: dblClick,
+    action: clearCountDown,
+  },
+  {
+    tile: 14,
+    modifier: dblClick,
     action: async () => {
       await reset();
-      activateNextPage();
+      page2.length = 0;
+      page2Base.forEach(a => page2.push(a));
+      await getFiles('/home/sander/Documents/talks/ngConf-2020/presentation/videos/');
+      activatePage(1);
     },
   },
   {
@@ -138,41 +149,8 @@ const page2: Command[] = [
   },
 ];
 
-const pages = [commands, page2];
+export const page2 = [...page2Base];
 
-let activePage = 1;
-function activatePage(n) {
-  pages[n].forEach(installCommand);
-}
-function activateNextPage() {
-  activePage += 1;
-  if (activePage > pages.length - 1) {
-    activePage = 0;
-  }
-  activatePage(activePage);
-}
+export const pages = [commands, page2];
 
-function playVid(filename) {
-  return `cvlc "/home/sander/Documents/talks/ngConf-2020/presentation/videos/${filename}.mp4" --fullscreen --no-osd vlc://quit`;
-}
 
-async function getFiles(folder) {
-  const files: string[] = await new Promise(r => readdir(folder, (_, f) => r(f)));
-  files.forEach((file, tile) => {
-    const title = basename(file, '.mp4');
-    console.log(tile);
-    page2.push({
-      tile,
-      title,
-      action: async () => {
-        console.log(title);
-        await i3.command('workspace number 4');
-        exec(playVid(title)).unref();
-      },
-    });
-  });
-}
-
-getFiles('/home/sander/Documents/talks/ngConf-2020/presentation/videos/').then(() => {
-  activatePage(activePage);
-});

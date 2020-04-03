@@ -1,8 +1,7 @@
-import './utils/exitHandler'
-import './test'
-import {sdServer, reloadAll} from './server/'
+import './utils/exitHandler';
+import './commands';
+import {sdServer, reloadAll} from './server/';
 
 sdServer();
 
-setTimeout(() => reloadAll(),2000)
-
+setTimeout(() => reloadAll(), 500);
