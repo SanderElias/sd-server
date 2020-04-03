@@ -1,10 +1,11 @@
 import {pages} from '../commands';
-import {installCommand} from '../streamDeck/installCommand';
+import {installCommand, resetDeck} from '../streamDeck/installCommand';
 
-let activePage = 1;
+let activePage = 0;
 
-export function activatePage(n: number) {
+export async function activatePage(n = activePage) {
   activePage = n;
+  await resetDeck();
   pages[n].forEach(installCommand);
 }
 
@@ -13,5 +14,12 @@ export function activateNextPage() {
   if (activePage > pages.length - 1) {
     activePage = 0;
   }
-  activatePage(activePage);
+  return activatePage(activePage);
+}
+export function activatePrevPage() {
+  activePage -= 1;
+  if (activePage < 0) {
+    activePage = pages.length - 1;
+  }
+  return activatePage(activePage);
 }

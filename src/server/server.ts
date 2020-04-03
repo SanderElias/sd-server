@@ -21,14 +21,14 @@ export async function sdServer() {
 
     };
     const hostFolder = join(__dirname, settings.publicFolder);
-    console.log(hostFolder);
+    // console.log(hostFolder);
 
     const server = express();
     server.use(compression());
     // server.use(injectReloadMiddleware)
     server.get('/image/:fileName', function(req, res) {
       const asset = resolve(__dirname, '../../../assets', req.params.fileName);
-      console.log(asset);
+      // console.log(asset);
       res.sendFile(asset);
     });
     server.use(express.static(hostFolder, options));

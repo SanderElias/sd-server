@@ -4,4 +4,4 @@ import {sdServer, reloadAll} from './server/';
 
 sdServer();
 
-setTimeout(() => reloadAll(), 500);
+setTimeout(() => reloadAll(), 1500);

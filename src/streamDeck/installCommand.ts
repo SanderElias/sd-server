@@ -9,7 +9,7 @@ import {Subject} from 'rxjs';
 export const cmdList = new Map<string, Command>();
 const flush = new Subject<void>();
 
-export const reset = async () => {
+export const resetDeck = async () => {
   cmdList.clear();
   flush.next();
   return deck$
@@ -30,7 +30,7 @@ export function installCommand(cmd: Command) {
     }
     listen
       .pipe(
-        tap(key => console.log('key', key, listen['name'])),
+        // tap(key => console.log('key', key, listen['name'])),
         repeat(),
         takeUntil(flush)
       )
@@ -44,7 +44,7 @@ export function installCommand(cmd: Command) {
           }
         },
         complete: () => {
-          console.log(`${id} unloaded`);
+          // console.log(`${id} unloaded`);
         },
       });
     cmdList.set(id, {...cmd, id});

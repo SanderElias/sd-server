@@ -42,6 +42,7 @@ function playVid(filename) {
   return `vlc "/home/sander/Documents/talks/ngConf-2020/presentation/videos/${filename}.flv"  --no-osd vlc://quit`;
 }
 
-getFiles('/home/sander/Documents/talks/ngConf-2020/presentation/videos/').then(() => {
-  activatePage(1);
-});
+getFiles('/home/sander/Documents/talks/ngConf-2020/presentation/videos/')
+// .then(() => {
+//   activatePage(1);
+// });

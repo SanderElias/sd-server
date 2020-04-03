@@ -15,7 +15,7 @@ const font1 = PImage.registerFont(resolve(fontFolder, 'Verdana.ttf'), 'verdana')
 
 const loadFont = new Promise(res =>
   font.load(() => {
-    console.log('font loaded');
+    // console.log('font loaded');
     res();
   })
 );
@@ -28,7 +28,7 @@ export async function drawText(txt: string, tile: number) {
     await loadFont;
 
     const canvas = createCanvas(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE);
-    const context = canvas.getContext('2d', {pixelFormat: 'A8'});
+    const context = canvas.getContext('2d', {pixelFormat: 'RGB24'});
     context.strokeStyle = 'black';
     context.fillStyle = '#ffffff';
     // if (false) {

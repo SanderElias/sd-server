@@ -1,7 +1,7 @@
 import {exec} from 'child_process';
 import open from 'open';
 import {Command} from './streamDeck/Command.interface';
-import {reset} from './streamDeck/installCommand';
+import {resetDeck} from './streamDeck/installCommand';
 import {dblClick} from './streamDeck/streamDeck';
 import {activateNextPage, activatePage} from './utils/activePage';
 import {getFiles} from './utils/getFiles';
@@ -110,7 +110,6 @@ const commands = [
     tile: 14,
     image: 'refresh.png',
     action: async () => {
-      await reset();
       await getFiles('/home/sander/Documents/talks/ngConf-2020/presentation/videos/');
       activateNextPage();
     },
@@ -132,7 +131,7 @@ const page2Base: Command[] = [
     tile: 14,
     modifier: dblClick,
     action: async () => {
-      await reset();
+      await resetDeck();
       page2.length = 0;
       page2Base.forEach(a => page2.push(a));
       await getFiles('/home/sander/Documents/talks/ngConf-2020/presentation/videos/');
@@ -143,8 +142,7 @@ const page2Base: Command[] = [
     tile: 14,
     image: 'refresh.png',
     action: async () => {
-      await reset();
-      activateNextPage();
+      await activateNextPage();
     },
   },
 ];
@@ -153,4 +151,4 @@ export const page2 = [...page2Base];
 
 export const pages = [commands, page2];
 
-
+activatePage()
