@@ -7,6 +7,7 @@ import {activateNextPage, activatePage} from './utils/activePage';
 import {getFiles} from './utils/getFiles';
 import {i3} from './utils/i3';
 import {clearCountDown, countDown} from './utils/timer';
+import {rejects} from 'assert';
 
 const commands = [
   {
@@ -146,9 +147,68 @@ const page2Base: Command[] = [
     },
   },
 ];
+const page3: Command[] = [
+  {
+    tile: 0,
+    image: 'angular.png',
+    action: async () => {
+      // i3.command('workspace number 3 to output 2');
+      i3.outputs((err, d) =>
+        console.log(
+          d
+            .filter(r => r.active)
+            .sort((x, y) => (x.rect.x < y.rect.x ? -1 : 1))
+            .map(r => r.name)
+        )
+      );
+      i3.workspaces((err, w) => {
+        console.log(w.map(({num, output}) => ({num, output})));
+      });
+      const log = (result) => console.log( result);
+      // await i3Command(`[workspace="1"] move workspace  to output "DisplayPort-0"`).then(log);
+      await i3Command(`[workspace="2"] move workspace  to output "DisplayPort-1"`).then(log);
+      await i3Command(`[workspace="3"] move workspace  to output "DisplayPort-1"`).then(log);
+      await i3Command(`[workspace="10"] move workspace  to output "DisplayPort-2"`).then(log);
+      await i3Command(`[workspace="19"] move workspace  to output "DisplayPort-2"`).then(log);
+      await i3Command(`workspace 1 focus`);
+      await i3Command(`workspace 3 focus`);
+      await i3Command(`workspace 19 focus`);
+    },
+  },
+  {
+    tile: 1,
+    image: 'angular.png',
+    action: () => {
+      const log = (err, result) => console.log(err, result);
+      // i3.command(`[workspace="1"] move workspace  to output "DisplayPort-0"`,log)
+      // i3.command(`[workspace="2"] move workspace  to output "DisplayPort-1"`,log)
+      // i3.command(`[workspace="3"] move workspace  to output "DisplayPort-1"`,log)
+      // i3.command(`[workspace="10"] move workspace  to output "DisplayPort-2"`,log)
+      // i3.command(`[workspace="19"] move workspace  to output "DisplayPort-2"`,log)
+    },
+  },
+  {
+    tile: 14,
+    image: 'refresh.png',
+    action: async () => {
+      await activateNextPage();
+    },
+  },
+];
 
 export const page2 = [...page2Base];
 
-export const pages = [commands, page2];
+export const pages = [commands, page2, page3];
 
-activatePage()
+activatePage(2);
+
+function i3Command(arg) {
+  return new Promise((resolve, reject) => {
+    i3.command(arg, (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(result);
+    });
+  });
+}

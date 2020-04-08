@@ -20,6 +20,7 @@ export const resetDeck = async () => {
     .toPromise();
 };
 
+
 export function installCommand(cmd: Command) {
   try {
     const {tile, modifier, action} = cmd;
