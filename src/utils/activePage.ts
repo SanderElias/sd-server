@@ -1,9 +1,13 @@
 import {pages} from '../commands';
 import {installCommand, resetDeck} from '../streamDeck/installCommand';
+import {logWarn} from './log';
 
 let activePage = 0;
 
 export async function activatePage(n = activePage) {
+  if (n < 0 || n > pages.length - 1) {
+    logWarn(`page "${n}" doesn't exist, keeping page ${activatePage}`);
+  }
   activePage = n;
   await resetDeck();
   pages[n].forEach(installCommand);
