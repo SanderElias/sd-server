@@ -3,10 +3,13 @@ import {readdir} from 'fs';
 import {basename, extname} from 'path';
 import {page2} from '../commands';
 import {i3} from './i3';
-import { activatePage } from './activePage';
+import {activatePage} from './activePage';
 
 export async function getFiles(folder) {
   const files: string[] = await new Promise(r => readdir(folder, (_, f) => r(f)));
+  if (!files) {
+    return;
+  }
   let tile = -1;
   files.forEach(file => {
     const title = basename(file, '.flv');
@@ -42,7 +45,7 @@ function playVid(filename) {
   return `vlc "/home/sander/Documents/talks/ngConf-2020/presentation/videos/${filename}.flv"  --no-osd vlc://quit`;
 }
 
-getFiles('/home/sander/Documents/talks/ngConf-2020/presentation/videos/')
+getFiles('/home/sander/Documents/talks/ngConf-2020/presentation/videos/');
 // .then(() => {
 //   activatePage(1);
 // });

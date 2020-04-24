@@ -1,7 +1,10 @@
-import './utils/exitHandler';
 import './commands';
-import {sdServer, reloadAll} from './server/';
+import {dynamicTs} from './DynamicTs';
+import {reloadAll, sdServer} from './server/';
+import './utils/exitHandler';
 
 sdServer();
 
-setTimeout(() => reloadAll(), 1500);
+setTimeout(() => reloadAll(), 250);
+
+dynamicTs('testAction', 'testAction2').then(f => f && f());
