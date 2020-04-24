@@ -1,6 +1,6 @@
 import {listStreamDecks, openStreamDeck, StreamDeck} from 'elgato-stream-deck';
-import {interval, race, Subject, ReplaySubject} from 'rxjs';
-import {bufferCount, debounceTime, filter, first, map, repeat, switchMap, takeUntil} from 'rxjs/operators';
+import {interval, merge, race, ReplaySubject, Subject} from 'rxjs';
+import {bufferCount, debounceTime, filter, first, map, repeat, switchMap, takeWhile} from 'rxjs/operators';
 import {logWarn} from '../utils/log';
 // const i3 = I3
 const deck = new ReplaySubject<StreamDeck>();
@@ -64,10 +64,24 @@ const cycle$ = down$.pipe(
 const longPress$ = down$.pipe(
   switchMap(key => {
     const start = Date.now();
-    return interval(25).pipe(map(() => ({key, delay: Date.now() - start, double: false, long: true})));
+    return merge(
+      up$.pipe(
+        filter(k => k === key),
+        map(() => true)
+      ),
+      interval(25)
+    ).pipe(
+      map(r => ({
+        key,
+        delay: Date.now() - start,
+        double: false,
+        long: true,
+        up: typeof r === 'boolean',
+      }))
+    );
   }),
+  takeWhile(r => !r.up),
   filter(r => r.delay > 210),
-  takeUntil(up$),
   repeat()
 );
 
@@ -77,8 +91,8 @@ const interClick$ = cycle$.pipe(
 );
 const limit$ = cycle$.pipe(
   bufferCount(2),
-  map(([_a, e]) => {
-    e.double = true;
+  map(([a, e]) => {
+    e.double = a.key === e.key;
     return e;
   })
 );
