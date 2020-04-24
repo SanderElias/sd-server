@@ -299,5 +299,6 @@ function toctick() {
   } else {
     discoff();
   }
+  bulb(8,x)
   x = !x;
 }

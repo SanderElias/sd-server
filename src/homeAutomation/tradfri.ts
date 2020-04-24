@@ -110,41 +110,27 @@ export function discoff() {
   clearTimeout(dc);
 }
 export function disco() {
-  const shg = devices.get(131086) as Group;
-  console.log(shg.deviceIDs);
-  // const devList = [...devices.values()]
-  //   .filter(d => d?.name?.toLowerCase().includes('show') && d instanceof Accessory)
-  //   .map(d => d?.instanceId);
-  const devList = [65585, 65543]; //shg.deviceIDs.filter(id => id !== shg.instanceId);
-  console.log(devList);
-
-  devList.forEach(d => console.log(devices.get(d)?.name));
-  const fl = (n = -1) => {
+  const devList = [65585, 65543];
+  const flash = (n = -1) => {
     n += 1;
     if (n >= devList.length) {
       n = 0;
     }
     devList.forEach(async (d, i) => {
-      console.log({n, i});
       try {
         const device = devices.get(d) as Accessory;
-        const plug = device?.plugList[0];
-        // console.log(device.name);
-        if (!plug) {
-          return;
-        }
+        const plug = device.plugList[0];
         if (i === n) {
           plug.turnOn();
         } else {
           plug.turnOff();
         }
       } catch (e) {
-        // console.log('err', e);
       }
     });
-    dc = setTimeout(() => fl(n), 500);
+    dc = setTimeout(() => flash(n), 500);
   };
-  fl();
+  flash();
 }
 
 function handleTradfriError(e: {code: any}) {
