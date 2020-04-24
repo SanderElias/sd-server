@@ -30,12 +30,9 @@
     "elgato-stream-deck": "^3.3.0",
     "express": "^4.17.1",
     "i3": "^0.2.1",
-<<<<<<< HEAD
     "jsonc": "^2.0.0",
     "node-fetch": "^2.6.0",
-=======
     "node-tradfri-client": "^2.1.5",
->>>>>>> d53430fd0704d9692a901c08d97605803044aba8
     "open": "^7.0.3",
     "puppeteer-core": "^2.1.1",
     "pureimage": "^0.2.1",
