@@ -1,17 +1,15 @@
 import {exec} from 'child_process';
 import open from 'open';
 import {distinctUntilChanged, filter, map, repeat, tap} from 'rxjs/operators';
-import {i3Command, i3Outputs, i3WorksSpaces, moveWP, i3Tree, I3Tree, PurpleNode} from './i3Command';
+import {buroToggle, isBuroAan, isTestBuroAan, tradfriInit, disco, discoff} from './homeAutomation/tradfri';
+import {i3Command, i3Outputs, i3Tree, I3Tree, i3WorksSpaces, moveWP, PurpleNode} from './i3Command';
 import {Command} from './streamDeck/Command.interface';
-import {resetDeck} from './streamDeck/installCommand';
+import {loadImage} from './streamDeck/loadImage';
 import {dblClick, longPress} from './streamDeck/streamDeck';
 import {activateNextPage, activatePage} from './utils/activePage';
 import {getFiles} from './utils/getFiles';
 import {i3} from './utils/i3';
-import {clearCountDown, countDown} from './utils/timer';
-import {writeFileSync} from 'fs';
-import {join} from 'path';
-import { tradfri } from './homeAutomation/tradfri';
+import {page2Base} from './page2Base';
 
 const commands = [
   {
@@ -121,36 +119,6 @@ const commands = [
   },
 ];
 
-const page2Base: Command[] = [
-  {
-    tile: 13,
-    image: 'alarm.png',
-    action: countDown,
-  },
-  {
-    tile: 13,
-    modifier: dblClick,
-    action: clearCountDown,
-  },
-  {
-    tile: 14,
-    modifier: dblClick,
-    action: async () => {
-      await resetDeck();
-      page2.length = 0;
-      page2Base.forEach(a => page2.push(a));
-      await getFiles('/home/sander/Documents/talks/ngConf-2020/presentation/videos/');
-      activatePage(1);
-    },
-  },
-  {
-    tile: 14,
-    image: 'refresh.png',
-    action: async () => {
-      await activateNextPage();
-    },
-  },
-];
 const page3: Command[] = [
   {
     tile: 0,
@@ -225,7 +193,13 @@ const page3: Command[] = [
       console.log(
         nodes
           .filter(node => node.window_properties)
-          .map(n => ({class: n.type, title: n.window_properties?.title, name: n.name, parent:n.parentId, r: getById(n.parentId)?.layout}))
+          .map(n => ({
+            class: n.type,
+            title: n.window_properties?.title,
+            name: n.name,
+            parent: n.parentId,
+            r: getById(n.parentId)?.layout,
+          }))
           .sort((x, y) => (x.parent < y.parent ? -1 : 1))
       );
     },
@@ -239,9 +213,26 @@ const page3: Command[] = [
   },
   {
     tile: 6,
-    image: 'drive.png',
-    action: () => {
-      tradfri();
+    image: 'bulbOff.png',
+    action: async () => {
+      await tradfriInit();
+      await updateTest();
+    },
+  },
+  {
+    tile: 7,
+    image: 'bulbOff.png',
+    action: async () => {
+      const me = getTile(page3, 7);
+      await buroToggle();
+      await updateBuro();
+    },
+  },
+  {
+    tile: 8,
+    image: 'bulbOff.png',
+    action: async () => {
+      await toctick();
     },
   },
   {
@@ -255,11 +246,37 @@ const page3: Command[] = [
 
 export const page2 = [...page2Base];
 
-export const pages = [commands, page2, page3];
+export const pages = [commands, page3];
 
-activatePage(2);
+activatePage(1);
 
-const cycle = () => {
+function getTile(page: Command[], num: any) {
+  return page.find(r => r.tile === num);
+}
+
+async function bulb(tile, prom) {
+  const t = getTile(page3, tile)!;
+  if (await prom) {
+    t.image = 'bulbOn.png';
+  } else {
+    t.image = 'bulbOff.png';
+  }
+  loadImage(t);
+}
+async function updateBuro() {
+  return await bulb(7, isBuroAan());
+}
+async function updateTest() {
+  /** put in a small timeout to account for new status settling in */
+  await new Promise(r => setTimeout(r, 150));
+  return await bulb(6, isTestBuroAan());
+}
+setTimeout(() => {
+  updateBuro();
+  updateTest();
+}, 1500);
+
+const cyclePages = () => {
   longPress(14)
     .pipe(
       map(r => Math.floor(r.delay / 1500)),
@@ -273,6 +290,14 @@ const cycle = () => {
     });
 };
 
-cycle();
+cyclePages();
 
-
+let x = true;
+function toctick() {
+  if (x) {
+    disco();
+  } else {
+    discoff();
+  }
+  x = !x;
+}
