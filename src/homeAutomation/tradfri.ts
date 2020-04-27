@@ -6,10 +6,12 @@ import {
   TradfriError,
   TradfriErrorCodes,
   GatewayDetails,
+  AccessoryTypes,
 } from 'node-tradfri-client';
 import {join} from 'path';
 import {bufferToggle, shareReplay} from 'rxjs/operators';
-import {Subject} from 'rxjs';
+import {Subject, merge} from 'rxjs';
+import {dailyTimer} from '../scheduledTaks/simpleTimer';
 
 const settingsFile = join(__dirname, '../../../serials.json');
 const settings = JSON.parse(readFileSync(settingsFile).toString('utf8'));
@@ -61,7 +63,6 @@ export async function buroToggle() {
 export async function isBuroAan() {
   await isInit;
   const buro = devices.get(131079) as Group;
-  console.log({buro});
   return buro?.onOff;
 }
 
@@ -109,7 +110,7 @@ let dc: NodeJS.Timeout;
 export function discoff() {
   clearTimeout(dc);
 }
-export function disco() {
+export function disco1() {
   const devList = [65585, 65543];
   const flash = (n = -1) => {
     n += 1;
@@ -125,12 +126,20 @@ export function disco() {
         } else {
           plug.turnOff();
         }
-      } catch (e) {
-      }
+      } catch (e) {}
     });
     dc = setTimeout(() => flash(n), 500);
   };
   flash();
+}
+
+export async function disco() {
+  [...devices.values()].forEach(d => {
+    if (!(d instanceof Accessory) || d.type !== AccessoryTypes.motionSensor) {
+      return;
+    }
+    console.log(d.constructor.name, d.name, d.type);
+  });
 }
 
 function handleTradfriError(e: {code: any}) {
@@ -186,3 +195,18 @@ async function getAuth(id: string, secret: string) {
     return {};
   }
 }
+
+
+merge(dailyTimer('18:00'), dailyTimer('20:00'), dailyTimer('21:00')).subscribe(async () => {
+  await isInit;
+  const buro = devices.get(131079) as Group;
+  buro.turnOff();
+});
+
+merge(dailyTimer('21:00'), dailyTimer('21:45'), dailyTimer('22:30'), dailyTimer('23:30')).subscribe(
+  async () => {
+    await isInit;
+    const showRoom = devices.get(131086) as Group;
+    showRoom.turnOff();
+  }
+);
