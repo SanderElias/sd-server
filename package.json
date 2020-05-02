@@ -20,7 +20,7 @@
     "@types/sharp": "^0.24.0",
     "@types/stream-buffers": "^3.0.3",
     "@types/websocket": "^1.0.0",
-    "@types/ws": "^7.2.2",
+    "@types/ws": "^7.2.4",
     "cbor": "^5.0.1",
     "chalk": "^3.0.0",
     "clipboardy": "^2.2.0",
@@ -38,6 +38,7 @@
     "stream-buffers": "^3.0.2",
     "tsc-watch": "^4.2.3",
     "tslib": "^1.10.0",
+    "ws": "^7.2.5",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {

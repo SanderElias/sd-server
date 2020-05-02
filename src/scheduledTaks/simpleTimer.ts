@@ -17,6 +17,11 @@ const timeDefaults: Time = {
 
 const day = 24 * 60 * 60 * 1000;
 
+/**
+ *  creates an observable that emites daily on the given time.
+ * can filter on weekdays
+ * @param givenTime takes a `Time` interface or a time string
+ */
 export function dailyTimer(givenTime: Partial<Time> | string) {
   if (typeof givenTime === 'string') {
     const [hour, minute, second] = givenTime
@@ -37,6 +42,5 @@ export function dailyTimer(givenTime: Partial<Time> | string) {
   ).getTime();
   const now = d.getTime();
   const dueTime = run - now < 0 ? run - now + day : run - now;
-  console.log({run, offset: dueTime, now, givenTime, d});
   return timer(dueTime, day).pipe(filter(() => time.days.includes(new Date().getDay())));
 }

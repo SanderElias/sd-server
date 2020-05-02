@@ -1,24 +1,21 @@
-import {readFileSync, writeFileSync} from 'fs';
+import {writeFileSync} from 'fs';
 import {
   Accessory,
+  AccessoryTypes,
   Group,
   TradfriClient,
   TradfriError,
   TradfriErrorCodes,
-  GatewayDetails,
-  AccessoryTypes,
 } from 'node-tradfri-client';
-import {join} from 'path';
-import {bufferToggle, shareReplay} from 'rxjs/operators';
-import {Subject, merge} from 'rxjs';
+import {merge, Subject} from 'rxjs';
 import {dailyTimer} from '../scheduledTaks/simpleTimer';
+import {getSettings, updateSettings} from './settings';
 
-const settingsFile = join(__dirname, '../../../serials.json');
-const settings = JSON.parse(readFileSync(settingsFile).toString('utf8'));
-
+const settings = getSettings();
 const inits = new Subject<void>();
 const devices = new Map<number, Accessory | Group>();
 const isInit = init();
+
 export async function tradfriInit() {
   await isInit;
 
@@ -27,7 +24,7 @@ export async function tradfriInit() {
 
 async function init(tr = 0) {
   const {identity: tdId, psk, id} = await getIdPsk();
-  const tradfri = new TradfriClient(id, {watchConnection: true});
+  const tradfri = new TradfriClient(id!, {watchConnection: true});
   try {
     await tradfri.connect(tdId, psk);
   } catch (e) {
@@ -74,6 +71,41 @@ export async function toggleDevice(deviceId: number) {
     device.turnOff();
   } else {
     device.turnOn();
+  }
+}
+
+const isGroup = (d: any): d is Group => typeof d === 'object' && d instanceof Group;
+
+export async function turnOn(deviceId: number) {
+  await isInit;
+  const device = devices.get(deviceId);
+  try {
+    if (isGroup(device)) {
+      // tslint:disable-next-line: no-unused-expression
+      device.onOff === false && (await device.turnOn());
+    }
+    if (device instanceof Accessory) {
+      device.lightList?.forEach(l => l.onOff === false && l.turnOn());
+      device.plugList?.forEach(p => p.onOff === false && p.turnOn());
+    }
+  } catch (e) {
+    console.log(`error while turning ${device?.name} off`, e);
+  }
+}
+export async function turnOff(deviceId: number) {
+  await isInit;
+  const device = devices.get(deviceId);
+  try {
+    if (isGroup(device)) {
+      // tslint:disable-next-line: no-unused-expression
+      device.onOff && (await device.turnOff());
+    }
+    if (device instanceof Accessory) {
+      device.lightList?.forEach(l => l.onOff && l.turnOff());
+      device.plugList?.forEach(p => p.onOff && p.turnOff());
+    }
+  } catch (e) {
+    console.log(`error while turning ${device?.name} off`, e);
   }
 }
 
@@ -176,7 +208,7 @@ async function getIdPsk() {
       const {identity, psk} = await getAuth(tradfri.id, tradfri.securityCode);
       tradfri.identity = identity;
       tradfri.psk = psk;
-      writeFileSync(settingsFile, JSON.stringify(settings));
+      updateSettings(settings);
       return {identity, psk, id: tradfri.id};
     }
     return {identity: tradfri.identity, psk: tradfri.psk, id: tradfri.id};
@@ -195,7 +227,6 @@ async function getAuth(id: string, secret: string) {
     return {};
   }
 }
-
 
 merge(dailyTimer('18:00'), dailyTimer('20:00'), dailyTimer('21:00')).subscribe(async () => {
   await isInit;

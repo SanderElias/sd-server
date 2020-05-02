@@ -1,0 +1,24 @@
+
+  "31": {
+    "etag": "150cbdaa1d6f804a06f25e39cf21ebc9",
+    "hascolor": false,
+    "manufacturername": "dresden elektronik",
+    "modelid": "ConBee II",
+    "name": "Configuration tool 1",
+    "state": {"reachable": true},
+    "swversion": "0x264a0700",
+    "type": "Configuration tool",
+    "uniqueid": "00:21:2e:ff:ff:05:ab:26-01"
+  },
+  "33": {
+    "etag": "240e50eb79e5186bc38278effcb77e4b",
+    "hascolor": false,
+    "manufacturername": "IKEA of Sweden",
+    "modelid": "TRADFRI bulb E27 W opal 1000lm",
+    "name": "Dimmable light 3",
+    "state": {"alert": "none", "bri": 254, "on": true, "reachable": true},
+    "swversion": "1.2.214",
+    "type": "Dimmable light",
+    "uniqueid": "90:fd:9f:ff:fe:29:9b:87-01"
+  }
+
