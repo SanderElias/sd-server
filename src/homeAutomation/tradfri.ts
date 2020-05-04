@@ -69,6 +69,7 @@ export async function toggleDevice(deviceId: number) {
   await isInit;
   // tslint:disable-next-line: no-non-null-assertion
   const device = (devices.get(deviceId) as Accessory)!.plugList[0];
+  console.log(device);
   if (device.onOff) {
     device.turnOff();
   } else {
@@ -125,8 +126,7 @@ export function disco() {
         } else {
           plug.turnOff();
         }
-      } catch (e) {
-      }
+      } catch (e) {}
     });
     dc = setTimeout(() => flash(n), 500);
   };
@@ -167,6 +167,7 @@ async function getIdPsk() {
       const {identity, psk} = await getAuth(tradfri.id, tradfri.securityCode);
       tradfri.identity = identity;
       tradfri.psk = psk;
+      console.log('new psk', psk);
       writeFileSync(settingsFile, JSON.stringify(settings));
       return {identity, psk, id: tradfri.id};
     }
@@ -183,6 +184,7 @@ async function getAuth(id: string, secret: string) {
     const {identity, psk} = await tradfri.authenticate(secret).catch();
     return {identity, psk};
   } catch (e) {
+    console.log(e)
     return {};
   }
 }

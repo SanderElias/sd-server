@@ -23,7 +23,6 @@ export const dynamicTs = async (file: string, fnName: string) => {
     compilerOptions: {module: ModuleKind.CommonJS, target: ScriptTarget.ES5},
   });
 
-  // console.log(result);
   const out = join(__dirname, '/actions/', 'tmp' + Date.now().toString(36) + '.js');
   writeFileSync(out, result.outputText);
 
