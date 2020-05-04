@@ -1,22 +1,21 @@
-import {readFileSync, writeFileSync} from 'fs';
+import {writeFileSync} from 'fs';
 import {
   Accessory,
+  AccessoryTypes,
   Group,
   TradfriClient,
   TradfriError,
   TradfriErrorCodes,
-  GatewayDetails,
 } from 'node-tradfri-client';
-import {join} from 'path';
-import {bufferToggle, shareReplay} from 'rxjs/operators';
-import {Subject} from 'rxjs';
+import {merge, Subject} from 'rxjs';
+import {dailyTimer} from '../scheduledTaks/simpleTimer';
+import {getSettings, updateSettings} from './settings';
 
-const settingsFile = join(__dirname, '../../../serials.json');
-const settings = JSON.parse(readFileSync(settingsFile).toString('utf8'));
-
+const settings = getSettings();
 const inits = new Subject<void>();
 const devices = new Map<number, Accessory | Group>();
 const isInit = init();
+
 export async function tradfriInit() {
   await isInit;
 
@@ -25,7 +24,7 @@ export async function tradfriInit() {
 
 async function init(tr = 0) {
   const {identity: tdId, psk, id} = await getIdPsk();
-  const tradfri = new TradfriClient(id, {watchConnection: true});
+  const tradfri = new TradfriClient(id!, {watchConnection: true});
   try {
     await tradfri.connect(tdId, psk);
   } catch (e) {
@@ -61,7 +60,6 @@ export async function buroToggle() {
 export async function isBuroAan() {
   await isInit;
   const buro = devices.get(131079) as Group;
-  console.log({buro});
   return buro?.onOff;
 }
 
@@ -74,6 +72,41 @@ export async function toggleDevice(deviceId: number) {
     device.turnOff();
   } else {
     device.turnOn();
+  }
+}
+
+const isGroup = (d: any): d is Group => typeof d === 'object' && d instanceof Group;
+
+export async function turnOn(deviceId: number) {
+  await isInit;
+  const device = devices.get(deviceId);
+  try {
+    if (isGroup(device)) {
+      // tslint:disable-next-line: no-unused-expression
+      await device.turnOn();
+    }
+    if (device instanceof Accessory) {
+      device.lightList?.forEach(l => l.onOff === false && l.turnOn());
+      device.plugList?.forEach(p => p.onOff === false && p.turnOn());
+    }
+  } catch (e) {
+    console.log(`error while turning ${device?.name} off`, e);
+  }
+}
+export async function turnOff(deviceId: number) {
+  await isInit;
+  const device = devices.get(deviceId);
+  try {
+    if (isGroup(device)) {
+      // tslint:disable-next-line: no-unused-expression
+      await device.turnOff();
+    }
+    if (device instanceof Accessory) {
+      device.lightList?.forEach(l => l.onOff && l.turnOff());
+      device.plugList?.forEach(p => p.onOff && p.turnOff());
+    }
+  } catch (e) {
+    console.log(`error while turning ${device?.name} off`, e);
   }
 }
 
@@ -110,7 +143,7 @@ let dc: NodeJS.Timeout;
 export function discoff() {
   clearTimeout(dc);
 }
-export function disco() {
+export function disco1() {
   const devList = [65585, 65543];
   const flash = (n = -1) => {
     n += 1;
@@ -131,6 +164,15 @@ export function disco() {
     dc = setTimeout(() => flash(n), 500);
   };
   flash();
+}
+
+export async function disco() {
+  [...devices.values()].forEach(d => {
+    if (!(d instanceof Accessory) || d.type !== AccessoryTypes.motionSensor) {
+      return;
+    }
+    console.log(d.constructor.name, d.name, d.type);
+  });
 }
 
 function handleTradfriError(e: {code: any}) {
@@ -167,8 +209,7 @@ async function getIdPsk() {
       const {identity, psk} = await getAuth(tradfri.id, tradfri.securityCode);
       tradfri.identity = identity;
       tradfri.psk = psk;
-      console.log('new psk', psk);
-      writeFileSync(settingsFile, JSON.stringify(settings));
+      updateSettings(settings);
       return {identity, psk, id: tradfri.id};
     }
     return {identity: tradfri.identity, psk: tradfri.psk, id: tradfri.id};
@@ -188,3 +229,17 @@ async function getAuth(id: string, secret: string) {
     return {};
   }
 }
+
+merge(dailyTimer('18:00'), dailyTimer('20:00'), dailyTimer('21:00')).subscribe(async () => {
+  await isInit;
+  const buro = devices.get(131079) as Group;
+  buro.turnOff();
+});
+
+merge(dailyTimer('21:00'), dailyTimer('21:45'), dailyTimer('22:30'), dailyTimer('23:30')).subscribe(
+  async () => {
+    await isInit;
+    const showRoom = devices.get(131086) as Group;
+    showRoom.turnOff();
+  }
+);

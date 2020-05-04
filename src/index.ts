@@ -1,5 +1,6 @@
 import './commands';
 import {dynamicTs} from './DynamicTs';
+import './homeAutomation/deconz';
 import {reloadAll, sdServer} from './server/';
 import './utils/exitHandler';
 

@@ -1,0 +1,138 @@
+[
+  {
+    "config": {"alert": "none", "delay": 180, "duration": 122, "group": "3", "on": true, "reachable": true},
+    "e": "changed",
+    "id": "3",
+    "r": "sensors",
+    "t": "event",
+    "uniqueid": "14:b4:57:ff:fe:54:9e:32-01-0006"
+  },
+  {
+    "e": "changed",
+    "id": "3",
+    "r": "sensors",
+    "state": {"dark": true, "lastupdated": "2020-04-30T02:49:50", "presence": true},
+    "t": "event",
+    "uniqueid": "14:b4:57:ff:fe:54:9e:32-01-0006"
+  },
+  {
+    "e": "changed",
+    "id": "12",
+    "r": "sensors",
+    "state": {"lastupdated": "2020-04-30T02:49:50", "presence": true},
+    "t": "event",
+    "uniqueid": "vpir-1588171190744"
+  },
+  {
+    "e": "changed",
+    "id": "13",
+    "r": "sensors",
+    "state": {"lastupdated": "2020-04-30T02:49:50", "status": 1},
+    "t": "event",
+    "uniqueid": "fsm-state-1588171190744"
+  },
+  {
+    "e": "changed",
+    "id": "12",
+    "r": "sensors",
+    "state": {"lastupdated": "2020-04-30T02:50:50", "presence": false},
+    "t": "event",
+    "uniqueid": "vpir-1588171190744"
+  },
+  {
+    "e": "changed",
+    "id": "12",
+    "r": "sensors",
+    "state": {"lastupdated": "2020-04-30T02:50:50", "presence": true},
+    "t": "event",
+    "uniqueid": "vpir-1588171190744"
+  },
+  {
+    "e": "changed",
+    "id": "13",
+    "r": "sensors",
+    "state": {"lastupdated": "2020-04-30T02:50:50", "status": 1},
+    "t": "event",
+    "uniqueid": "fsm-state-1588171190744"
+  },
+  {
+    "config": {"alert": "none", "battery": 47, "group": "4", "on": true, "reachable": true},
+    "e": "changed",
+    "id": "5",
+    "r": "sensors",
+    "t": "event",
+    "uniqueid": "90:fd:9f:ff:fe:e4:29:b0-01-1000"
+  },
+  {
+    "e": "changed",
+    "id": "12",
+    "r": "sensors",
+    "state": {"lastupdated": "2020-04-30T02:51:49", "presence": false},
+    "t": "event",
+    "uniqueid": "vpir-1588171190744"
+  },
+  {
+    "e": "changed",
+    "id": "13",
+    "r": "sensors",
+    "state": {"lastupdated": "2020-04-30T02:51:49", "status": 2},
+    "t": "event",
+    "uniqueid": "fsm-state-1588171190744"
+  },
+  {
+    "e": "changed",
+    "id": "12",
+    "r": "sensors",
+    "state": {"lastupdated": "2020-04-30T02:51:49", "presence": true},
+    "t": "event",
+    "uniqueid": "vpir-1588171190744"
+  },
+  {
+    "e": "changed",
+    "id": "13",
+    "r": "sensors",
+    "state": {"lastupdated": "2020-04-30T02:51:49", "status": 1},
+    "t": "event",
+    "uniqueid": "fsm-state-1588171190744"
+  },
+  {
+    "e": "changed",
+    "id": "3",
+    "r": "sensors",
+    "state": {"dark": true, "lastupdated": "2020-04-30T02:51:52", "presence": false},
+    "t": "event",
+    "uniqueid": "14:b4:57:ff:fe:54:9e:32-01-0006"
+  },
+  {
+    "config": {"alert": "none", "delay": 180, "duration": 122, "group": "3", "on": true, "reachable": true},
+    "e": "changed",
+    "id": "3",
+    "r": "sensors",
+    "t": "event",
+    "uniqueid": "14:b4:57:ff:fe:54:9e:32-01-0006"
+  },
+  {
+    "e": "changed",
+    "id": "3",
+    "r": "sensors",
+    "state": {"dark": true, "lastupdated": "2020-04-30T02:51:54", "presence": true},
+    "t": "event",
+    "uniqueid": "14:b4:57:ff:fe:54:9e:32-01-0006"
+  },
+  {
+    "e": "changed",
+    "id": "12",
+    "r": "sensors",
+    "state": {"lastupdated": "2020-04-30T02:51:54", "presence": true},
+    "t": "event",
+    "uniqueid": "vpir-1588171190744"
+  },
+  {
+    "e": "changed",
+    "id": "13",
+    "r": "sensors",
+    "state": {"lastupdated": "2020-04-30T02:51:54", "status": 1},
+    "t": "event",
+    "uniqueid": "fsm-state-1588171190744"
+  }
+]
