@@ -2,11 +2,11 @@ import {httpGetJson} from '../utils/httpGetJson';
 import {getSettings, updateSettings} from './settings';
 import {readFileSync, writeFileSync} from 'fs';
 import {join} from 'path';
-import {Subject, timer, merge, of} from 'rxjs';
-import {map, tap, filter, switchMap, startWith} from 'rxjs/operators';
+import {Subject, timer, merge, of, EMPTY, Observable} from 'rxjs';
+import {map, tap, filter, switchMap, shareReplay} from 'rxjs/operators';
 
 import WebSocket from 'ws';
-import {DeConfig, Aak, Whitelist, WsSmartEvent, Sensors, Sensor} from './deconz.interfaces';
+import {DeConfig, Aak, Whitelist, WsSmartEvent, Sensors, Sensor, State} from './deconz.interfaces';
 import {turnOn, turnOff} from './tradfri';
 
 const url = part => `http://localhost/api/${deconz.apiKey}/${part}`;
@@ -16,23 +16,25 @@ const devices = new Map<string, Sensor>();
 
 export const zigbeeEvents$ = events$$.pipe(
   filter(ev => devices.has(ev.uniqueid)),
-  map(
-    (ev: WsSmartEvent): Sensor => {
+  switchMap(
+    (ev: WsSmartEvent): Observable<Sensor | undefined> => {
       // tslint:disable-next-line: no-non-null-assertion
       const device = devices.get(ev.uniqueid)!;
       if (ev.state) {
         device.state = {...device.state, ...ev.state};
+        return of(device);
       }
       if (ev.config) {
         device.config = {...device.config, ...ev.config};
       }
-      return device;
+      return of(undefined);
     }
   ),
-  // filter(d => typeof d !== 'undefined'),
+  filter((d: any) => typeof d !== 'undefined'),
   tap((d: Sensor) => {
     console.log(d.name, d.state?.presence || d.state?.buttonevent);
-  })
+  }),
+  shareReplay(1)
 );
 
 const getConfig = async (): Promise<DeConfig> => {
@@ -97,22 +99,54 @@ const init = async () => {
   console.table([...devices.values()]);
 };
 
-init();
+const isInit = init();
 
+/** turn on at program start, and start listening to motion sensor */
 merge(zigbeeEvents$, of({name: 'Buro motion sensor', state: {presence: true}} as Sensor))
   .pipe(
+    /** only listen for 'motion detected, ignoring 'off' */
     filter(sensor => sensor.name === 'Buro motion sensor' && sensor.state?.presence === true),
     tap(async s => {
-      console.log('turn on' + new Date().toTimeString().slice(0, 8));
+      console.log('turn on ' + new Date().toTimeString().slice(0, 8));
+      /** turn on related light (monitors and desk lights) */
       await turnOn(1310798);
     }),
+    /** start a timer, auto reset by above */
     switchMap(s => timer(15 * 60 * 1000)),
     tap(() => {
-      console.log('turn off' + new Date().toTimeString().slice(0, 8));
-
+      console.log('turn off ' + new Date().toTimeString().slice(0, 8));
       turnOff(131079);
     })
   )
   .subscribe();
 
+
 // turnOn(65579)
+
+const testLamp = async (lamp = '90:fd:9f:ff:fe:29:9b:87-01') => {
+  await isInit;
+  const dev = devices.get(lamp);
+  const state: State = {on: true, bri: 125};
+  console.log(state);
+  const r = await httpGetJson(url(`lights/${dev?._id}/state`), {method: 'put', data: state}).catch(e =>
+    console.error(e)
+  );
+  console.log('r', r);
+  return r;
+};
+
+testLamp();
+
+zigbeeEvents$
+  .pipe(
+    filter(
+      sensor =>
+        sensor.name === 'TRÅDFRI remote control' &&
+        sensor.state?.buttonevent !== undefined &&
+        [3001, 3003].includes(sensor.state.buttonevent)
+    ),
+    map(sensor => sensor.state.buttonevent),
+    switchMap(ev => (ev === 3001 ? timer(0, 250) : EMPTY)),
+    tap(sensor => console.log(sensor))
+  )
+  .subscribe();

@@ -1,4 +1,5 @@
 import {exec} from 'child_process';
+
 import open from 'open';
 import {distinctUntilChanged, filter, map, repeat, tap} from 'rxjs/operators';
 import {buroToggle, isBuroAan, isTestBuroAan, tradfriInit, disco, discoff} from './homeAutomation/tradfri';
@@ -299,6 +300,9 @@ function toctick() {
   } else {
     discoff();
   }
-  bulb(8,x)
+  bulb(8, x);
   x = !x;
 }
+
+// 06 53 79 61 46, bastansen
+const lamp = '90:fd:9f:ff:fe:29:9b:87-01';

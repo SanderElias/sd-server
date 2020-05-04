@@ -82,7 +82,7 @@ export async function turnOn(deviceId: number) {
   try {
     if (isGroup(device)) {
       // tslint:disable-next-line: no-unused-expression
-      device.onOff === false && (await device.turnOn());
+      await device.turnOn();
     }
     if (device instanceof Accessory) {
       device.lightList?.forEach(l => l.onOff === false && l.turnOn());
@@ -98,7 +98,7 @@ export async function turnOff(deviceId: number) {
   try {
     if (isGroup(device)) {
       // tslint:disable-next-line: no-unused-expression
-      device.onOff && (await device.turnOff());
+      await device.turnOff();
     }
     if (device instanceof Accessory) {
       device.lightList?.forEach(l => l.onOff && l.turnOff());

@@ -17,7 +17,7 @@ export const logWarnOnce = (...args) => {
 interface httpGetJsonOptions {
   suppressErrors?: boolean;
   headers?: HeadersObject;
-  method?: 'get' | 'post'|'delete';
+  method?: 'get' | 'post' | 'delete' | 'put';
   data?: any;
 }
 
@@ -96,7 +96,7 @@ on url: ${url}`);
         resolve(undefined);
       }
     });
-    if (method === 'post' && data !== undefined) {
+    if (method && ['post', 'put'].includes(method) && data !== undefined) {
       req.write(rawPostData);
     }
     req.end();
