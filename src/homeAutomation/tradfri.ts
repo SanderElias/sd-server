@@ -67,6 +67,7 @@ export async function toggleDevice(deviceId: number) {
   await isInit;
   // tslint:disable-next-line: no-non-null-assertion
   const device = (devices.get(deviceId) as Accessory)!.plugList[0];
+  console.log(device);
   if (device.onOff) {
     device.turnOff();
   } else {
@@ -224,6 +225,7 @@ async function getAuth(id: string, secret: string) {
     const {identity, psk} = await tradfri.authenticate(secret).catch();
     return {identity, psk};
   } catch (e) {
+    console.log(e)
     return {};
   }
 }

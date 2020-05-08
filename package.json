@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "cd src && tsc-watch --onSuccess 'node ../dist/server/index.js' --noClear"
+    "start": "cd src && tsc-watch --onSuccess 'node --experimental-vm-modules ../dist/server/index.js' --noClear"
   },
   "dependencies": {
     "@angular/animations": "~9.0.2",
@@ -17,6 +17,7 @@
     "@angular/router": "~9.0.2",
     "@julusian/jpeg-turbo": "^0.5.3",
     "@types/cbor": "^5.0.0",
+    "@types/node-fetch": "^2.5.5",
     "@types/sharp": "^0.24.0",
     "@types/stream-buffers": "^3.0.3",
     "@types/websocket": "^1.0.0",
@@ -29,6 +30,8 @@
     "elgato-stream-deck": "^3.3.0",
     "express": "^4.17.1",
     "i3": "^0.2.1",
+    "jsonc": "^2.0.0",
+    "node-fetch": "^2.6.0",
     "node-tradfri-client": "^2.1.5",
     "open": "^7.0.3",
     "puppeteer-core": "^2.1.1",
@@ -48,7 +51,7 @@
     "@angular/language-service": "~9.0.2",
     "@types/jasmine": "~3.5.0",
     "@types/jasminewd2": "~2.0.3",
-    "@types/node": "^13.9.1",
+    "@types/node": "^13.11.0",
     "codelyzer": "^5.1.2",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~4.2.1",

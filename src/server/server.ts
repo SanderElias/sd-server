@@ -4,6 +4,7 @@ import compression from 'compression';
 import {join, resolve} from 'path';
 import {settings} from './settings';
 import {injectReloadMiddleware} from './injectReloadMiddleware';
+import { src } from '../DynamicTs';
 
 export async function sdServer() {
   try {
@@ -18,7 +19,6 @@ export async function sdServer() {
       setHeaders(res, path, stat) {
         res.set('x-timestamp', Date.now());
       },
-
     };
     const hostFolder = join(__dirname, settings.publicFolder);
     // console.log(hostFolder);
@@ -26,9 +26,12 @@ export async function sdServer() {
     const server = express();
     server.use(compression());
     // server.use(injectReloadMiddleware)
-    server.get('/image/:fileName', function(req, res) {
+    server.get('/action/:fileName', (req, res) => {
+      const asset = resolve(src, 'actions', req.params.fileName);
+      res.sendFile(asset);
+    });
+    server.get('/assets/:fileName', (req, res) => {
       const asset = resolve(__dirname, '../../../assets', req.params.fileName);
-      // console.log(asset);
       res.sendFile(asset);
     });
     server.use(express.static(hostFolder, options));
