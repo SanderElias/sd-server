@@ -1,13 +1,10 @@
-import {httpGetJson} from '../utils/httpGetJson';
-import {getSettings, updateSettings} from './settings';
-import {readFileSync, writeFileSync} from 'fs';
-import {join} from 'path';
-import {Subject, timer, merge, of, EMPTY, Observable} from 'rxjs';
-import {map, tap, filter, switchMap, shareReplay} from 'rxjs/operators';
-
+import {EMPTY, merge, Observable, of, Subject, timer} from 'rxjs';
+import {filter, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 import WebSocket from 'ws';
-import {DeConfig, Aak, Whitelist, WsSmartEvent, Sensors, Sensor, State} from './deconz.interfaces';
-import {turnOn, turnOff} from './tradfri';
+import {httpGetJson} from '../utils/httpGetJson';
+import {Aak, DeConfig, Sensor, Sensors, State, Whitelist, WsSmartEvent} from './deconz.interfaces';
+import {getSettings, updateSettings} from './settings';
+import {turnOff, turnOn} from './tradfri';
 
 const url = part => `http://localhost/api/${deconz.apiKey}/${part}`;
 const {deconz} = getSettings();
@@ -96,7 +93,8 @@ const init = async () => {
     devices
   );
   // zigbeeEvents$.subscribe();
-  console.table([...devices.values()]);
+  // console.table([...devices.values()]);
+  console.log(await getConfig());
 };
 
 const isInit = init();
@@ -109,17 +107,16 @@ merge(zigbeeEvents$, of({name: 'Buro motion sensor', state: {presence: true}} as
     tap(async s => {
       console.log('turn on ' + new Date().toTimeString().slice(0, 8));
       /** turn on related light (monitors and desk lights) */
-      await turnOn(1310798);
+      await turnOn(131079);
     }),
     /** start a timer, auto reset by above */
     switchMap(s => timer(15 * 60 * 1000)),
-    tap(() => {
+    tap(async () => {
       console.log('turn off ' + new Date().toTimeString().slice(0, 8));
-      turnOff(131079);
+      await turnOff(131079);
     })
   )
   .subscribe();
-
 
 // turnOn(65579)
 
@@ -150,3 +147,5 @@ zigbeeEvents$
     tap(sensor => console.log(sensor))
   )
   .subscribe();
+
+

@@ -27,9 +27,12 @@ export function i3Outputs(): Promise<Outputs> {
         /** sort on left to right order */
         .sort((x, y) => (x.rect.x < y.rect.x ? -1 : 1))
         /** extract only the names */
-        .map(r => r.name);
+        .map(r => {
+          console.log(r.name,r.rect)
+          return r.name});
       const [left, middle, right, ...rest] = displays;
       const result = {left, middle, right, rest};
+      console.log(result)
       resolve(result);
     });
   });

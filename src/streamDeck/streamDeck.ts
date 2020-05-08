@@ -4,7 +4,8 @@ import {bufferCount, debounceTime, filter, first, map, repeat, switchMap, takeWh
 import {logWarn} from '../utils/log';
 // const i3 = I3
 const deck = new ReplaySubject<StreamDeck>();
-export const deck$ = deck.asObservable();
+/** filter out empty results. */
+export const deck$ = deck.pipe(filter(d => d instanceof Object));
 let currentDeck: StreamDeck | undefined;
 
 export const getStreamDeck = () => currentDeck;
@@ -36,6 +37,7 @@ const up$ = new Subject<number>();
 
 deck$.subscribe({
   next: strDeck => {
+    if(!strDeck) { return}
     strDeck.clearAllKeys();
     strDeck.on('down', (keyNumber: number) => down$.next(keyNumber));
     strDeck.on('up', (keyNumber: number) => up$.next(keyNumber));
