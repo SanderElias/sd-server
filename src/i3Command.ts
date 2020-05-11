@@ -15,25 +15,30 @@ interface Outputs {
   right: string;
   rest: string[];
 }
+
 export function i3Outputs(): Promise<Outputs> {
   return new Promise((resolve, reject) => {
     i3.outputs((err, d) => {
       if (err) {
+        console.log('i3Outputs error', err);
         return reject(err);
       }
-      const displays = d
-        /** get the active ones */
-        .filter(r => r.active)
-        /** sort on left to right order */
-        .sort((x, y) => (x.rect.x < y.rect.x ? -1 : 1))
-        /** extract only the names */
-        .map(r => {
-          console.log(r.name,r.rect)
-          return r.name});
-      const [left, middle, right, ...rest] = displays;
-      const result = {left, middle, right, rest};
-      console.log(result)
-      resolve(result);
+      try {
+        const displays = d
+          /** get the active ones */
+          .filter(r => r.active)
+          /** sort on left to right order */
+          .sort((x, y) => (x.rect.x < y.rect.x ? -1 : 1))
+          /** extract only the names */
+          .map(r => {
+            return r.name;
+          });
+        const [left, middle, right, ...rest] = displays;
+        resolve({left, middle, right, rest});
+      } catch (e) {
+        console.log('i3Outputs catch error', e);
+        return reject(e);
+      }
     });
   });
 }

@@ -5,6 +5,7 @@ import {httpGetJson} from '../utils/httpGetJson';
 import {Aak, DeConfig, Sensor, Sensors, State, Whitelist, WsSmartEvent} from './deconz.interfaces';
 import {getSettings, updateSettings} from './settings';
 import {turnOff, turnOn} from './tradfri';
+import { i3Command } from '../i3Command';
 
 const url = part => `http://localhost/api/${deconz.apiKey}/${part}`;
 const {deconz} = getSettings();
@@ -98,6 +99,7 @@ const init = async () => {
 };
 
 const isInit = init();
+let onState = false;
 
 /** turn on at program start, and start listening to motion sensor */
 merge(zigbeeEvents$, of({name: 'Buro motion sensor', state: {presence: true}} as Sensor))
@@ -106,14 +108,20 @@ merge(zigbeeEvents$, of({name: 'Buro motion sensor', state: {presence: true}} as
     filter(sensor => sensor.name === 'Buro motion sensor' && sensor.state?.presence === true),
     tap(async s => {
       console.log('turn on ' + new Date().toTimeString().slice(0, 8));
-      /** turn on related light (monitors and desk lights) */
-      await turnOn(131079);
+      if (!onState) {
+        /** turn on related light (monitors and desk lights) */
+        await turnOn(131079);
+        await new Promise((r) => setTimeout(r,3000))
+        await i3Command('restart');
+        onState = true;
+      }
     }),
     /** start a timer, auto reset by above */
     switchMap(s => timer(15 * 60 * 1000)),
     tap(async () => {
       console.log('turn off ' + new Date().toTimeString().slice(0, 8));
       await turnOff(131079);
+      onState = false;
     })
   )
   .subscribe();
@@ -147,5 +155,3 @@ zigbeeEvents$
     tap(sensor => console.log(sensor))
   )
   .subscribe();
-
-
