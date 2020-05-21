@@ -6,6 +6,7 @@ import {Aak, DeConfig, Sensor, Sensors, State, Whitelist, WsSmartEvent} from './
 import {getSettings, updateSettings} from './settings';
 import {turnOff, turnOn} from './tradfri';
 import { i3Command } from '../i3Command';
+import { resetDeck } from '../streamDeck/streamDeck';
 
 const url = part => `http://localhost/api/${deconz.apiKey}/${part}`;
 const {deconz} = getSettings();
@@ -93,13 +94,10 @@ const init = async () => {
     },
     devices
   );
-  // zigbeeEvents$.subscribe();
-  // console.table([...devices.values()]);
-  console.log(await getConfig());
 };
 
 const isInit = init();
-let onState = false;
+let onState = true;
 
 /** turn on at program start, and start listening to motion sensor */
 merge(zigbeeEvents$, of({name: 'Buro motion sensor', state: {presence: true}} as Sensor))
@@ -113,6 +111,7 @@ merge(zigbeeEvents$, of({name: 'Buro motion sensor', state: {presence: true}} as
         await turnOn(131079);
         await new Promise((r) => setTimeout(r,3000))
         await i3Command('restart');
+        await resetDeck();
         onState = true;
       }
     }),
