@@ -6,7 +6,7 @@ import {Aak, DeConfig, Sensor, Sensors, State, Whitelist, WsSmartEvent} from './
 import {getSettings, updateSettings} from './settings';
 import {turnOff, turnOn} from './tradfri';
 import { i3Command } from '../i3Command';
-import { resetDeck } from '../streamDeck/streamDeck';
+import { resetDeckConnection } from '../streamDeck/streamDeck';
 
 const url = part => `http://localhost/api/${deconz.apiKey}/${part}`;
 const {deconz} = getSettings();
@@ -111,7 +111,7 @@ merge(zigbeeEvents$, of({name: 'Buro motion sensor', state: {presence: true}} as
         await turnOn(131079);
         await new Promise((r) => setTimeout(r,3000))
         await i3Command('restart');
-        await resetDeck();
+        await resetDeckConnection();
         onState = true;
       }
     }),

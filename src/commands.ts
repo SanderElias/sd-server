@@ -6,7 +6,7 @@ import {buroToggle, isBuroAan, isTestBuroAan, tradfriInit, disco, discoff} from 
 import {i3Command, i3Outputs, i3Tree, I3Tree, i3WorksSpaces, moveWP, PurpleNode} from './i3Command';
 import {Command} from './streamDeck/Command.interface';
 import {loadImage} from './streamDeck/loadImage';
-import {dblClick, longPress} from './streamDeck/streamDeck';
+import {dblClick, longPress, resetDeckConnection} from './streamDeck/streamDeck';
 import {activateNextPage, activatePage} from './utils/activePage';
 import {getFiles} from './utils/getFiles';
 import {i3} from './utils/i3';
@@ -234,6 +234,20 @@ const page3: Command[] = [
     image: 'bulbOff.png',
     action: async () => {
       await toctick();
+    },
+  },
+  {
+    tile: 10,
+    image: 'test.png',
+    action: async () => {
+      console.log('test');
+    },
+  },
+  {
+    tile: 11,
+    image: 'warn.png',
+    action: async () => {
+      await resetDeckConnection();
     },
   },
   {

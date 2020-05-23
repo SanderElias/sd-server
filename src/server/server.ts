@@ -1,10 +1,10 @@
-import {logError, yellow, log} from '../utils/log';
+import {logError, yellow, log, logWarn} from '../utils/log';
 import express from 'express';
 import compression from 'compression';
 import {join, resolve} from 'path';
 import {settings} from './settings';
 import {injectReloadMiddleware} from './injectReloadMiddleware';
-import { src } from '../DynamicTs';
+import {src} from '../DynamicTs';
 
 export async function sdServer() {
   try {
@@ -31,7 +31,13 @@ export async function sdServer() {
       res.sendFile(asset);
     });
     server.get('/assets/:fileName', (req, res) => {
+      const asset = resolve(__dirname, '../../assets', req.params.fileName);
+      console.log(asset)
+      res.sendFile(asset);
+    });
+    server.get('/image/:fileName', (req, res) => {
       const asset = resolve(__dirname, '../../../assets', req.params.fileName);
+      console.log(asset)
       res.sendFile(asset);
     });
     server.use(express.static(hostFolder, options));

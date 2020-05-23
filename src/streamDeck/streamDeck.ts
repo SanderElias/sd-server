@@ -13,7 +13,7 @@ import {
   mergeMap,
   take,
 } from 'rxjs/operators';
-import {logWarn} from '../utils/log';
+import {logWarn, logError} from '../utils/log';
 import {throws} from 'assert';
 import {DEFAULT_ECDH_CURVE} from 'tls';
 // const i3 = I3
@@ -23,14 +23,10 @@ export const deck$ = deck.pipe(filter(d => d !== undefined)) as Observable<Strea
 
 let pollTimeOut: NodeJS.Timeout | undefined;
 let pollInterval = 250;
-let _deck: StreamDeck;
-async function pollIt(lastInterval = 0) {
-  const myDeck = await deck.pipe(take(1)).toPromise();
-  if (myDeck) {
-    try {
-      myDeck.close();
-    } catch {}
-  }
+// tslint:disable-next-line: variable-name
+let _deck: StreamDeck | undefined;
+let counter = 0;
+function pollIt(lastInterval = 0) {
   console.log('start streamdeck poll');
   pollInterval = Math.max(pollInterval + 50, 2500);
   if (lastInterval === 2500) {
@@ -39,16 +35,25 @@ async function pollIt(lastInterval = 0) {
   }
   // tslint:disable-next-line: no-unused-expression
   pollTimeOut !== undefined && clearTimeout(pollTimeOut);
+  if (_deck) {
+    try {
+      _deck.close();
+      _deck = undefined;
+      logWarn('closed deck from poll');
+    } catch (e) {
+      _deck = undefined;
+      // console.log(e);
+    }
+  }
+  if (++counter > 25) {
+    /** temporary kill switch */
+    logError('exited by kill switch in streamdeck.ts');
+    process.exit(15);
+  }
   const decks = listStreamDecks();
   if (decks.length === 0) {
     pollTimeOut = setTimeout(() => pollIt(pollInterval), pollInterval);
     return;
-  }
-  if (_deck) {
-    try {
-      logWarn('closing deck from poll')
-      _deck.close();
-    } catch (e) {}
   }
 
   // TODO: add support for multiple decks!
@@ -57,7 +62,7 @@ async function pollIt(lastInterval = 0) {
     _deck = openStreamDeck(path);
     deck.next(_deck);
   } catch (e) {
-    console.error(e);
+    _deck = undefined;
     pollTimeOut = setTimeout(() => pollIt(pollInterval), pollInterval);
     return;
   }
@@ -65,8 +70,9 @@ async function pollIt(lastInterval = 0) {
 }
 
 /** watchdog, check if deck is up */
-timer(0, 60 * 60 * 1000)
+timer(0, 60 * 1000)
   .pipe(
+    tap(() => console.log('watchdog')),
     mergeMap(() => deck),
     tap((currentDeck: StreamDeck | undefined) => {
       try {
@@ -81,12 +87,9 @@ timer(0, 60 * 60 * 1000)
   )
   .subscribe();
 
-export const resetDeck = async () => {
-  const curDeck = await deck.pipe(take(1)).toPromise();
-  if (curDeck) {
-    curDeck.close();
-  }
+export const resetDeckConnection = async () => {
   deck.next(undefined);
+  // pollIt();
 };
 
 const down$ = new Subject<number>();

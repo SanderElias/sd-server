@@ -230,7 +230,7 @@ async function getAuth(id: string, secret: string) {
   }
 }
 
-merge(dailyTimer('18:00'), dailyTimer('20:00'), dailyTimer('21:00')).subscribe(async () => {
+merge(dailyTimer('18:30'), dailyTimer('20:00'), dailyTimer('21:00')).subscribe(async () => {
   await isInit;
   const buro = devices.get(131079) as Group;
   buro.turnOff();

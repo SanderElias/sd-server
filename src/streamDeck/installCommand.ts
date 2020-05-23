@@ -3,7 +3,7 @@ import {broadcast, listenFor, send} from '../server';
 import {logWarn} from '../utils/log';
 import {Command} from './Command.interface';
 import {loadImage} from './loadImage';
-import {click, deck$} from './streamDeck';
+import {click, deck$, resetDeckConnection} from './streamDeck';
 import {Subject} from 'rxjs';
 
 export const cmdList = new Map<string, Command>();
@@ -19,7 +19,6 @@ export const resetDeck = async () => {
     )
     .toPromise();
 };
-
 
 export function installCommand(cmd: Command) {
   try {
@@ -56,9 +55,19 @@ export function installCommand(cmd: Command) {
   }
 }
 
+function updateApp() {
+  send({type: 'cmdList', payload: [...cmdList.values()]});
+}
+
 listenFor('fetchList').subscribe({
   next: msg => {
-    console.log('fetch from client');
     send({client: msg.client, type: 'cmdList', payload: [...cmdList.values()]});
+  },
+});
+
+listenFor('resetDeck').subscribe({
+  next() {
+    console.log('going to reset');
+    resetDeckConnection()
   },
 });
