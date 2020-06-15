@@ -1,0 +1,24 @@
+<script type="nomodule">
+  console.log('lazy-load es5 here! (make sure to take order in account)')
+</script>
+<script
+  defer
+  async
+>
+  async function lazyLoad() {
+    const sr = ["runtime-es2015.js", "polyfills-es2015.js", "main-es2015.js"]
+    for (const i of sr) {
+      const scr = document.createElement('script')
+      scr.type = 'module';
+      scr.src = i;
+      await new Promise((resolve, rej) => {
+        scr.onload = () => resolve()
+        scr.onerror = (e) => rej(e)
+        document.head.appendChild(scr)
+      })
+      // await import(`/${i}`)
+      console.log(i)
+    }
+  }
+  lazyLoad().then(() => console.log('all scripts loaded'))
+</script>

@@ -14,8 +14,8 @@ import {
   take,
 } from 'rxjs/operators';
 import {logWarn, logError} from '../utils/log';
-import {throws} from 'assert';
-import {DEFAULT_ECDH_CURVE} from 'tls';
+import {log} from 'console';
+
 // const i3 = I3
 const deck = new BehaviorSubject<StreamDeck | undefined>(undefined);
 /** filter out empty results. */
@@ -27,9 +27,8 @@ let pollInterval = 250;
 let _deck: StreamDeck | undefined;
 let counter = 0;
 function pollIt(lastInterval = 0) {
-  console.log('start streamdeck poll');
   pollInterval = Math.max(pollInterval + 50, 2500);
-  if (lastInterval === 2500) {
+  if (lastInterval === 5000) {
     /** cancel retry and leave it to watchdog to restart */
     return;
   }
@@ -37,6 +36,9 @@ function pollIt(lastInterval = 0) {
   pollTimeOut !== undefined && clearTimeout(pollTimeOut);
   if (_deck) {
     try {
+      // tslint:disable-next-line: whitespace
+      // tslint:disable-next-line: no-string-literal
+      _deck['removeAllListeners']();
       _deck.close();
       _deck = undefined;
       logWarn('closed deck from poll');
@@ -44,7 +46,9 @@ function pollIt(lastInterval = 0) {
       _deck = undefined;
       // console.log(e);
     }
+    return pollIt();
   }
+
   if (++counter > 25) {
     /** temporary kill switch */
     logError('exited by kill switch in streamdeck.ts');
@@ -61,6 +65,7 @@ function pollIt(lastInterval = 0) {
   try {
     _deck = openStreamDeck(path);
     deck.next(_deck);
+    log('StreamDeck assigned from poll');
   } catch (e) {
     _deck = undefined;
     pollTimeOut = setTimeout(() => pollIt(pollInterval), pollInterval);
@@ -70,23 +75,23 @@ function pollIt(lastInterval = 0) {
 }
 
 /** watchdog, check if deck is up */
-timer(0, 60 * 1000)
+merge(timer(0, 10 * 1000).pipe(map(() => undefined)), deck)
   .pipe(
-    tap(() => console.log('watchdog')),
-    mergeMap(() => deck),
-    tap((currentDeck: StreamDeck | undefined) => {
+    tap(async () => {
       try {
-        const ser = currentDeck?.getSerialNumber();
-        if (!ser) {
+        const currentDeck = await deck.pipe(take(1)).toPromise();
+        if (currentDeck === undefined) {
           return pollIt();
         }
       } catch (e) {
-        return pollIt();
+        console.error(e);
+        pollIt();
       }
     })
   )
   .subscribe();
 
+// pollIt()
 export const resetDeckConnection = async () => {
   deck.next(undefined);
   // pollIt();
@@ -106,6 +111,7 @@ deck$.subscribe({
     strDeck.on('error', (error: any) => {
       logWarn('stream-deck Error, start polling for device');
       try {
+        strDeck['removeAllListeners']();
         strDeck.close();
       } catch {}
       deck.next(undefined);

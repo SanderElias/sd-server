@@ -10,6 +10,8 @@ import {
 import {merge, Subject} from 'rxjs';
 import {dailyTimer} from '../scheduledTaks/simpleTimer';
 import {getSettings, updateSettings} from './settings';
+import {logWarn} from '../utils/log';
+import { filter } from 'rxjs/operators';
 
 const settings = getSettings();
 const inits = new Subject<void>();
@@ -67,7 +69,7 @@ export async function toggleDevice(deviceId: number) {
   await isInit;
   // tslint:disable-next-line: no-non-null-assertion
   const device = (devices.get(deviceId) as Accessory)!.plugList[0];
-  console.log(device);
+  // console.log(device);
   if (device.onOff) {
     device.turnOff();
   } else {
@@ -122,18 +124,18 @@ export async function isTestBuroAan() {
 }
 
 function tradfri_deviceUpdated(dev: Accessory) {
-  console.log('Dev', dev.name, dev.instanceId);
+  // console.log('Dev', dev.name, dev.instanceId);
   // if (!devices.has(dev.instanceId)) {
   devices.set(dev.instanceId, dev);
   // }
 }
 
 function tradfri_deviceRemoved(id) {
-  console.log('remove', id);
+  // console.log('remove', id);
   devices.delete(id);
 }
 function tradfri_groupUpdated(dev: Group) {
-  console.log('group', dev.name, dev.instanceId);
+  // console.log('group', dev.name, dev.instanceId);
   // if (!devices.has(dev.instanceId)) {
   devices.set(dev.instanceId, dev);
   // }
@@ -171,7 +173,7 @@ export async function disco() {
     if (!(d instanceof Accessory) || d.type !== AccessoryTypes.motionSensor) {
       return;
     }
-    console.log(d.constructor.name, d.name, d.type);
+    // console.log(d.constructor.name, d.name, d.type);
   });
 }
 
@@ -225,12 +227,14 @@ async function getAuth(id: string, secret: string) {
     const {identity, psk} = await tradfri.authenticate(secret).catch();
     return {identity, psk};
   } catch (e) {
-    console.log(e)
+    logWarn(e);
     return {};
   }
 }
 
-merge(dailyTimer('18:30'), dailyTimer('20:00'), dailyTimer('21:00')).subscribe(async () => {
+
+
+merge(dailyTimer('18:30'), dailyTimer('20:00').pipe(filter(() => new Date().getDay() !== 2)), dailyTimer('21:15')).subscribe(async () => {
   await isInit;
   const buro = devices.get(131079) as Group;
   buro.turnOff();

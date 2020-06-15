@@ -149,12 +149,15 @@ const page3: Command[] = [
     image: 'display.png',
     action: async () => {
       const log = (err?, result?) => (console.log(err, result) as unknown) as any;
+      await moveWP(2, 'middle');
       await moveWP(3, 'middle');
       await moveWP(10, 'right');
       await moveWP(7, 'right');
       await moveWP(1, 'left');
+      await moveWP(5, 'left');
+      await moveWP(18, 'right');
       await moveWP(19, 'right');
-      await moveWP(2, 'middle');
+      await moveWP(4, 'middle');
     },
   },
   {
@@ -248,6 +251,13 @@ const page3: Command[] = [
     image: 'warn.png',
     action: async () => {
       await resetDeckConnection();
+    },
+  },
+  {
+    tile: 12,
+    image: 'contrast.png',
+    action: async () => {
+      exec('xrandr --output DisplayPort-0 --brightness 1.75 && xrandr --output DisplayPort-1 --brightness 1.75 && xrandr --output DisplayPort-2 --brightness 1.75').unref()
     },
   },
   {

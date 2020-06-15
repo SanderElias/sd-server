@@ -1,18 +1,16 @@
-import {EMPTY, merge, Observable, of, Subject, timer} from 'rxjs';
+import {EMPTY, Observable, of, Subject, timer} from 'rxjs';
 import {filter, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 import WebSocket from 'ws';
 import {httpGetJson} from '../utils/httpGetJson';
+import {logWarn} from '../utils/log';
 import {Aak, DeConfig, Sensor, Sensors, State, Whitelist, WsSmartEvent} from './deconz.interfaces';
 import {getSettings, updateSettings} from './settings';
-import {turnOff, turnOn} from './tradfri';
-import { i3Command } from '../i3Command';
-import { resetDeckConnection } from '../streamDeck/streamDeck';
 
 const url = part => `http://localhost/api/${deconz.apiKey}/${part}`;
 const {deconz} = getSettings();
 const events$$ = new Subject<WsSmartEvent>();
 const devices = new Map<string, Sensor>();
-
+let logEvents = false;
 export const zigbeeEvents$ = events$$.pipe(
   filter(ev => devices.has(ev.uniqueid)),
   switchMap(
@@ -31,7 +29,13 @@ export const zigbeeEvents$ = events$$.pipe(
   ),
   filter((d: any) => typeof d !== 'undefined'),
   tap((d: Sensor) => {
-    console.log(d.name, d.state?.presence || d.state?.buttonevent);
+    if (d.name === 'Smart Switch' && d.state?.buttonevent === 1004) {
+      logEvents = !logEvents;
+      console.log(`Logging deconz events turned ${logEvents?'on':'off'}`)
+    }
+    if (logEvents) {
+      console.log(d.name, d.state?.presence || d.state?.buttonevent);
+    }
   }),
   shareReplay(1)
 );
@@ -94,36 +98,69 @@ const init = async () => {
     },
     devices
   );
+  console.table([...devices.values()]);
 };
 
 const isInit = init();
+
+async function resetLamp() {
+  await isInit;
+  const d = 'ResetLightHelp';
+  // const outlet = devices.get('cc:cc:cc:ff:fe:ae:9f:d1-01') as Sensor;
+  // zigbeeEvents$
+  //   .pipe(
+  //     filter(sensor => sensor.name === 'ResetLightHelp'),
+  //     tap(sensor => console.log('outlet', sensor)),
+  //     // switchMap(ev => (ev === 3001 ? timer(0, 250) : EMPTY)),
+  //     tap(sensor => console.log(sensor))
+  //   )
+  //   .subscribe();
+
+  // console.log(outlet);
+
+  // await dcSetState(d, {bri: 255});
+  // await dcSetState(d, {on: false});
+  // await new Promise(r => setTimeout(r, 1000));
+  // await dcSetState(d, {on: true});
+  // await new Promise(r => setTimeout(r, 2500));
+  // const t = 950;
+  // for (let i = 0; i < 8; i += 1) {
+  //   await dcSetState(d, {on: false});
+  //   await new Promise(r => setTimeout(r, t));
+  //   await dcSetState(d, {on: true});
+  //   await new Promise(r => setTimeout(r, t / 1.5));
+  // }
+}
+
+resetLamp();
+
 let onState = true;
 
 /** turn on at program start, and start listening to motion sensor */
-merge(zigbeeEvents$, of({name: 'Buro motion sensor', state: {presence: true}} as Sensor))
-  .pipe(
-    /** only listen for 'motion detected, ignoring 'off' */
-    filter(sensor => sensor.name === 'Buro motion sensor' && sensor.state?.presence === true),
-    tap(async s => {
-      console.log('turn on ' + new Date().toTimeString().slice(0, 8));
-      if (!onState) {
-        /** turn on related light (monitors and desk lights) */
-        await turnOn(131079);
-        await new Promise((r) => setTimeout(r,3000))
-        await i3Command('restart');
-        await resetDeckConnection();
-        onState = true;
-      }
-    }),
-    /** start a timer, auto reset by above */
-    switchMap(s => timer(15 * 60 * 1000)),
-    tap(async () => {
-      console.log('turn off ' + new Date().toTimeString().slice(0, 8));
-      await turnOff(131079);
-      onState = false;
-    })
-  )
-  .subscribe();
+// merge(zigbeeEvents$, of({name: 'Buro motion sensor', state: {presence: true}} as Sensor))
+//   .pipe(
+//     /** only listen for 'motion detected, ignoring 'off' */
+//     filter(sensor => sensor.name === 'Buro motion sensor' && sensor.state?.presence === true),
+//     tap(async s => {
+//       console.log('turn on ' + new Date().toTimeString().slice(0, 8));
+//       if (!onState) {
+//         /** turn on related light (monitors and desk lights) */
+//         await turnOn(131079);
+//         await new Promise((r) => setTimeout(r,3000))
+//         await i3Command('restart');
+//         await resetDeckConnection();
+//         onState = true;
+//       }
+//     }),
+//     /** start a timer, auto reset by above */
+//     switchMap(s => timer(15 * 60 * 1000)),
+//     tap(async () => {
+//       console.log('turn off ' + new Date().toTimeString().slice(0, 8));
+//       await turnOff(131079);
+//       onState = false;
+//     })
+//   )
+//   .subscribe();
 
 // turnOn(65579)
 
@@ -140,6 +177,18 @@ const testLamp = async (lamp = '90:fd:9f:ff:fe:29:9b:87-01') => {
 };
 
 testLamp();
+
+async function dcSetState(d: string, state: State) {
+  const dev = devices.has(d) ? devices.get(d) : [...devices.values()].find(dev => dev.name === d);
+  if (dev === undefined) {
+    logWarn(`device ${d} not found`);
+    return;
+  }
+  const r = await httpGetJson(url(`lights/${dev?._id}/state`), {method: 'put', data: state}).catch(e =>
+    console.error(e)
+  );
+  console.log('r', r);
+}
 
 zigbeeEvents$
   .pipe(
