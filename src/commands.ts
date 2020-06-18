@@ -257,7 +257,7 @@ const page3: Command[] = [
     tile: 12,
     image: 'contrast.png',
     action: async () => {
-      exec('xrandr --output DisplayPort-0 --brightness 1.75 && xrandr --output DisplayPort-1 --brightness 1.75 && xrandr --output DisplayPort-2 --brightness 1.75').unref()
+      exec('xrandr --output DisplayPort-0 --brightness 1 && xrandr --output DisplayPort-1 --brightness 1 && xrandr --output DisplayPort-2 --brightness 1').unref()
     },
   },
   {

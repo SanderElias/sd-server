@@ -31,7 +31,7 @@ export const zigbeeEvents$ = events$$.pipe(
   tap((d: Sensor) => {
     if (d.name === 'Smart Switch' && d.state?.buttonevent === 1004) {
       logEvents = !logEvents;
-      console.log(`Logging deconz events turned ${logEvents?'on':'off'}`)
+      console.log(`Logging deconz events turned ${logEvents ? 'on' : 'off'}`);
     }
     if (logEvents) {
       console.log(d.name, d.state?.presence || d.state?.buttonevent);
@@ -134,7 +134,7 @@ async function resetLamp() {
 
 resetLamp();
 
-let onState = true;
+const onState = true;
 
 /** turn on at program start, and start listening to motion sensor */
 // merge(zigbeeEvents$, of({name: 'Buro motion sensor', state: {presence: true}} as Sensor))
@@ -179,7 +179,7 @@ const testLamp = async (lamp = '90:fd:9f:ff:fe:29:9b:87-01') => {
 testLamp();
 
 async function dcSetState(d: string, state: State) {
-  const dev = devices.has(d) ? devices.get(d) : [...devices.values()].find(dev => dev.name === d);
+  const dev = await dcGetState(d);
   if (dev === undefined) {
     logWarn(`device ${d} not found`);
     return;
@@ -187,7 +187,94 @@ async function dcSetState(d: string, state: State) {
   const r = await httpGetJson(url(`lights/${dev?._id}/state`), {method: 'put', data: state}).catch(e =>
     console.error(e)
   );
-  console.log('r', r);
+  // console.log('new device state', r);
+}
+
+async function dcGetState(d: string) {
+  const dev = devices.has(d) ? devices.get(d) : [...devices.values()].find(dev => dev.name === d);
+  if (dev === undefined) {
+    logWarn(`device ${d} not found`);
+    return;
+  }
+  // console.log('device', dev);
+  return dev;
+}
+
+setTimeout(async () => {
+  const p = 9990;
+  const step = 250;
+  let factor = 1;
+  let factory = -1;
+  let x = 100;
+  let y = p;
+  const maxed = n => {
+    n += factor * step;
+    if (n > p) {
+      n = p;
+      factor = -1;
+    }
+    if (n < 100) {
+      n = 100;
+      factor = 1;
+    }
+    return n;
+  };
+  const maxedy = n => {
+    n += factory * step;
+    if (n > p) {
+      n = p;
+      factory = -1;
+    }
+    if (n < 100) {
+      n = 100;
+      factory = 1;
+    }
+    return n;
+  };
+  const newState = {on: true, transitiontime: 1, bri: 48, sat: 0} as State;
+  while (true) {
+    x = maxed(x);
+    y = x < 101 ? maxedy(y) : y;
+    newState.xy = [x / p, y / p];
+    // console.log(x, y, newState.xy);
+    await dcSetState('rgb', newState);
+    await new Promise(r => setTimeout(r, 500));
+  }
+}, 2000);
+
+
+/**
+ * https://github.com/usolved/cie-rgb-converter/blob/master/cie_rgb_converter.js
+ * Converts RGB color space to CIE color space
+ * @param {Number} red
+ * @param {Number} green
+ * @param {Number} blue
+ * @return {Array} Array that contains the CIE color values for x and y
+ */
+function rgb_to_cie(red = 0, green = 0, blue = 0): [number, number] {
+  // Apply a gamma correction to the RGB values, which makes the color more vivid and more the like the color displayed on the screen of your device
+  red = red > 0.04045 ? Math.pow((red + 0.055) / (1.0 + 0.055), 2.4) : red / 12.92;
+  green = green > 0.04045 ? Math.pow((green + 0.055) / (1.0 + 0.055), 2.4) : green / 12.92;
+  blue = blue > 0.04045 ? Math.pow((blue + 0.055) / (1.0 + 0.055), 2.4) : blue / 12.92;
+
+  // RGB values to XYZ using the Wide RGB D65 conversion formula
+  const X = red * 0.664511 + green * 0.154324 + blue * 0.162028;
+  const Y = red * 0.283881 + green * 0.668433 + blue * 0.047685;
+  const Z = red * 0.000088 + green * 0.07231 + blue * 0.986039;
+
+  // Calculate the xy values from the XYZ values
+  let x = +(X / (X + Y + Z)).toFixed(4);
+  let y = +(Y / (X + Y + Z)).toFixed(4);
+
+  if (isNaN(x)) {
+    x = 0;
+  }
+
+  if (isNaN(y)) {
+    y = 0;
+  }
+
+  return [x, y];
 }
 
 zigbeeEvents$
