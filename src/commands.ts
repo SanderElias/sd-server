@@ -149,15 +149,16 @@ const page3: Command[] = [
     image: 'display.png',
     action: async () => {
       const log = (err?, result?) => (console.log(err, result) as unknown) as any;
-      await moveWP(2, 'middle');
+      await exec('/home/sander/.screenlayout/default.sh')
+      await moveWP(4, 'middle');
       await moveWP(3, 'middle');
-      await moveWP(10, 'right');
-      await moveWP(7, 'right');
-      await moveWP(1, 'left');
+      await moveWP(2, 'middle');
       await moveWP(5, 'left');
+      await moveWP(1, 'left');
+      await moveWP(7, 'right');
+      await moveWP(10, 'right');
       await moveWP(18, 'right');
       await moveWP(19, 'right');
-      await moveWP(4, 'middle');
     },
   },
   {
@@ -253,6 +254,7 @@ const page3: Command[] = [
       await resetDeckConnection();
     },
   },
+
   {
     tile: 12,
     image: 'contrast.png',

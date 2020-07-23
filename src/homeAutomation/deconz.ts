@@ -5,6 +5,7 @@ import {httpGetJson} from '../utils/httpGetJson';
 import {logWarn} from '../utils/log';
 import {Aak, DeConfig, Sensor, Sensors, State, Whitelist, WsSmartEvent} from './deconz.interfaces';
 import {getSettings, updateSettings} from './settings';
+import {pluckFrom} from '../utils/pluckFrom';
 
 const url = part => `http://localhost/api/${deconz.apiKey}/${part}`;
 const {deconz} = getSettings();
@@ -29,12 +30,9 @@ export const zigbeeEvents$ = events$$.pipe(
   ),
   filter((d: any) => typeof d !== 'undefined'),
   tap((d: Sensor) => {
-    if (d.name === 'Smart Switch' && d.state?.buttonevent === 1004) {
-      logEvents = !logEvents;
-      console.log(`Logging deconz events turned ${logEvents ? 'on' : 'off'}`);
-    }
-    if (logEvents) {
-      console.log(d.name, d.state?.presence || d.state?.buttonevent);
+    const stateProps = Object.keys(d.state || {});
+    if (logEvents && stateProps.findIndex(p => 'buttonevent open presence'.split(' ').includes(p)) !== -1) {
+      console.log(d.name, d.state);
     }
   }),
   shareReplay(1)
@@ -92,16 +90,27 @@ const init = async () => {
   const lights = await httpGetJson<Sensors[]>(url('lights'));
   [...Object.entries(sensors), ...Object.entries(lights)].reduce(
     (m: Map<string, Sensor>, [id, sensor]: [string, any]) => {
-      sensor._id = id;
-      m.set(sensor.uniqueid, sensor);
+      /** for now, filter out vnr e irtual phoscon devices */
+      if (sensor.manufacturername !== 'Phoscon') {
+        sensor._id = id;
+        m.set(sensor.uniqueid, sensor);
+      }
       return m;
     },
     devices
   );
-  console.table([...devices.values()]);
+  showTable();
 };
 
 const isInit = init();
+
+function showTable() {
+  console.table(
+    [...devices.values()].map(row =>
+      pluckFrom(row, '_id', 'name', 'type', 'modelid', 'manufacturername', 'swversion')
+    )
+  );
+}
 
 async function resetLamp() {
   await isInit;
@@ -242,7 +251,6 @@ setTimeout(async () => {
   }
 }, 2000);
 
-
 /**
  * https://github.com/usolved/cie-rgb-converter/blob/master/cie_rgb_converter.js
  * Converts RGB color space to CIE color space
@@ -279,6 +287,7 @@ function rgb_to_cie(red = 0, green = 0, blue = 0): [number, number] {
 
 zigbeeEvents$
   .pipe(
+    tap(handleZigbeeEvents),
     filter(
       sensor =>
         sensor.name === 'TRÅDFRI remote control' &&
@@ -286,7 +295,48 @@ zigbeeEvents$
         [3001, 3003].includes(sensor.state.buttonevent)
     ),
     map(sensor => sensor.state.buttonevent),
-    switchMap(ev => (ev === 3001 ? timer(0, 250) : EMPTY)),
-    tap(sensor => console.log(sensor))
+    switchMap(ev => (ev === 3001 ? timer(0, 250) : EMPTY))
   )
   .subscribe();
+
+export interface ZigbeeAction {
+  /** the given name of the sensor from the Psocon app */
+  sensorName: string;
+  /** type type of event, defaults to buttonPress */
+  type?: string;
+  /** one of more events to act on */
+  events: number[];
+  /** action to take, receives the Sensor, including the state  */
+  action: (s?: Sensor) => void;
+}
+
+function handleZigbeeEvents(sensor: Sensor) {
+  zigbeeActions
+    .filter(a => a.sensorName === sensor.name)
+    .forEach(a => {
+      try {
+        const prop = a.type || 'buttonevent';
+        if (a.events.includes(sensor.state[prop])) {
+          a.action(sensor);
+        }
+      } catch (e) {
+        logWarn(a, e);
+      }
+    });
+}
+
+const zigbeeActions: ZigbeeAction[] = [
+  {
+    sensorName: 'Smart Switch',
+    events: [1005],
+    action: () => showTable(),
+  },
+  {
+    sensorName: 'Smart Switch',
+    events: [1004],
+    action: () => {
+      logEvents = !logEvents;
+      console.log(`Logging deconz events turned ${logEvents ? 'on' : 'off'}`);
+    },
+  },
+];
