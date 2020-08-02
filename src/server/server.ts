@@ -54,3 +54,40 @@ export async function sdServer() {
     logError(e);
   }
 }
+export async function hookServer() {
+  try {
+    const options = {
+      dotfiles: 'ignore',
+      etag: true,
+      extensions: ['htm', 'html'],
+      index: ['index.html'],
+      /** use a sensible setting for dev time. */
+      maxAge: '30s',
+      redirect: true,
+      setHeaders(res, path, stat) {
+        res.set('x-timestamp', Date.now());
+      },
+    };
+
+    const server = express();
+    server.use(compression());
+    // server.use(injectReloadMiddleware)
+    server.get('/ping', (req, res) => {
+      res.send(`pong`);
+    });
+
+    server.get('*', (req, res) => {
+      res.send(`pong`);
+    });
+
+    server.listen(8001,'2001:41f0:198:0:3034:f593:acdc:acdc', x => {
+      log(
+        `Hook server started on "${yellow(
+          `http${settings.ssl ? 's' : ''}://2001:41f0:198:0:3034:f593:acdc:acdc:8001/`
+        )}"`
+      );
+    });
+  } catch (e) {
+    logError(e);
+  }
+}
