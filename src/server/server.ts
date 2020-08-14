@@ -54,6 +54,7 @@ export async function sdServer() {
     logError(e);
   }
 }
+
 export async function hookServer() {
   try {
     const options = {
@@ -80,10 +81,10 @@ export async function hookServer() {
       res.send(`pong`);
     });
 
-    server.listen(8001,'2001:41f0:198:0:3034:f593:acdc:acdc', x => {
+    server.listen(8001, x => {
       log(
         `Hook server started on "${yellow(
-          `http${settings.ssl ? 's' : ''}://2001:41f0:198:0:3034:f593:acdc:acdc:8001/`
+          `http${settings.ssl ? 's' : ''}://localhost:8001/`
         )}"`
       );
     });

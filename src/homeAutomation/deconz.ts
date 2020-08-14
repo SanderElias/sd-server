@@ -7,7 +7,7 @@ import {Aak, DeConfig, Sensor, Sensors, State, Whitelist, WsSmartEvent} from './
 import {getSettings, updateSettings} from './settings';
 import {pluckFrom} from '../utils/pluckFrom';
 
-const url = part => `http://localhost/api/${deconz.apiKey}/${part}`;
+const url = part => `http://localhost:180/api/${deconz.apiKey}/${part}`;
 const {deconz} = getSettings();
 const events$$ = new Subject<WsSmartEvent>();
 const devices = new Map<string, Sensor>();
