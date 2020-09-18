@@ -33,7 +33,7 @@
     "express": "^4.17.1",
     "i3": "^0.3.0",
     "jsonc": "^2.0.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "node-tradfri-client": "^2.1.5",
     "open": "^7.1.0",
     "puppeteer-core": "^5.2.1",
