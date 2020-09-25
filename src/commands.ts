@@ -133,7 +133,7 @@ const page3: Command[] = [
       //   // console.log(w.map(({num, output, name}) => ({num, output, name})));
       //   console.log(w);
       // });
-      const log = result => console.log(result);
+      const log = (result) => console.log(result);
       // await i3Command(`[workspace="1"] move workspace  to output "DisplayPort-0"`).then(log);
       // await i3Command(`[workspace="2"] move workspace  to output "DisplayPort-1"`).then(log);
       // await i3Command(`[workspace="3"] move workspace  to output "DisplayPort-1"`).then(log);
@@ -149,7 +149,7 @@ const page3: Command[] = [
     image: 'display.png',
     action: async () => {
       const log = (err?, result?) => (console.log(err, result) as unknown) as any;
-      await exec('/home/sander/.screenlayout/default.sh')
+      await exec('/home/sander/.screenlayout/default.sh');
       await moveWP(4, 'middle');
       await moveWP(3, 'middle');
       await moveWP(2, 'middle');
@@ -190,15 +190,15 @@ const page3: Command[] = [
         nodes.push(({...node, parentId} as unknown) as MyNode);
         // }
         // tslint:disable-next-line: no-angle-bracket-type-assertion
-        node.nodes.forEach(n => walkTree(<any>n, node.id));
+        node.nodes.forEach((n) => walkTree(<any>n, node.id));
       };
       walkTree(tree);
-      const getById = (id: number) => nodes.find(n => n.id === id);
+      const getById = (id: number) => nodes.find((n) => n.id === id);
       // writeFileSync(join(__dirname, `../nodes.json`), JSON.stringify(tree));
       console.log(
         nodes
-          .filter(node => node.window_properties)
-          .map(n => ({
+          .filter((node) => node.window_properties)
+          .map((n) => ({
             class: n.type,
             title: n.window_properties?.title,
             name: n.name,
@@ -258,9 +258,7 @@ const page3: Command[] = [
   {
     tile: 12,
     image: 'contrast.png',
-    action: async () => {
-      exec('xrandr --output DisplayPort-0 --brightness 1 && xrandr --output DisplayPort-1 --brightness 1 && xrandr --output DisplayPort-2 --brightness 1').unref()
-    },
+    action: setBrightness(),
   },
   {
     tile: 14,
@@ -277,8 +275,27 @@ export const pages = [commands, page3];
 
 activatePage(1);
 
+function setBrightness(type = 'up'): () => void {
+  let brightness = 0;
+  let modifier= 1;
+  const setIt = () =>
+    exec(
+      `xrandr --output DisplayPort-0 --brightness ${brightness} && xrandr --output DisplayPort-1 --brightness ${brightness} && xrandr --output DisplayPort-2 --brightness ${brightness}`
+    ).unref();
+  return async () => {
+    brightness += modifier;
+    if( brightness<=1) {
+      modifier=1
+    }
+    if (brightness>=15)
+    {modifier=-1}
+    console.log({brightness})
+    setIt();
+  };
+}
+
 function getTile(page: Command[], num: any) {
-  return page.find(r => r.tile === num);
+  return page.find((r) => r.tile === num);
 }
 
 async function bulb(tile, prom) {
@@ -295,7 +312,7 @@ async function updateBuro() {
 }
 async function updateTest() {
   /** put in a small timeout to account for new status settling in */
-  await new Promise(r => setTimeout(r, 150));
+  await new Promise((r) => setTimeout(r, 150));
   return await bulb(6, isTestBuroAan());
 }
 setTimeout(() => {
@@ -306,14 +323,14 @@ setTimeout(() => {
 const cyclePages = () => {
   longPress(14)
     .pipe(
-      map(r => Math.floor(r.delay / 1500)),
+      map((r) => Math.floor(r.delay / 1500)),
       distinctUntilChanged(),
       filter(Boolean),
-      tap(k => activateNextPage()),
+      tap((k) => activateNextPage()),
       repeat()
     )
     .subscribe({
-      next: p => {},
+      next: (p) => {},
     });
 };
 

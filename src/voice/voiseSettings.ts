@@ -12,3 +12,18 @@ const selectedVoice = {
     name: 'en-GB-Wavenet-B',
   },
 };
+
+const anm = {
+  audioConfig: {
+    audioEncoding: 'LINEAR16',
+    pitch: -6.8,
+    speakingRate: 0.74,
+  },
+  input: {
+    text: 'Aap. Noot. Mies.',
+  },
+  voice: {
+    languageCode: 'nl-NL',
+    name: 'nl-NL-Wavenet-D',
+  },
+};

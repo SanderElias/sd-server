@@ -28,7 +28,7 @@ async function init(tr = 0) {
   const {identity: tdId, psk, id} = await getIdPsk();
   const tradfri = new TradfriClient(id!, {watchConnection: true});
   try {
-    await tradfri.connect(tdId, psk);
+    await tradfri.connect(tdId!, psk!);
   } catch (e) {
     handleTradfriError(e);
   }
@@ -209,8 +209,8 @@ async function getIdPsk() {
     const {tradfri} = settings;
     if (!tradfri.psk) {
       const {identity, psk} = await getAuth(tradfri.id, tradfri.securityCode);
-      tradfri.identity = identity;
-      tradfri.psk = psk;
+      tradfri.identity = identity!;
+      tradfri.psk = psk!;
       updateSettings(settings);
       return {identity, psk, id: tradfri.id};
     }
