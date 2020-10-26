@@ -11,6 +11,7 @@ import {activateNextPage, activatePage} from './utils/activePage';
 import {getFiles} from './utils/getFiles';
 import {i3} from './utils/i3';
 import {page2Base} from './page2Base';
+import { setBrightness, videoBright } from './utils/setBrightness';
 
 const commands = [
   {
@@ -244,7 +245,7 @@ const page3: Command[] = [
     tile: 10,
     image: 'test.png',
     action: async () => {
-      console.log('test');
+      videoBright()
     },
   },
   {
@@ -258,7 +259,12 @@ const page3: Command[] = [
   {
     tile: 12,
     image: 'contrast.png',
-    action: setBrightness(),
+    action: setBrightness(.5),
+  },
+  {
+    tile: 13,
+    image: 'contrast.png',
+    action: setBrightness(-.5),
   },
   {
     tile: 14,
@@ -274,25 +280,6 @@ export const page2 = [...page2Base];
 export const pages = [commands, page3];
 
 activatePage(1);
-
-function setBrightness(type = 'up'): () => void {
-  let brightness = 0;
-  let modifier= 1;
-  const setIt = () =>
-    exec(
-      `xrandr --output DisplayPort-0 --brightness ${brightness} && xrandr --output DisplayPort-1 --brightness ${brightness} && xrandr --output DisplayPort-2 --brightness ${brightness}`
-    ).unref();
-  return async () => {
-    brightness += modifier;
-    if( brightness<=1) {
-      modifier=1
-    }
-    if (brightness>=15)
-    {modifier=-1}
-    console.log({brightness})
-    setIt();
-  };
-}
 
 function getTile(page: Command[], num: any) {
   return page.find((r) => r.tile === num);
