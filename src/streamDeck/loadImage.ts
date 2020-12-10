@@ -1,16 +1,16 @@
-import {resolve} from 'path';
-import {take} from 'rxjs/operators';
+import { resolve } from 'path';
+import { take } from 'rxjs/operators';
 import sharp from 'sharp';
-import {Command} from './Command.interface';
-import {deck$} from './streamDeck';
-import {drawText} from './drawtext';
+import { Command } from './Command.interface';
+import { drawText } from './drawtext';
+import { deck$ } from './streamDeck';
 
 export async function loadImage(cmd: Command) {
   const {tile, image: fileName, title}: {tile: number; image?: string; title?: string} = cmd;
   if (title) {
     return drawText(title, tile);
   }
-  if (fileName===undefined) {
+  if (fileName === undefined) {
     return;
   }
   const asset = resolve(__dirname, '../../../assets', fileName);
@@ -24,13 +24,11 @@ export async function loadImage(cmd: Command) {
     .resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE) // Scale up/down to the right size, cropping if necessary.
     .raw() // Give us uncompressed RGB.
     .toBuffer()
-    .then(buffer => {
+    .then((buffer) => {
       /** hook up after (dis)connect */
-      deck$.subscribe(sd => sd.fillImage(tile, buffer));
+      deck$.subscribe((sd) => sd.fillImage(tile, buffer));
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
     });
 }
-
-

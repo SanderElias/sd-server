@@ -1,19 +1,20 @@
 import {EMPTY, Observable, of, Subject, timer} from 'rxjs';
 import {filter, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 import WebSocket from 'ws';
+import {broadcast} from '../server';
 import {httpGetJson} from '../utils/httpGetJson';
 import {logWarn} from '../utils/log';
 import {Aak, DeConfig, Sensor, Sensors, State, Whitelist, WsSmartEvent} from './deconz.interfaces';
+import {pool} from './pg-client';
 import {getSettings, updateSettings} from './settings';
-import {pluckFrom} from '../utils/pluckFrom';
 
-const url = part => `http://localhost:180/api/${deconz.apiKey}/${part}`;
+const url = (part) => `http://localhost:180/api/${deconz.apiKey}/${part}`;
 const {deconz} = getSettings();
 const events$$ = new Subject<WsSmartEvent>();
 const devices = new Map<string, Sensor>();
 let logEvents = false;
 export const zigbeeEvents$ = events$$.pipe(
-  filter(ev => devices.has(ev.uniqueid)),
+  filter((ev) => devices.has(ev.uniqueid)),
   switchMap(
     (ev: WsSmartEvent): Observable<Sensor | undefined> => {
       // tslint:disable-next-line: no-non-null-assertion
@@ -31,7 +32,7 @@ export const zigbeeEvents$ = events$$.pipe(
   filter((d: any) => typeof d !== 'undefined'),
   tap((d: Sensor) => {
     const stateProps = Object.keys(d.state || {});
-    if (logEvents && stateProps.findIndex(p => 'buttonevent open presence'.split(' ').includes(p)) !== -1) {
+    if (logEvents && stateProps.findIndex((p) => 'buttonevent open presence'.split(' ').includes(p)) !== -1) {
       console.log(d.name, d.state);
     }
   }),
@@ -54,7 +55,7 @@ const getApiKey = async () => {
     data: {
       devicetype: appName,
     },
-  }).catch(e => [] as Aak[]);
+  }).catch((e) => [] as Aak[]);
   const apiKey = result[0]?.success?.username;
   if (apiKey) {
     deconz.apiKey = apiKey;
@@ -64,7 +65,7 @@ const getApiKey = async () => {
   return apiKey;
 };
 
-const removeOthers = async apiKey => {
+const removeOthers = async (apiKey) => {
   const {whitelist} = await getConfig();
   [...Object.entries(whitelist)].forEach(async ([key, item]: [string, Whitelist]) => {
     if (key !== apiKey && item.name === appName) {
@@ -77,11 +78,11 @@ const removeOthers = async apiKey => {
 const connect = async () => {
   const {websocketport} = await getConfig();
   const ws = new WebSocket(`ws://localhost:${websocketport}`);
-  ws.onmessage = m => {
+  ws.onmessage = (m) => {
     const data = JSON.parse(m.data.toString());
     events$$.next(data as WsSmartEvent);
   };
-  ws.onerror = e => console.error(e);
+  ws.onerror = (e) => console.error(e);
 };
 
 const init = async () => {
@@ -99,17 +100,16 @@ const init = async () => {
     },
     devices
   );
-  showTable();
+  // showTable();
 };
 
 const isInit = init();
 
-function showTable() {
-  console.table(
-    [...devices.values()].map(row =>
-      pluckFrom(row, '_id', 'name', 'type', 'modelid', 'manufacturername', 'swversion')
-    )
-  );
+export function getTable() {
+  return [...devices.values()];
+  // .map(row =>
+  //   pluckFrom(row, '_id', 'name', 'type', 'modelid', 'manufacturername', 'swversion')
+  // )
 }
 
 async function resetLamp() {
@@ -178,7 +178,7 @@ const testLamp = async (lamp = '90:fd:9f:ff:fe:29:9b:87-01') => {
   const dev = devices.get(lamp);
   const state: State = {on: true, bri: 125};
   console.log(state);
-  const r = await httpGetJson(url(`lights/${dev?._id}/state`), {method: 'put', data: state}).catch(e =>
+  const r = await httpGetJson(url(`lights/${dev?._id}/state`), {method: 'put', data: state}).catch((e) =>
     console.error(e)
   );
   console.log('r', r);
@@ -193,14 +193,14 @@ async function dcSetState(d: string, state: State) {
     logWarn(`device ${d} not found`);
     return;
   }
-  const r = await httpGetJson(url(`lights/${dev?._id}/state`), {method: 'put', data: state}).catch(e =>
+  const r = await httpGetJson(url(`lights/${dev?._id}/state`), {method: 'put', data: state}).catch((e) =>
     console.error(e)
   );
   // console.log('new device state', r);
 }
 
 async function dcGetState(d: string) {
-  const dev = devices.has(d) ? devices.get(d) : [...devices.values()].find(dev => dev.name === d);
+  const dev = devices.has(d) ? devices.get(d) : [...devices.values()].find((dev) => dev.name === d);
   if (dev === undefined) {
     logWarn(`device ${d} not found`);
     return;
@@ -216,7 +216,7 @@ setTimeout(async () => {
   let factory = -1;
   let x = 100;
   let y = p;
-  const maxed = n => {
+  const maxed = (n) => {
     n += factor * step;
     if (n > p) {
       n = p;
@@ -228,7 +228,7 @@ setTimeout(async () => {
     }
     return n;
   };
-  const maxedy = n => {
+  const maxedy = (n) => {
     n += factory * step;
     if (n > p) {
       n = p;
@@ -247,7 +247,7 @@ setTimeout(async () => {
     newState.xy = [x / p, y / p];
     // console.log(x, y, newState.xy);
     await dcSetState('rgb', newState);
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 500));
   }
 }, 2000);
 
@@ -289,13 +289,13 @@ zigbeeEvents$
   .pipe(
     tap(handleZigbeeEvents),
     filter(
-      sensor =>
+      (sensor) =>
         sensor.name === 'TRÅDFRI remote control' &&
         sensor.state?.buttonevent !== undefined &&
         [3001, 3003].includes(sensor.state.buttonevent)
     ),
-    map(sensor => sensor.state.buttonevent),
-    switchMap(ev => (ev === 3001 ? timer(0, 250) : EMPTY))
+    map((sensor) => sensor.state.buttonevent),
+    switchMap((ev) => (ev === 3001 ? timer(0, 250) : EMPTY))
   )
   .subscribe();
 
@@ -309,11 +309,20 @@ export interface ZigbeeAction {
   /** action to take, receives the Sensor, including the state  */
   action: (s?: Sensor) => void;
 }
-
 function handleZigbeeEvents(sensor: Sensor) {
+  if (sensor.uniqueid === '00:15:8d:00:04:aa:c5:ef-01-0402') {
+    /** temp sensor desk */
+    broadcast({type: 'temprature', payload: sensor.state});
+    console.log(sensor.state);
+    // tslint:disable-next-line: no-string-literal
+    const tempt = sensor.state['temperature'];
+    if (tempt) {
+      pool.query('INSERT INTO tempratures (date,temp) VALUES ($1,$2)', [sensor.state.lastupdated, tempt]);
+    }
+  }
   zigbeeActions
-    .filter(a => a.sensorName === sensor.name)
-    .forEach(a => {
+    .filter((a) => a.sensorName === sensor.name)
+    .forEach((a) => {
       try {
         const prop = a.type || 'buttonevent';
         if (a.events.includes(sensor.state[prop])) {
@@ -329,7 +338,7 @@ const zigbeeActions: ZigbeeAction[] = [
   {
     sensorName: 'Smart Switch',
     events: [1005],
-    action: () => showTable(),
+    action: () => undefined,
   },
   {
     sensorName: 'Smart Switch',

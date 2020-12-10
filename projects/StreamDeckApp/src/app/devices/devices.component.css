@@ -1,0 +1,8 @@
+
+tr:nth-child(odd) {
+  background-color:#afafaf;
+}
+
+table {
+  text-align: left;
+}

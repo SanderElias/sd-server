@@ -1,10 +1,12 @@
-import {logError, yellow, log, logWarn} from '../utils/log';
-import express from 'express';
 import compression from 'compression';
+import cors from 'cors';
+import express from 'express';
 import {join, resolve} from 'path';
-import {settings} from './settings';
-import {injectReloadMiddleware} from './injectReloadMiddleware';
 import {src} from '../DynamicTs';
+import {getTable} from '../homeAutomation/deconz';
+import {pool} from '../homeAutomation/pg-client';
+import {log, logError, yellow} from '../utils/log';
+import {settings} from './settings';
 
 export async function sdServer() {
   try {
@@ -32,18 +34,18 @@ export async function sdServer() {
     });
     server.get('/assets/:fileName', (req, res) => {
       const asset = resolve(__dirname, '../../assets', req.params.fileName);
-      console.log(asset)
+      console.log(asset);
       res.sendFile(asset);
     });
     server.get('/image/:fileName', (req, res) => {
       const asset = resolve(__dirname, '../../../assets', req.params.fileName);
-      console.log(asset)
+      console.log(asset);
       res.sendFile(asset);
     });
     server.use(express.static(hostFolder, options));
     server.get('*', (req, res) => res.sendFile(join(hostFolder, '/index.html')));
 
-    server.listen(settings.port, settings.hostName, x => {
+    server.listen(settings.port, settings.hostName, () => {
       log(
         `StreamDeck server started on "${yellow(
           `http${settings.ssl ? 's' : ''}://${settings.hostName}:${settings.port}/`
@@ -72,21 +74,32 @@ export async function hookServer() {
 
     const server = express();
     server.use(compression());
+    server.use(cors());
     // server.use(injectReloadMiddleware)
     server.get('/ping', (req, res) => {
       res.send(`pong`);
+    });
+    server.get('/devices', (req, res) => {
+      res.send(getTable());
+    });
+
+    server.get('/temperatures', async (req, res) => {
+      const query = {
+        text: 'select * from tempratures ORDER BY prim DESC LIMIT 30',
+        rowMode: 'array',
+      };
+      const {rows} = await pool.query(query);
+      res.send(rows);
     });
 
     server.get('*', (req, res) => {
       res.send(`pong`);
     });
 
-    server.listen(8001, x => {
-      log(
-        `Hook server started on "${yellow(
-          `http${settings.ssl ? 's' : ''}://localhost:8001/`
-        )}"`
-      );
+    // postgresDBforPromitor
+
+    server.listen(8001, () => {
+      log(`Hook server started on "${yellow(`http${settings.ssl ? 's' : ''}://localhost:8001/`)}"`);
     });
   } catch (e) {
     logError(e);

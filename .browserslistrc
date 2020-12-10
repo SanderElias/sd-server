@@ -5,5 +5,5 @@
 # You can see what browsers were selected by your queries by running:
 #   npx browserslist
 
-> 5%
+> 3%
 not IE 9-12 # For IE 9-11 support, remove 'not'.
