@@ -24,14 +24,14 @@ export async function getFiles(folder) {
         console.log(title);
         await i3.command('workspace number 5; fullscreen disable');
         // await i3.command('workspace number 5');
-        await new Promise(r =>
+        await new Promise<void>(r =>
           exec(playVid(title), (err, std, ste) => {
             console.log('vlc', {err, std, ste});
             r();
           })
         );
         await i3.command('workspace number 5; fullscreen enable');
-        await new Promise(r =>
+        await new Promise<void>(r =>
           exec('killall -9 vlc', res => {
             // console.log('kill', res);
             r();

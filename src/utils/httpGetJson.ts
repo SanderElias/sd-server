@@ -93,7 +93,7 @@ on url: ${url}`);
         // console.error(`Got error: ${e.message}`);
         reject(e);
       } else {
-        resolve(undefined);
+        resolve(undefined as unknown as T);
       }
     });
     if (method && ['post', 'put'].includes(method) && data !== undefined) {

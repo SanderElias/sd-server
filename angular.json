@@ -18,7 +18,6 @@
             "main": "projects/StreamDeckApp/src/main.ts",
             "polyfills": "projects/StreamDeckApp/src/polyfills.ts",
             "tsConfig": "projects/StreamDeckApp/tsconfig.app.json",
-            "aot": true,
             "assets": [
               "projects/StreamDeckApp/src/favicon.ico",
               "projects/StreamDeckApp/src/assets"
@@ -26,7 +25,13 @@
             "styles": [
               "projects/StreamDeckApp/src/styles.css"
             ],
-            "scripts": []
+            "scripts": [],
+            "vendorChunk": true,
+            "extractLicenses": true,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": false
           },
           "configurations": {
             "production": {
@@ -40,8 +45,6 @@
               "outputHashing": "all",
               "sourceMap": false,
               "namedChunks": true,
-              "extractLicenses": true,
-              "vendorChunk": true,
               "buildOptimizer": true,
               "budgets": [
                 {

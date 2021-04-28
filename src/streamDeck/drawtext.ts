@@ -13,7 +13,7 @@ const font = PImage.registerFont(resolve(fontFolder, 'SourceSansPro-Regular.ttf'
 
 const font1 = PImage.registerFont(resolve(fontFolder, 'Verdana.ttf'), 'verdana');
 
-const loadFont = new Promise(res =>
+const loadFont = new Promise<void>(res =>
   font.load(() => {
     // console.log('font loaded');
     res();
