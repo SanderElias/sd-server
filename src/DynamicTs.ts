@@ -34,7 +34,6 @@ export const dynamicTs = async (file: string, fnName: string) => {
   } catch (e) {
     console.error(e);
   } finally {
-    console.log('delete file');
     unlinkSync(out);
   }
 };

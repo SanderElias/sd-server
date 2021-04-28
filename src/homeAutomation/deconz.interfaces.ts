@@ -176,4 +176,5 @@ export interface State {
   alert?: string;
   bri?: number;
   on?: boolean;
+  temperature?: number;
 }

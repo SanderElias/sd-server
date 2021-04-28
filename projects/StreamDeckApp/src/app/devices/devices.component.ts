@@ -21,7 +21,10 @@ import {map, tap} from 'rxjs/operators';
   styleUrls: ['./devices.component.css'],
 })
 export class DevicesComponent implements OnInit {
-  table$ = this.http.get('http://localhost:8001/devices').pipe(tap((r) => console.log(r)));
+  table$ = this.http.get('http://localhost:8001/devices').pipe(
+    tap((r) => console.log(r)),
+    map((table: any[]) => table.map((row) => ({...row, ...row.state})))
+  );
   keys$ = this.table$.pipe(
     map((table: any[]) =>
       table.reduce((fields, row) => {
@@ -35,7 +38,9 @@ export class DevicesComponent implements OnInit {
     ),
     tap((k) => console.log('keys', k)),
     map((keys) =>
-      keys.filter((key: string) => ['id', 'name', 'type'].findIndex((k) => key.includes(k)) !== -1)
+      keys.filter(
+        (key: string) => ['id', 'name', 'type', 'on', 'presence'].findIndex((k) => key.includes(k)) !== -1
+      )
     )
   );
 

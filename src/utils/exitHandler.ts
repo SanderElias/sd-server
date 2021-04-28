@@ -1,4 +1,6 @@
 
+
+export const exitHandlerInit = () => {
 /**
  * The following code is to make sure puppeteer will be closed properly.
  * Future additions on cleanup might to be handled here too.
@@ -16,7 +18,7 @@ function exitHandler(options, exitCode) {
   }
 }
 // do something when app is closing
-process.on('exit', exitHandler.bind(null, {cleanup: true}));
+process.on('exit', exitHandler.bind(null, {cleanup: true, exit:true}));
 // catches ctrl+c event
 process.on('SIGINT', exitHandler.bind(null, {exit: true}));
 // catches "kill pid" (for example: nodemon restart)
@@ -25,3 +27,4 @@ process.on('SIGUSR2', exitHandler.bind(null, {exit: true}));
 process.on('SIGTERM', exitHandler.bind(null, {exit: true}));
 // catches uncaught exceptions
 process.on('uncaughtException', exitHandler.bind(null, {exit: true}));
+}

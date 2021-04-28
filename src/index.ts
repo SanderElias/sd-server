@@ -1,5 +1,4 @@
 import './commands';
-import {dynamicTs} from './DynamicTs';
 import './homeAutomation/deconz';
 import {reloadAll, sdServer, hookServer} from './server/';
 import './utils/exitHandler';
@@ -7,6 +6,9 @@ import './utils/exitHandler';
 sdServer();
 hookServer();
 
-setTimeout(() => reloadAll(), 250);
-
-dynamicTs('testAction', 'testAction2').then(f => f && f());
+console.log('start your engine');
+setTimeout(() => {
+  console.log('going to reload');
+  reloadAll();
+}, 1000);
+// dynamicTs('testAction', 'testAction2').then(f => f && f());

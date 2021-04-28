@@ -114,7 +114,7 @@ export function getTable() {
 
 async function resetLamp() {
   await isInit;
-  const d = 'ResetLightHelp';
+  const d = 'ResetHelp';
   // const outlet = devices.get('cc:cc:cc:ff:fe:ae:9f:d1-01') as Sensor;
   // zigbeeEvents$
   //   .pipe(
@@ -173,20 +173,6 @@ const onState = true;
 
 // turnOn(65579)
 
-const testLamp = async (lamp = '90:fd:9f:ff:fe:29:9b:87-01') => {
-  await isInit;
-  const dev = devices.get(lamp);
-  const state: State = {on: true, bri: 125};
-  console.log(state);
-  const r = await httpGetJson(url(`lights/${dev?._id}/state`), {method: 'put', data: state}).catch((e) =>
-    console.error(e)
-  );
-  console.log('r', r);
-  return r;
-};
-
-testLamp();
-
 async function dcSetState(d: string, state: State) {
   const dev = await dcGetState(d);
   if (dev === undefined) {
@@ -200,7 +186,8 @@ async function dcSetState(d: string, state: State) {
 }
 
 async function dcGetState(d: string) {
-  const dev = devices.has(d) ? devices.get(d) : [...devices.values()].find((dev) => dev.name === d);
+  await isInit;
+  const dev = devices.has(d) ? devices.get(d) : [...devices.values()].find((device) => device.name === d);
   if (dev === undefined) {
     logWarn(`device ${d} not found`);
     return;
@@ -240,15 +227,16 @@ setTimeout(async () => {
     }
     return n;
   };
-  const newState = {on: true, transitiontime: 1, bri: 48, sat: 0} as State;
-  while (true) {
-    x = maxed(x);
-    y = x < 101 ? maxedy(y) : y;
-    newState.xy = [x / p, y / p];
-    // console.log(x, y, newState.xy);
-    await dcSetState('rgb', newState);
-    await new Promise((r) => setTimeout(r, 500));
-  }
+  const newState = {on: false, transitiontime: 1, bri: 48, sat: 0} as State;
+  await dcSetState('rgb', newState);
+  // while (true) {
+  //   x = maxed(x);
+  //   y = x < 101 ? maxedy(y) : y;
+  //   newState.xy = [x / p, y / p];
+  //   // console.log(x, y, newState.xy);
+  //   await dcSetState('rgb', newState);
+  //   // await new Promise((r) => setTimeout(r, 500));
+  // }
 }, 2000);
 
 /**
@@ -287,46 +275,40 @@ function rgb_to_cie(red = 0, green = 0, blue = 0): [number, number] {
 
 zigbeeEvents$
   .pipe(
-    tap(handleZigbeeEvents),
-    filter(
-      (sensor) =>
-        sensor.name === 'TRÅDFRI remote control' &&
-        sensor.state?.buttonevent !== undefined &&
-        [3001, 3003].includes(sensor.state.buttonevent)
-    ),
-    map((sensor) => sensor.state.buttonevent),
-    switchMap((ev) => (ev === 3001 ? timer(0, 250) : EMPTY))
+    tap(handleZigbeeEvents)
+    // filter(
+    //   (sensor) =>
+    //     sensor.name === 'TRÅDFRI remote control' &&
+    //     sensor.state?.buttonevent !== undefined &&
+    //     [3001, 3003].includes(sensor.state.buttonevent)
+    // ),
+    // map((sensor) => sensor.state.buttonevent),
+    // switchMap((ev) => (ev === 3001 ? timer(0, 250) : EMPTY))
   )
   .subscribe();
 
 export interface ZigbeeAction {
-  /** the given name of the sensor from the Psocon app */
+  /** the given name or uniqueID of the sensor from the Psocon app */
   sensorName: string;
   /** type type of event, defaults to buttonPress */
-  type?: string;
+  type?: keyof State;
   /** one of more events to act on */
-  events: number[];
+  events: (number | ((param: any) => boolean))[];
   /** action to take, receives the Sensor, including the state  */
-  action: (s?: Sensor) => void;
+  action: (s: Sensor) => void;
 }
 function handleZigbeeEvents(sensor: Sensor) {
-  if (sensor.uniqueid === '00:15:8d:00:04:aa:c5:ef-01-0402') {
-    /** temp sensor desk */
-    broadcast({type: 'temprature', payload: sensor.state});
-    console.log(sensor.state);
-    // tslint:disable-next-line: no-string-literal
-    const tempt = sensor.state['temperature'];
-    if (tempt) {
-      pool.query('INSERT INTO tempratures (date,temp) VALUES ($1,$2)', [sensor.state.lastupdated, tempt]);
-    }
-  }
   zigbeeActions
-    .filter((a) => a.sensorName === sensor.name)
-    .forEach((a) => {
+    .filter((a) => a.sensorName === sensor.name || sensor.uniqueid === a.sensorName)
+    .forEach(async (a) => {
       try {
         const prop = a.type || 'buttonevent';
-        if (a.events.includes(sensor.state[prop])) {
-          a.action(sensor);
+        if (
+          a.events.some((ev: any) =>
+            typeof ev === 'function' ? ev(sensor.state[prop]) : ev === sensor.state[prop]
+          )
+        ) {
+          await a.action(sensor);
         }
       } catch (e) {
         logWarn(a, e);
@@ -336,9 +318,22 @@ function handleZigbeeEvents(sensor: Sensor) {
 
 const zigbeeActions: ZigbeeAction[] = [
   {
-    sensorName: 'Smart Switch',
-    events: [1005],
-    action: () => undefined,
+    sensorName: 'BuroControl',
+    events: [2002],
+    action: async (s) => {
+      const curBright = (await dcGetState('BuroSanderLamp'))?.state.bri || 0;
+      dcSetState('BuroSanderHanglamp', {bri: curBright + 25});
+      dcSetState('BuroSanderLamp', {bri: curBright + 25});
+    },
+  },
+  {
+    sensorName: 'BuroControl',
+    events: [3002],
+    action: async (s) => {
+      const curBright = (await dcGetState('BuroSanderLamp'))?.state.bri || 0;
+      dcSetState('BuroSanderHanglamp', {bri: curBright - 25});
+      dcSetState('BuroSanderLamp', {bri: curBright - 25});
+    },
   },
   {
     sensorName: 'Smart Switch',
@@ -346,6 +341,67 @@ const zigbeeActions: ZigbeeAction[] = [
     action: () => {
       logEvents = !logEvents;
       console.log(`Logging deconz events turned ${logEvents ? 'on' : 'off'}`);
+    },
+  },
+  {
+    sensorName: 'showroomSwitch',
+    events: [(t) => true],
+    action: async (s) => {
+      // tslint:disable-next-line: no-non-null-assertion
+      const wait = (seconds) => new Promise((r) => setTimeout(r, seconds * 1000));
+      const e = s.state.buttonevent!;
+      const p = 'resetHelp';
+      const {
+        state: {on},
+      } = (await dcGetState(p))!;
+      switch (e) {
+        case 1002:
+          await dcSetState(p, {on: !on});
+          break;
+        case 1001:
+          await dcSetState(p, {on: false});
+          await wait(10);
+          for (let x = 0; x < 3; x += 1) {
+            console.log('cycle',x)
+            await dcSetState(p, {on: true});
+            await wait(3);
+            await dcSetState(p, {on: false});
+            await wait(3);
+          }
+          await dcSetState(p, {on: true});
+
+          break;
+        default:
+          break;
+      }
+      if (e === 1002) {
+      }
+    },
+  },
+  {
+    sensorName: 'showroomSwitch',
+    events: [2002],
+    action: async (s) => {
+      const p = 'rgb'
+      const state = await dcGetState(p)
+      console.log(state)
+    }
+
+  },
+  {
+    sensorName: '00:15:8d:00:04:aa:c5:ef-01-0402',
+    type: 'temperature',
+    events: [(t) => true],
+    action: async (sensor: Sensor) => {
+      const temp = sensor.state.temperature || 0;
+      broadcast({type: 'temprature', payload: sensor.state});
+      pool.query('INSERT INTO tempratures (date,temp) VALUES ($1,$2)', [sensor.state.lastupdated, temp]);
+      const heaterState = (await dcGetState('Heater'))?.state.on;
+      const neededHeaterState = temp > 2100 ? false : temp < 1900 ? true : undefined;
+      if (neededHeaterState !== undefined && heaterState !== neededHeaterState) {
+        dcSetState('Heater', {on: neededHeaterState});
+      }
+      console.log({temp, neededHeaterState, heaterState});
     },
   },
 ];
