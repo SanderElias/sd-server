@@ -46,7 +46,7 @@
     "sharp": "^0.27.1",
     "stream-buffers": "^3.0.2",
     "tslib": "^2.1.0",
-    "ws": "^7.4.3",
+    "ws": "^7.4.6",
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
