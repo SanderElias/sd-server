@@ -1,15 +1,17 @@
-import {EMPTY, Observable, of, Subject, timer} from 'rxjs';
-import {filter, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import { EMPTY, Observable, of, Subject, timer } from 'rxjs';
+import { filter, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import WebSocket from 'ws';
-import {broadcast} from '../server';
-import {httpGetJson} from '../utils/httpGetJson';
-import {logWarn} from '../utils/log';
-import {Aak, DeConfig, Sensor, Sensors, State, Whitelist, WsSmartEvent} from './deconz.interfaces';
-import {pool} from './pg-client';
-import {getSettings, updateSettings} from './settings';
+import { broadcast } from '../server';
+import { httpGetJson } from '../utils/httpGetJson';
+import { logWarn } from '../utils/log';
+import { Aak, DeConfig, Sensor, Sensors, State, Whitelist, WsSmartEvent } from './deconz.interfaces';
+import { pool } from './pg-client';
+import { getSettings, updateSettings } from './settings';
 
+
+
+const { deconz } = getSettings();
 const url = (part) => `http://localhost:180/api/${deconz.apiKey}/${part}`;
-const {deconz} = getSettings();
 const events$$ = new Subject<WsSmartEvent>();
 const devices = new Map<string, Sensor>();
 let logEvents = false;
@@ -20,11 +22,11 @@ export const zigbeeEvents$ = events$$.pipe(
       // tslint:disable-next-line: no-non-null-assertion
       const device = devices.get(ev.uniqueid)!;
       if (ev.state) {
-        device.state = {...device.state, ...ev.state};
+        device.state = { ...device.state, ...ev.state };
         return of(device);
       }
       if (ev.config) {
-        device.config = {...device.config, ...ev.config};
+        device.config = { ...device.config, ...ev.config };
       }
       return of(undefined);
     }
@@ -51,7 +53,7 @@ const getApiKey = async () => {
   const ba = `Basic ${Buffer.from(`admin:${deconz.password}`).toString('base64')}`;
   const result = await httpGetJson<Aak[]>('http://localhost/api', {
     method: 'post',
-    headers: {Authorization: ba},
+    headers: { Authorization: ba },
     data: {
       devicetype: appName,
     },
@@ -59,24 +61,24 @@ const getApiKey = async () => {
   const apiKey = result[0]?.success?.username;
   if (apiKey) {
     deconz.apiKey = apiKey;
-    updateSettings({deconz});
+    updateSettings({ deconz });
     removeOthers(apiKey);
   }
   return apiKey;
 };
 
 const removeOthers = async (apiKey) => {
-  const {whitelist} = await getConfig();
+  const { whitelist } = await getConfig();
   [...Object.entries(whitelist)].forEach(async ([key, item]: [string, Whitelist]) => {
     if (key !== apiKey && item.name === appName) {
       const uri = url(`config/whitelist/${key}`);
-      await httpGetJson(uri, {method: 'delete'});
+      await httpGetJson(uri, { method: 'delete' });
     }
   });
 };
 
 const connect = async () => {
-  const {websocketport} = await getConfig();
+  const { websocketport } = await getConfig();
   const ws = new WebSocket(`ws://localhost:${websocketport}`);
   ws.onmessage = (m) => {
     const data = JSON.parse(m.data.toString());
@@ -179,7 +181,7 @@ async function dcSetState(d: string, state: State) {
     logWarn(`device ${d} not found`);
     return;
   }
-  const r = await httpGetJson(url(`lights/${dev?._id}/state`), {method: 'put', data: state}).catch((e) =>
+  const r = await httpGetJson(url(`lights/${dev?._id}/state`), { method: 'put', data: state }).catch((e) =>
     console.error(e)
   );
   // console.log('new device state', r);
@@ -227,7 +229,7 @@ setTimeout(async () => {
     }
     return n;
   };
-  const newState = {on: false, transitiontime: 1, bri: 48, sat: 0} as State;
+  const newState = { on: false, transitiontime: 1, bri: 48, sat: 0 } as State;
   await dcSetState('rgb', newState);
   // while (true) {
   //   x = maxed(x);
@@ -296,6 +298,8 @@ export interface ZigbeeAction {
   events: (number | ((param: any) => boolean))[];
   /** action to take, receives the Sensor, including the state  */
   action: (s: Sensor) => void;
+  /** optional description to remember me what's the idea of this action ;) */
+  description?: string;
 }
 function handleZigbeeEvents(sensor: Sensor) {
   zigbeeActions
@@ -319,11 +323,12 @@ function handleZigbeeEvents(sensor: Sensor) {
 const zigbeeActions: ZigbeeAction[] = [
   {
     sensorName: 'BuroControl',
+    description: 'Increase brightness of lampen @ buro',
     events: [2002],
     action: async (s) => {
       const curBright = (await dcGetState('BuroSanderLamp'))?.state.bri || 0;
-      dcSetState('BuroSanderHanglamp', {bri: curBright + 25});
-      dcSetState('BuroSanderLamp', {bri: curBright + 25});
+      dcSetState('BuroSanderHanglamp', { bri: curBright + 25 });
+      dcSetState('BuroSanderLamp', { bri: curBright + 25 });
     },
   },
   {
@@ -331,8 +336,20 @@ const zigbeeActions: ZigbeeAction[] = [
     events: [3002],
     action: async (s) => {
       const curBright = (await dcGetState('BuroSanderLamp'))?.state.bri || 0;
-      dcSetState('BuroSanderHanglamp', {bri: curBright - 25});
-      dcSetState('BuroSanderLamp', {bri: curBright - 25});
+      dcSetState('BuroSanderHanglamp', { bri: curBright - 25 });
+      dcSetState('BuroSanderLamp', { bri: curBright - 25 });
+    },
+  },
+  {
+    sensorName: 'BuroControl',
+    events: [4002],
+    action: async (s) => {
+      await dcSetState('BuroSanderHanglamp', { on: false });
+      await dcSetState('BuroSanderLamp', { on: false });
+      // await dcSetState('keukenHalOutlet', {on: false});
+      await dcSetState('keukenHalOutletNew', { on: false });
+      await dcSetState('KeukenLedLigth', { on: false });
+      await dcSetState('showroomSwitch', { on: false });
     },
   },
   {
@@ -352,23 +369,24 @@ const zigbeeActions: ZigbeeAction[] = [
       const e = s.state.buttonevent!;
       const p = 'resetHelp';
       const {
-        state: {on},
+        state: { on },
       } = (await dcGetState(p))!;
       switch (e) {
         case 1002:
-          await dcSetState(p, {on: !on});
+          await dcSetState(p, { on: !on });
           break;
         case 1001:
-          await dcSetState(p, {on: false});
+          console.log('start reset')
+          await dcSetState(p, { on: true });
           await wait(10);
-          for (let x = 0; x < 3; x += 1) {
-            console.log('cycle',x)
-            await dcSetState(p, {on: true});
-            await wait(3);
-            await dcSetState(p, {on: false});
-            await wait(3);
+          for (let x = 0; x < 6; x += 1) {
+            console.log('cycle', x);
+            await dcSetState(p, { on: false });
+            await wait(1);
+            await dcSetState(p, { on: true });
+            await wait(1);
           }
-          await dcSetState(p, {on: true});
+          // await dcSetState(p, {on: true});
 
           break;
         default:
@@ -382,11 +400,10 @@ const zigbeeActions: ZigbeeAction[] = [
     sensorName: 'showroomSwitch',
     events: [2002],
     action: async (s) => {
-      const p = 'rgb'
-      const state = await dcGetState(p)
-      console.log(state)
-    }
-
+      const p = 'rgb';
+      const state = await dcGetState(p);
+      console.log(state);
+    },
   },
   {
     sensorName: '00:15:8d:00:04:aa:c5:ef-01-0402',
@@ -394,14 +411,18 @@ const zigbeeActions: ZigbeeAction[] = [
     events: [(t) => true],
     action: async (sensor: Sensor) => {
       const temp = sensor.state.temperature || 0;
-      broadcast({type: 'temprature', payload: sensor.state});
+      broadcast({ type: 'temprature', payload: sensor.state });
       pool.query('INSERT INTO tempratures (date,temp) VALUES ($1,$2)', [sensor.state.lastupdated, temp]);
       const heaterState = (await dcGetState('Heater'))?.state.on;
       const neededHeaterState = temp > 2100 ? false : temp < 1900 ? true : undefined;
       if (neededHeaterState !== undefined && heaterState !== neededHeaterState) {
-        dcSetState('Heater', {on: neededHeaterState});
+        dcSetState('Heater', { on: neededHeaterState });
       }
-      console.log({temp, neededHeaterState, heaterState});
+      console.log({ temp, neededHeaterState, heaterState });
     },
   },
 ];
+
+export async function addZigbeeAction(action: ZigbeeAction) {
+  zigbeeActions.push(action);
+}

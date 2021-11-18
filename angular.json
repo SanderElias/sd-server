@@ -26,12 +26,11 @@
               "projects/StreamDeckApp/src/styles.css"
             ],
             "scripts": [],
-            "vendorChunk": true,
-            "extractLicenses": true,
-            "buildOptimizer": false,
+            "vendorChunk": false,
+            "buildOptimizer": true,
             "sourceMap": true,
-            "optimization": false,
-            "namedChunks": false
+            "optimization": true,
+            "aot": true
           },
           "configurations": {
             "production": {
@@ -59,7 +58,8 @@
                 }
               ]
             }
-          }
+          },
+          "defaultConfiguration": ""
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -93,19 +93,6 @@
               "projects/StreamDeckApp/src/styles.css"
             ],
             "scripts": []
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "projects/StreamDeckApp/tsconfig.app.json",
-              "projects/StreamDeckApp/tsconfig.spec.json",
-              "projects/StreamDeckApp/e2e/tsconfig.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
           }
         },
         "e2e": {

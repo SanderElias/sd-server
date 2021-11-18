@@ -1,17 +1,16 @@
-import {exec} from 'child_process';
-import {readdir} from 'fs';
-import {basename, extname} from 'path';
-import {page2} from '../commands';
-import {i3} from './i3';
-import {activatePage} from './activePage';
+import { exec } from 'child_process';
+import { readdir } from 'fs';
+import { basename, extname } from 'path';
+import { page2 } from '../streamdeckPages/page-2';
+import { i3 } from './i3';
 
 export async function getFiles(folder) {
-  const files: string[] = await new Promise(r => readdir(folder, (_, f) => r(f)));
+  const files: string[] = await new Promise((r) => readdir(folder, (_, f) => r(f)));
   if (!files) {
     return;
   }
   let tile = -1;
-  files.forEach(file => {
+  files.forEach((file) => {
     const title = basename(file, '.flv');
     if (extname(file) !== '.flv') {
       return;
@@ -24,15 +23,15 @@ export async function getFiles(folder) {
         console.log(title);
         await i3.command('workspace number 5; fullscreen disable');
         // await i3.command('workspace number 5');
-        await new Promise<void>(r =>
+        await new Promise<void>((r) =>
           exec(playVid(title), (err, std, ste) => {
             console.log('vlc', {err, std, ste});
             r();
           })
         );
         await i3.command('workspace number 5; fullscreen enable');
-        await new Promise<void>(r =>
-          exec('killall -9 vlc', res => {
+        await new Promise<void>((r) =>
+          exec('killall -9 vlc', (res) => {
             // console.log('kill', res);
             r();
           })

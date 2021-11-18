@@ -1,5 +1,5 @@
-import {listStreamDecks, openStreamDeck, StreamDeck} from 'elgato-stream-deck';
-import {interval, merge, race, ReplaySubject, Subject, BehaviorSubject, Observable, timer} from 'rxjs';
+import { listStreamDecks, openStreamDeck, StreamDeck } from 'elgato-stream-deck';
+import { interval, merge, race, ReplaySubject, Subject, BehaviorSubject, Observable, timer } from 'rxjs';
 import {
   bufferCount,
   debounceTime,
@@ -13,8 +13,8 @@ import {
   mergeMap,
   take,
 } from 'rxjs/operators';
-import {logWarn, logError} from '../utils/log';
-import {log} from 'console';
+import { logWarn, logError } from '../utils/log';
+import { log } from 'console';
 
 // const i3 = I3
 const deck = new BehaviorSubject<StreamDeck | undefined>(undefined);
@@ -61,7 +61,7 @@ function pollIt(lastInterval = 0) {
   }
 
   // TODO: add support for multiple decks!
-  const {path} = decks[0];
+  const { path } = decks[0];
   try {
     _deck = openStreamDeck(path);
     deck.next(_deck);
@@ -113,7 +113,7 @@ deck$.subscribe({
       try {
         strDeck['removeAllListeners']();
         strDeck.close();
-      } catch {}
+      } catch { }
       deck.next(undefined);
       // pollIt();
     });
@@ -125,7 +125,7 @@ const cycle$ = down$.pipe(
     const start = Date.now();
     return up$.pipe(
       filter(k => k === key),
-      map(key => ({key, delay: Date.now() - start, double: false, long: false}))
+      map(key => ({ key, delay: Date.now() - start, double: false, long: false }))
     );
   })
 );

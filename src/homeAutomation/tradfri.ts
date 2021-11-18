@@ -1,17 +1,16 @@
-import {writeFileSync} from 'fs';
 import {
   Accessory,
   AccessoryTypes,
   Group,
   TradfriClient,
   TradfriError,
-  TradfriErrorCodes,
+  TradfriErrorCodes
 } from 'node-tradfri-client';
-import {merge, Subject} from 'rxjs';
-import {dailyTimer} from '../scheduledTaks/simpleTimer';
-import {getSettings, updateSettings} from './settings';
-import {logWarn} from '../utils/log';
-import { filter } from 'rxjs/operators';
+import { merge, Subject } from 'rxjs';
+import { filter } from 'rxjs/operators'
+import { dailyTimer } from '../scheduledTaks/simpleTimer';
+import { logWarn } from '../utils/log';
+import { getSettings, updateSettings } from './settings';
 
 const settings = getSettings();
 const inits = new Subject<void>();
@@ -25,12 +24,12 @@ export async function tradfriInit() {
 }
 
 async function init(tr = 0) {
-  const {identity: tdId, psk, id} = await getIdPsk();
-  const tradfri = new TradfriClient(id!, {watchConnection: true});
+  const { identity: tdId, psk, id } = await getIdPsk();
+  const tradfri = new TradfriClient(id!, { watchConnection: true });
   try {
     await tradfri.connect(tdId!, psk!);
   } catch (e) {
-    handleTradfriError(e);
+    handleTradfriError(e as unknown as TradfriError);
   }
   devices.clear();
   await tradfri
@@ -161,7 +160,7 @@ export function disco1() {
         } else {
           plug.turnOff();
         }
-      } catch (e) {}
+      } catch (e) { }
     });
     dc = setTimeout(() => flash(n), 500);
   };
@@ -177,7 +176,11 @@ export async function disco() {
   });
 }
 
-function handleTradfriError(e: {code: any}) {
+interface TradFriError {
+  code: any;
+}
+
+function handleTradfriError(e: TradFriError) {
   if (e instanceof TradfriError) {
     switch (e.code) {
       case TradfriErrorCodes.ConnectionTimedOut: {
@@ -206,15 +209,15 @@ function handleTradfriError(e: {code: any}) {
 async function getIdPsk() {
   try {
     // tslint:disable-next-line: no-shadowed-variable
-    const {tradfri} = settings;
+    const { tradfri } = settings;
     if (!tradfri.psk) {
-      const {identity, psk} = await getAuth(tradfri.id, tradfri.securityCode);
+      const { identity, psk } = await getAuth(tradfri.id, tradfri.securityCode);
       tradfri.identity = identity!;
       tradfri.psk = psk!;
       updateSettings(settings);
-      return {identity, psk, id: tradfri.id};
+      return { identity, psk, id: tradfri.id };
     }
-    return {identity: tradfri.identity, psk: tradfri.psk, id: tradfri.id};
+    return { identity: tradfri.identity, psk: tradfri.psk, id: tradfri.id };
   } catch (e) {
     console.error(e);
   }
@@ -224,8 +227,8 @@ async function getIdPsk() {
 async function getAuth(id: string, secret: string) {
   try {
     const tradfri = new TradfriClient(id);
-    const {identity, psk} = await tradfri.authenticate(secret).catch();
-    return {identity, psk};
+    const { identity, psk } = await tradfri.authenticate(secret).catch();
+    return { identity, psk };
   } catch (e) {
     logWarn(e);
     return {};

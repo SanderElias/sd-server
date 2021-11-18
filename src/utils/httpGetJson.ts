@@ -82,7 +82,7 @@ on url: ${url}`);
         try {
           const parsedData = JSON.parse(rawData);
           resolve(parsedData);
-        } catch (e) {
+        } catch (e:any) {
           console.error(e.message);
           return reject(error);
         }

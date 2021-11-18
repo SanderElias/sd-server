@@ -1,10 +1,11 @@
-import { Command } from './streamDeck/Command.interface';
-import { resetDeck } from './streamDeck/installCommand';
-import { dblClick } from './streamDeck/streamDeck';
-import { activateNextPage, activatePage } from './utils/activePage';
-import { getFiles } from './utils/getFiles';
-import { clearCountDown, countDown } from './utils/timer';
-import { page2 } from './commands';
+import { Command } from '../streamDeck/Command.interface';
+import { resetDeck } from '../streamDeck/installCommand';
+import { dblClick } from '../streamDeck/streamDeck';
+import { activateNextPage, activatePage } from '../utils/activePage';
+import { getFiles } from '../utils/getFiles';
+import { clearCountDown, countDown } from '../utils/timer';
+
+export const page2: Command[] = []
 export const page2Base: Command[] = [
   {
     tile: 13,
