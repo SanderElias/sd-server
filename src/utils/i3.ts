@@ -1,8 +1,6 @@
 // import * as i3 from 'node-i3';
 export const i3 = require('i3').createClient();
 
-
-
 export interface TentacledNode {
   id: number;
   type: string;

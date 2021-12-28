@@ -18,13 +18,8 @@
             "main": "projects/StreamDeckApp/src/main.ts",
             "polyfills": "projects/StreamDeckApp/src/polyfills.ts",
             "tsConfig": "projects/StreamDeckApp/tsconfig.app.json",
-            "assets": [
-              "projects/StreamDeckApp/src/favicon.ico",
-              "projects/StreamDeckApp/src/assets"
-            ],
-            "styles": [
-              "projects/StreamDeckApp/src/styles.css"
-            ],
+            "assets": ["projects/StreamDeckApp/src/favicon.ico", "projects/StreamDeckApp/src/assets"],
+            "styles": ["projects/StreamDeckApp/src/styles.css"],
             "scripts": [],
             "vendorChunk": false,
             "buildOptimizer": true,
@@ -85,13 +80,8 @@
             "polyfills": "projects/StreamDeckApp/src/polyfills.ts",
             "tsConfig": "projects/StreamDeckApp/tsconfig.spec.json",
             "karmaConfig": "projects/StreamDeckApp/karma.conf.js",
-            "assets": [
-              "projects/StreamDeckApp/src/favicon.ico",
-              "projects/StreamDeckApp/src/assets"
-            ],
-            "styles": [
-              "projects/StreamDeckApp/src/styles.css"
-            ],
+            "assets": ["projects/StreamDeckApp/src/favicon.ico", "projects/StreamDeckApp/src/assets"],
+            "styles": ["projects/StreamDeckApp/src/styles.css"],
             "scripts": []
           }
         },
@@ -108,7 +98,8 @@
           }
         }
       }
-    }},
+    }
+  },
   "cli": {
     "analytics": "1ee7009e-d170-41c6-b965-db7f8b2a7a85"
   },

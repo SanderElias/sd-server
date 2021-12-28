@@ -9,7 +9,6 @@ import { Aak, DeConfig, Sensor, Sensors, State, Whitelist, WsSmartEvent } from '
 import { pool } from './pg-client';
 import { getSettings, updateSettings } from './settings';
 
-
 const { deconz } = getSettings();
 const url = (part) => `http://localhost:180/api/${deconz.apiKey}/${part}`;
 const events$$ = new Subject<WsSmartEvent>();
@@ -17,20 +16,18 @@ const devices = new Map<string, Sensor>();
 let logEvents = false;
 export const zigbeeEvents$ = events$$.pipe(
   filter((ev) => devices.has(ev.uniqueid)),
-  switchMap(
-    (ev: WsSmartEvent): Observable<Sensor | undefined> => {
-      // tslint:disable-next-line: no-non-null-assertion
-      const device = devices.get(ev.uniqueid)!;
-      if (ev.state) {
-        device.state = { ...device.state, ...ev.state };
-        return of(device);
-      }
-      if (ev.config) {
-        device.config = { ...device.config, ...ev.config };
-      }
-      return of(undefined);
+  switchMap((ev: WsSmartEvent): Observable<Sensor | undefined> => {
+    // tslint:disable-next-line: no-non-null-assertion
+    const device = devices.get(ev.uniqueid)!;
+    if (ev.state) {
+      device.state = { ...device.state, ...ev.state };
+      return of(device);
     }
-  ),
+    if (ev.config) {
+      device.config = { ...device.config, ...ev.config };
+    }
+    return of(undefined);
+  }),
   filter((d: any) => typeof d !== 'undefined'),
   tap((d: Sensor) => {
     const stateProps = Object.keys(d.state || {});
@@ -38,7 +35,7 @@ export const zigbeeEvents$ = events$$.pipe(
       console.log(d.name, d.state);
     }
   }),
-  shareReplay(1)
+  shareReplay(1),
 );
 
 const getConfig = async (): Promise<DeConfig> => {
@@ -100,7 +97,7 @@ const init = async () => {
       }
       return m;
     },
-    devices
+    devices,
   );
   // showTable();
 };
@@ -182,7 +179,7 @@ async function dcSetState(d: string, state: State) {
     return;
   }
   const r = await httpGetJson(url(`lights/${dev?._id}/state`), { method: 'put', data: state }).catch((e) =>
-    console.error(e)
+    console.error(e),
   );
   // console.log('new device state', r);
 }
@@ -277,7 +274,7 @@ function rgb_to_cie(red = 0, green = 0, blue = 0): [number, number] {
 
 zigbeeEvents$
   .pipe(
-    tap(handleZigbeeEvents)
+    tap(handleZigbeeEvents),
     // filter(
     //   (sensor) =>
     //     sensor.name === 'TRÅDFRI remote control' &&
@@ -309,7 +306,7 @@ function handleZigbeeEvents(sensor: Sensor) {
         const prop = a.type || 'buttonevent';
         if (
           a.events.some((ev: any) =>
-            typeof ev === 'function' ? ev(sensor.state[prop]) : ev === sensor.state[prop]
+            typeof ev === 'function' ? ev(sensor.state[prop]) : ev === sensor.state[prop],
           )
         ) {
           await a.action(sensor);
@@ -320,7 +317,6 @@ function handleZigbeeEvents(sensor: Sensor) {
     });
 }
 
-
 const zigbeeActions: ZigbeeAction[] = [
   {
     sensorName: 'Telfon',
@@ -328,7 +324,9 @@ const zigbeeActions: ZigbeeAction[] = [
     events: [1002],
     action: async (s) => {
       console.log('Start Telfon VM');
-      await runScript('vmrun -t ws start "/home/sander/vmware/Windows 7 x64/Windows 7 x64.vmx"').catch(console.error);
+      await runScript('vmrun -t ws start "/home/sander/vmware/Windows 7 x64/Windows 7 x64.vmx"').catch(
+        console.error,
+      );
     },
   },
   {
@@ -337,7 +335,9 @@ const zigbeeActions: ZigbeeAction[] = [
     events: [2002],
     action: async (s) => {
       console.log('Stop Telfon VM');
-      await runScript('vmrun -t ws stop "/home/sander/vmware/Windows 7 x64/Windows 7 x64.vmx"').catch(console.error);
+      await runScript('vmrun -t ws stop "/home/sander/vmware/Windows 7 x64/Windows 7 x64.vmx"').catch(
+        console.error,
+      );
     },
   },
   {
@@ -395,7 +395,7 @@ const zigbeeActions: ZigbeeAction[] = [
           await dcSetState(p, { on: !on });
           break;
         case 1001:
-          console.log('start reset')
+          console.log('start reset');
           await dcSetState(p, { on: true });
           await wait(10);
           for (let x = 0; x < 6; x += 1) {
@@ -431,9 +431,11 @@ const zigbeeActions: ZigbeeAction[] = [
     action: async (sensor: Sensor) => {
       const temp = sensor.state.temperature || 0;
       broadcast({ type: 'temprature', payload: sensor.state });
-      pool.query('INSERT INTO tempratures (date,temp) VALUES ($1,$2)', [sensor.state.lastupdated, temp]).catch(e => {
-        console.log('error while writing to PG', e);
-      });
+      pool
+        .query('INSERT INTO tempratures (date,temp) VALUES ($1,$2)', [sensor.state.lastupdated, temp])
+        .catch((e) => {
+          console.log('error while writing to PG', e);
+        });
       const heaterState = (await dcGetState('Heater'))?.state.on;
       const neededHeaterState = temp > 1700 ? false : temp < 1500 ? true : undefined;
       if (neededHeaterState !== undefined && heaterState !== neededHeaterState) {
@@ -450,13 +452,15 @@ export async function addZigbeeAction(action: ZigbeeAction) {
 
 addZigbeeAction({
   sensorName: 'BuroSignaal',
-  events: [(n) => {
-    // console.log('event', n);
-    return true;
-  }],
+  events: [
+    (n) => {
+      // console.log('event', n);
+      return true;
+    },
+  ],
   action: async (s) => {
     console.log(s.state.bri);
-  }
+  },
 });
 
 // pulsateBulb('BuroSignaal');
@@ -471,27 +475,28 @@ export async function pulsateBulb(lamp: string, direction: 'up' | 'down' = 'up',
   // await wait(50)
   dcSetState(lamp, { on: true, bri: 1 });
   await waitForState(lamp, { bri: 1 });
-  console.log('uit')
+  console.log('uit');
   for (let i = 0; i < iter; i += 1) {
     await dcSetState(lamp, { transitiontime: 5, bri: 254 });
     await waitForState(lamp, { bri: 254 });
-    console.log('top')
+    console.log('top');
     await dcSetState(lamp, { transitiontime: 5, bri: 1 });
     await waitForState(lamp, { bri: 1 });
-    console.log('low')
+    console.log('low');
   }
   await dcSetState(lamp, initialState);
-
 }
 
 function waitForState(name: Sensor['name'], state: Sensor['state']) {
-  return timer(50, 50).pipe(
-    switchMap(() => dcGetState(name)),
-    filter(s => s !== undefined),
-    tap(st => console.log(st!.state?.bri)),
-    filter(e => Object.entries(state).every(([k, v]) => e!.state[k] === v)),
-    take(1),
-  ).toPromise();
+  return timer(50, 50)
+    .pipe(
+      switchMap(() => dcGetState(name)),
+      filter((s) => s !== undefined),
+      tap((st) => console.log(st!.state?.bri)),
+      filter((e) => Object.entries(state).every(([k, v]) => e!.state[k] === v)),
+      take(1),
+    )
+    .toPromise();
 }
 
 function wait(n: number) {

@@ -1,16 +1,16 @@
-import {exec} from 'child_process';
-import {toggleDevice} from '../homeAutomation/tradfri';
+import { exec } from 'child_process';
+import { toggleDevice } from '../homeAutomation/tradfri';
 
 let brightness = 1;
 const setIt = (b1 = brightness, b2 = b1, b3 = b1) =>
   exec(
-    `xrandr --output DisplayPort-0 --brightness ${b1} && xrandr --output DisplayPort-1 --brightness ${b2} && xrandr --output DisplayPort-2 --brightness ${b3}`
+    `xrandr --output DisplayPort-0 --brightness ${b1} && xrandr --output DisplayPort-1 --brightness ${b2} && xrandr --output DisplayPort-2 --brightness ${b3}`,
   ).unref();
 
 export function setBrightness(modifier = 1): () => void {
   return async () => {
     brightness = Math.max(1, Math.min(15, brightness + modifier));
-    console.log({brightness});
+    console.log({ brightness });
     setIt();
   };
 }
@@ -30,5 +30,5 @@ export function videoBright() {
   //   setIt(1, 10, 10);
   //   triState = 1;
   // }
-  console.log('nextSTate',triState)
+  console.log('nextSTate', triState);
 }

@@ -36,7 +36,7 @@ export const page3: Command[] = [
     tile: 1,
     image: 'display.png',
     action: async () => {
-      const log = (err?, result?) => (console.log(err, result) as unknown) as any;
+      const log = (err?, result?) => console.log(err, result) as unknown as any;
       await exec('/home/sander/.screenlayout/default.sh');
       await moveWP(4, 'middle');
       await moveWP(3, 'middle');
@@ -91,7 +91,7 @@ export const page3: Command[] = [
       const tree = await i3Tree(); //.filter(row => row.name && row.name.includes('Disp'));
       const walkTree = (node: I3Tree, parentId = 0) => {
         // if (node.type && node.type === 'con') {
-        nodes.push(({ ...node, parentId } as unknown) as MyNode);
+        nodes.push({ ...node, parentId } as unknown as MyNode);
         // }
         // tslint:disable-next-line: no-angle-bracket-type-assertion
         node.nodes.forEach((n) => walkTree(<any>n, node.id));
@@ -110,14 +110,14 @@ export const page3: Command[] = [
             parent: n.parentId,
             r: getById(n.parentId)?.layout,
           }))
-          .sort((x, y) => (x.parent < y.parent ? -1 : 1))
+          .sort((x, y) => (x.parent < y.parent ? -1 : 1)),
       );
     },
   },
   {
     tile: 7,
     image: 'bulbOn.png',
-    action: async () => await pulsateBulb('BuroSignaal')
+    action: async () => await pulsateBulb('BuroSignaal'),
   },
   {
     tile: 8,

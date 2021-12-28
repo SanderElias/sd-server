@@ -1,12 +1,12 @@
 import compression from 'compression';
 import cors from 'cors';
 import express from 'express';
-import {join, resolve} from 'path';
-import {src} from '../DynamicTs';
-import {getTable} from '../homeAutomation/deconz';
-import {pool} from '../homeAutomation/pg-client';
-import {log, logError, yellow} from '../utils/log';
-import {settings} from './settings';
+import { join, resolve } from 'path';
+import { src } from '../DynamicTs';
+import { getTable } from '../homeAutomation/deconz';
+import { pool } from '../homeAutomation/pg-client';
+import { log, logError, yellow } from '../utils/log';
+import { settings } from './settings';
 
 export async function sdServer() {
   try {
@@ -48,8 +48,8 @@ export async function sdServer() {
     server.listen(settings.port, settings.hostName, () => {
       log(
         `StreamDeck server started on "${yellow(
-          `http${settings.ssl ? 's' : ''}://${settings.hostName}:${settings.port}/`
-        )}"`
+          `http${settings.ssl ? 's' : ''}://${settings.hostName}:${settings.port}/`,
+        )}"`,
       );
     });
   } catch (e) {
@@ -88,7 +88,7 @@ export async function hookServer() {
         text: 'select * from tempratures ORDER BY prim DESC LIMIT 30',
         rowMode: 'array',
       };
-      const {rows} = await pool.query(query);
+      const { rows } = await pool.query(query);
       res.send(rows);
     });
 

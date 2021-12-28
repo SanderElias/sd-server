@@ -3,5 +3,5 @@ export const settings = {
   hostName: 'localhost',
   port: 3000,
   publicFolder: '../../StreamDeckApp',
-  reloadPort: 3001
+  reloadPort: 3001,
 };

@@ -1,5 +1,5 @@
-import {readFileSync, writeFileSync} from 'fs';
-import {join} from 'path';
+import { readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
 
 let settings: Settings;
 const settingsFile = join(__dirname, '../../../serials.json');
@@ -11,8 +11,8 @@ try {
 
 export const getSettings = () => settings;
 
-export const updateSettings = update => {
-  settings = {...settings, ...update};
+export const updateSettings = (update) => {
+  settings = { ...settings, ...update };
   writeFileSync(settingsFile, JSON.stringify(settings));
 };
 

@@ -1,5 +1,5 @@
-import {timer} from 'rxjs';
-import {filter} from 'rxjs/operators';
+import { timer } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 interface Time {
   second: number;
@@ -26,19 +26,19 @@ export function dailyTimer(givenTime: Partial<Time> | string) {
   if (typeof givenTime === 'string') {
     const [hour, minute, second] = givenTime
       .split(':')
-      .map(x => +x)
+      .map((x) => +x)
       .concat(0, 0, 0);
-    givenTime = {hour, minute, second};
+    givenTime = { hour, minute, second };
   }
   const d = new Date();
-  const time = {...timeDefaults, ...givenTime};
+  const time = { ...timeDefaults, ...givenTime };
   const run = new Date(
     d.getUTCFullYear(),
     d.getUTCMonth(),
     d.getUTCDate(),
     time.hour,
     time.minute,
-    time.second
+    time.second,
   ).getTime();
   const now = d.getTime();
   const dueTime = run - now < 0 ? run - now + day : run - now;

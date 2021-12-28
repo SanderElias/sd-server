@@ -2,14 +2,10 @@
   <h1>StreamDeck</h1>
 </header>
 <main>
-
   <section>
-    <sd-button
-      *ngFor="let button of btnList$|async"
-      [buttonData]="button"
-    ></sd-button>
+    <sd-button *ngFor="let button of btnList$ | async" [buttonData]="button"></sd-button>
   </section>
-  <br>
+  <br />
   <button (click)="sendReset()">resetDeck</button>
 </main>
 <style>

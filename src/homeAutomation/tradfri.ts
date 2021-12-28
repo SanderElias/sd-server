@@ -4,10 +4,10 @@ import {
   Group,
   TradfriClient,
   TradfriError,
-  TradfriErrorCodes
+  TradfriErrorCodes,
 } from 'node-tradfri-client';
 import { merge, Subject } from 'rxjs';
-import { filter } from 'rxjs/operators'
+import { filter } from 'rxjs/operators';
 import { dailyTimer } from '../scheduledTaks/simpleTimer';
 import { logWarn } from '../utils/log';
 import { getSettings, updateSettings } from './settings';
@@ -87,8 +87,8 @@ export async function turnOn(deviceId: number) {
       await device.turnOn();
     }
     if (device instanceof Accessory) {
-      device.lightList?.forEach(l => l.onOff === false && l.turnOn());
-      device.plugList?.forEach(p => p.onOff === false && p.turnOn());
+      device.lightList?.forEach((l) => l.onOff === false && l.turnOn());
+      device.plugList?.forEach((p) => p.onOff === false && p.turnOn());
     }
   } catch (e) {
     console.log(`error while turning ${device?.name} off`, e);
@@ -103,8 +103,8 @@ export async function turnOff(deviceId: number) {
       await device.turnOff();
     }
     if (device instanceof Accessory) {
-      device.lightList?.forEach(l => l.onOff && l.turnOff());
-      device.plugList?.forEach(p => p.onOff && p.turnOff());
+      device.lightList?.forEach((l) => l.onOff && l.turnOff());
+      device.plugList?.forEach((p) => p.onOff && p.turnOff());
     }
   } catch (e) {
     console.log(`error while turning ${device?.name} off`, e);
@@ -160,7 +160,7 @@ export function disco1() {
         } else {
           plug.turnOff();
         }
-      } catch (e) { }
+      } catch (e) {}
     });
     dc = setTimeout(() => flash(n), 500);
   };
@@ -168,7 +168,7 @@ export function disco1() {
 }
 
 export async function disco() {
-  [...devices.values()].forEach(d => {
+  [...devices.values()].forEach((d) => {
     if (!(d instanceof Accessory) || d.type !== AccessoryTypes.motionSensor) {
       return;
     }
@@ -199,7 +199,7 @@ function handleTradfriError(e: TradFriError) {
           `
          An unknown error happened while trying to connect
         `,
-          e
+          e,
         );
       }
     }
@@ -235,9 +235,11 @@ async function getAuth(id: string, secret: string) {
   }
 }
 
-
-
-merge(dailyTimer('18:30'), dailyTimer('20:00').pipe(filter(() => new Date().getDay() !== 2)), dailyTimer('21:15')).subscribe(async () => {
+merge(
+  dailyTimer('18:30'),
+  dailyTimer('20:00').pipe(filter(() => new Date().getDay() !== 2)),
+  dailyTimer('21:15'),
+).subscribe(async () => {
   await isInit;
   const buro = devices.get(131079) as Group;
   buro.turnOff();
@@ -248,5 +250,5 @@ merge(dailyTimer('21:00'), dailyTimer('21:45'), dailyTimer('22:30'), dailyTimer(
     await isInit;
     const showRoom = devices.get(131086) as Group;
     showRoom.turnOff();
-  }
+  },
 );

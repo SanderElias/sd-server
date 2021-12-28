@@ -1,6 +1,6 @@
-import {pages} from '../commands';
-import {installCommand, resetDeck} from '../streamDeck/installCommand';
-import {logWarn} from './log';
+import { pages } from '../commands';
+import { installCommand, resetDeck } from '../streamDeck/installCommand';
+import { logWarn } from './log';
 
 let activePage = 0;
 
@@ -27,5 +27,3 @@ export function activatePrevPage() {
   }
   return activatePage(activePage);
 }
-
-

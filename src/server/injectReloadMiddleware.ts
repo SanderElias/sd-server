@@ -1,6 +1,6 @@
-import {join} from 'path';
-import {settings} from './settings';
-import {existsSync, readFileSync} from 'fs';
+import { join } from 'path';
+import { settings } from './settings';
+import { existsSync, readFileSync } from 'fs';
 
 export function injectReloadMiddleware(req, res, next) {
   const url = req.url;

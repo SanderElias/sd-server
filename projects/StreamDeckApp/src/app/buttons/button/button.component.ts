@@ -12,6 +12,6 @@ export class SdButtonComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    console.log(this.buttonData)
+    console.log(this.buttonData);
   }
 }

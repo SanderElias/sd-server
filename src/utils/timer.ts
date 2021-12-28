@@ -1,4 +1,4 @@
-import {drawText} from '../streamDeck/drawtext';
+import { drawText } from '../streamDeck/drawtext';
 import { deck$ } from '../streamDeck/streamDeck';
 import { take } from 'rxjs/operators';
 
@@ -24,8 +24,8 @@ export async function countDown(minutes = 20) {
 }
 
 export async function clearCountDown() {
-  clearTimeout(timer)
-  const sd = await deck$.pipe(take(1)).toPromise()
-  sd.clearKey(10)
-  sd.clearKey(11)
+  clearTimeout(timer);
+  const sd = await deck$.pipe(take(1)).toPromise();
+  sd.clearKey(10);
+  sd.clearKey(11);
 }

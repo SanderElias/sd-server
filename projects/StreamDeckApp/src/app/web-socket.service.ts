@@ -1,8 +1,8 @@
-import {Injectable} from '@angular/core';
-import {Subject} from 'rxjs';
-import {filter} from 'rxjs/operators';
-import {decode, encode} from 'src/utils/cbor';
-import {WsMessage} from 'src/server/WsMessage';
+import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { decode, encode } from 'src/utils/cbor';
+import { WsMessage } from 'src/server/WsMessage';
 
 interface WSocketHandlers {
   type: string;
@@ -18,10 +18,10 @@ export class WebSocketService {
   private handlers: WSocketHandlers[] = [];
   private events = new Subject<WsMessage>();
   events$ = this.events.asObservable();
-  listenFor = (type: string) => this.events$.pipe(filter(ev => ev.type === type));
+  listenFor = (type: string) => this.events$.pipe(filter((ev) => ev.type === type));
 
   addHandler = (type: string, action: (payload?: any, type?: string) => void) =>
-    this.handlers.push({type, action});
+    this.handlers.push({ type, action });
 
   constructor() {
     this.hookUp();
@@ -53,13 +53,13 @@ export class WebSocketService {
       });
 
       /** enable automated reload */
-      this.wSocket.addEventListener('message', evt => {
+      this.wSocket.addEventListener('message', (evt) => {
         if (evt) {
           try {
             const data = decode(evt.data) as WsMessage;
             this.events.next(data);
-            const actions = this.handlers.filter(h => h.type === data.type);
-            actions.forEach(action => action.action(data.payload, data.type));
+            const actions = this.handlers.filter((h) => h.type === data.type);
+            actions.forEach((action) => action.action(data.payload, data.type));
           } catch (e) {
             console.error(e);
           }
@@ -72,7 +72,7 @@ export class WebSocketService {
       });
 
       /** reattach on error */
-      this.wSocket.addEventListener('error', e => {
+      this.wSocket.addEventListener('error', (e) => {
         try {
           this.wSocket.close();
         } catch (e) {}

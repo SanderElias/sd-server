@@ -1,6 +1,6 @@
-import {get, request, RequestOptions} from 'http';
-import {get as getHttps} from 'https';
-import {logError} from './log';
+import { get, request, RequestOptions } from 'http';
+import { get as getHttps } from 'https';
+import { logError } from './log';
 
 export interface HeadersObject {
   [headerName: string]: string;
@@ -23,10 +23,10 @@ interface httpGetJsonOptions {
 
 export function httpGetJson<T>(
   url: string,
-  {suppressErrors, headers, method, data}: httpGetJsonOptions = {
+  { suppressErrors, headers, method, data }: httpGetJsonOptions = {
     suppressErrors: false,
     headers: {},
-  }
+  },
 ): Promise<T> {
   const isSSL = url.toLowerCase().includes('https:');
   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
@@ -36,7 +36,7 @@ export function httpGetJson<T>(
   headers = headers || {};
   method = method || 'get';
   return new Promise((resolve, reject) => {
-    const {pathname, hostname, port, protocol, search, hash} = new URL(url);
+    const { pathname, hostname, port, protocol, search, hash } = new URL(url);
     if (data) {
       // tslint:disable: no-non-null-assertion
       headers!['Content-Type'] = 'application/json';
@@ -51,8 +51,8 @@ export function httpGetJson<T>(
       headers,
     };
     let rawData = '';
-    const req = request(opt, res => {
-      const {statusCode} = res;
+    const req = request(opt, (res) => {
+      const { statusCode } = res;
       const contentType = res.headers['content-type'];
       let error: Error;
       if (statusCode !== 200) {
@@ -75,20 +75,20 @@ on url: ${url}`);
         return reject(error!);
       }
       res.setEncoding('utf8');
-      res.on('data', chunk => {
+      res.on('data', (chunk) => {
         rawData += chunk;
       });
       res.on('end', () => {
         try {
           const parsedData = JSON.parse(rawData);
           resolve(parsedData);
-        } catch (e:any) {
+        } catch (e: any) {
           console.error(e.message);
           return reject(error);
         }
       });
     });
-    req.on('error', e => {
+    req.on('error', (e) => {
       if (!suppressErrors) {
         // console.error(`Got error: ${e.message}`);
         reject(e);

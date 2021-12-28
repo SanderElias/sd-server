@@ -5,7 +5,7 @@ import { activateNextPage, activatePage } from '../utils/activePage';
 import { getFiles } from '../utils/getFiles';
 import { clearCountDown, countDown } from '../utils/timer';
 
-export const page2: Command[] = []
+export const page2: Command[] = [];
 export const page2Base: Command[] = [
   {
     tile: 13,
@@ -23,7 +23,7 @@ export const page2Base: Command[] = [
     action: async () => {
       await resetDeck();
       page2.length = 0;
-      page2Base.forEach(a => page2.push(a));
+      page2Base.forEach((a) => page2.push(a));
       await getFiles('/home/sander/Documents/talks/ngConf-2020/presentation/videos/');
       activatePage(1);
     },

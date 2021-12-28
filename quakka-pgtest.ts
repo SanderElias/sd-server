@@ -1,5 +1,5 @@
-import {pool} from './src/homeAutomation/pg-client';
-import {types} from 'pg';
+import { pool } from './src/homeAutomation/pg-client';
+import { types } from 'pg';
 
 const query = {
   text: 'select * from tempratures ORDER BY prim DESC LIMIT 30',

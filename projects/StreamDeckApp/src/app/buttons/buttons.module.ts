@@ -5,12 +5,8 @@ import { ButtonsRoutingModule } from './buttons-routing.module';
 import { ButtonsComponent } from './buttons.component';
 import { SdButtonComponent } from './button/button.component';
 
-
 @NgModule({
   declarations: [ButtonsComponent, SdButtonComponent],
-  imports: [
-    CommonModule,
-    ButtonsRoutingModule
-  ]
+  imports: [CommonModule, ButtonsRoutingModule],
 })
-export class ButtonsModule { }
+export class ButtonsModule {}

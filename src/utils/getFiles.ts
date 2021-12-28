@@ -25,16 +25,16 @@ export async function getFiles(folder) {
         // await i3.command('workspace number 5');
         await new Promise<void>((r) =>
           exec(playVid(title), (err, std, ste) => {
-            console.log('vlc', {err, std, ste});
+            console.log('vlc', { err, std, ste });
             r();
-          })
+          }),
         );
         await i3.command('workspace number 5; fullscreen enable');
         await new Promise<void>((r) =>
           exec('killall -9 vlc', (res) => {
             // console.log('kill', res);
             r();
-          })
+          }),
         );
       },
     });

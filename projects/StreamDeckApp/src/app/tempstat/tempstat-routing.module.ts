@@ -7,6 +7,6 @@ const routes: Routes = [{ path: '', component: TempstatComponent }];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class TempstatRoutingModule { }
+export class TempstatRoutingModule {}

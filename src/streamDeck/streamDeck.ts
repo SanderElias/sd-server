@@ -19,7 +19,7 @@ import { log } from 'console';
 // const i3 = I3
 const deck = new BehaviorSubject<StreamDeck | undefined>(undefined);
 /** filter out empty results. */
-export const deck$ = deck.pipe(filter(d => d !== undefined)) as Observable<StreamDeck>;
+export const deck$ = deck.pipe(filter((d) => d !== undefined)) as Observable<StreamDeck>;
 
 let pollTimeOut: NodeJS.Timeout | undefined;
 let pollInterval = 250;
@@ -87,7 +87,7 @@ merge(timer(0, 10 * 1000).pipe(map(() => undefined)), deck)
         console.error(e);
         pollIt();
       }
-    })
+    }),
   )
   .subscribe();
 
@@ -101,7 +101,7 @@ const down$ = new Subject<number>();
 const up$ = new Subject<number>();
 
 deck$.subscribe({
-  next: strDeck => {
+  next: (strDeck) => {
     if (!strDeck) {
       return;
     }
@@ -113,7 +113,7 @@ deck$.subscribe({
       try {
         strDeck['removeAllListeners']();
         strDeck.close();
-      } catch { }
+      } catch {}
       deck.next(undefined);
       // pollIt();
     });
@@ -121,80 +121,80 @@ deck$.subscribe({
 });
 
 const cycle$ = down$.pipe(
-  switchMap(key => {
+  switchMap((key) => {
     const start = Date.now();
     return up$.pipe(
-      filter(k => k === key),
-      map(key => ({ key, delay: Date.now() - start, double: false, long: false }))
+      filter((k) => k === key),
+      map((key) => ({ key, delay: Date.now() - start, double: false, long: false })),
     );
-  })
+  }),
 );
 
 const longPress$ = down$.pipe(
-  switchMap(key => {
+  switchMap((key) => {
     const start = Date.now();
     return merge(
       up$.pipe(
-        filter(k => k === key),
-        map(() => true)
+        filter((k) => k === key),
+        map(() => true),
       ),
-      interval(25)
+      interval(25),
     ).pipe(
-      map(r => ({
+      map((r) => ({
         key,
         delay: Date.now() - start,
         double: false,
         long: true,
         up: typeof r === 'boolean',
-      }))
+      })),
     );
   }),
-  takeWhile(r => !r.up),
-  filter(r => r.delay > 210),
-  repeat()
+  takeWhile((r) => !r.up),
+  filter((r) => r.delay > 210),
+  repeat(),
 );
 
 const interClick$ = cycle$.pipe(
-  filter(r => r.delay < 210),
-  debounceTime(200)
+  filter((r) => r.delay < 210),
+  debounceTime(200),
 );
 const limit$ = cycle$.pipe(
   bufferCount(2),
   map(([a, e]) => {
     e.double = a.key === e.key;
     return e;
-  })
+  }),
 );
 
 const gate$ = race(interClick$, limit$, longPress$).pipe(
   first(),
   repeat(),
-  filter(k => !k.long)
+  filter((k) => !k.long),
 );
 
 export function click(key: number) {
   return gate$.pipe(
-    filter(k => !k.double && k.key === key),
-    map(k => k.delay)
+    filter((k) => !k.double && k.key === key),
+    map((k) => k.delay),
   );
 }
 
 export function dblClick(key: number) {
   return gate$.pipe(
-    filter(k => k.double && k.key === key),
-    map(k => k.delay)
+    filter((k) => k.double && k.key === key),
+    map((k) => k.delay),
   );
 }
 
 export function longClick(key: number) {
   return longPress$.pipe(
-    filter(k => k.key === key),
+    filter((k) => k.key === key),
     first(),
-    map(k => k.delay),
-    repeat()
+    map((k) => k.delay),
+    repeat(),
   );
 }
 
 export function longPress(key: number) {
-  return longPress$.pipe(filter(k => k.key === key));
+  return longPress$.pipe(filter((k) => k.key === key));
 }

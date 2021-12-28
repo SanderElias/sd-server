@@ -1,4 +1,4 @@
-import { src } from '../DynamicTs'
+import { src } from '../DynamicTs';
 // const src = 'hello';
 
 export const testAction1 = () => console.log('testAction 1');

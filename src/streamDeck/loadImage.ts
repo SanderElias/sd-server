@@ -6,7 +6,7 @@ import { drawText } from './drawtext';
 import { deck$ } from './streamDeck';
 
 export async function loadImage(cmd: Command) {
-  const {tile, image: fileName, title}: {tile: number; image?: string; title?: string} = cmd;
+  const { tile, image: fileName, title }: { tile: number; image?: string; title?: string } = cmd;
   if (title) {
     return drawText(title, tile);
   }

@@ -1,8 +1,8 @@
-import {deck$} from './streamDeck';
-import {take} from 'rxjs/operators';
+import { deck$ } from './streamDeck';
+import { take } from 'rxjs/operators';
 import sharp from 'sharp';
 import * as PImage from 'pureimage';
-import {resolve} from 'path';
+import { resolve } from 'path';
 import * as streamBuffers from 'stream-buffers';
 
 const createCanvas = PImage.make.bind(PImage);
@@ -13,11 +13,11 @@ const font = PImage.registerFont(resolve(fontFolder, 'SourceSansPro-Regular.ttf'
 
 const font1 = PImage.registerFont(resolve(fontFolder, 'Verdana.ttf'), 'verdana');
 
-const loadFont = new Promise<void>(res =>
+const loadFont = new Promise<void>((res) =>
   font.load(() => {
     // console.log('font loaded');
     res();
-  })
+  }),
 );
 
 // const {createCanvas, loadImage} = require('canvas');
@@ -28,7 +28,7 @@ export async function drawText(txt: string, tile: number) {
     await loadFont;
 
     const canvas = createCanvas(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE);
-    const context = canvas.getContext('2d', {pixelFormat: 'RGB24'});
+    const context = canvas.getContext('2d', { pixelFormat: 'RGB24' });
     context.strokeStyle = 'black';
     context.fillStyle = '#ffffff';
     // if (false) {
@@ -60,7 +60,7 @@ export async function drawText(txt: string, tile: number) {
       context.fillText(text, 0, yPosition);
     }
 
-    const {data} = context.getImageData();
+    const { data } = context.getImageData();
     const out: number[] = [];
     let c = 0;
     for (let x of data) {

@@ -1,6 +1,6 @@
 import './commands';
 import './homeAutomation/deconz';
-import {reloadAll, sdServer, hookServer} from './server/';
+import { reloadAll, sdServer, hookServer } from './server/';
 import './utils/exitHandler';
 
 sdServer();

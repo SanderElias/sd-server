@@ -1,4 +1,3 @@
-
 import { distinctUntilChanged, filter, map, repeat, tap } from 'rxjs/operators';
 import { disco, discoff } from './homeAutomation/tradfri';
 import { Command } from './streamDeck/Command.interface';
@@ -33,7 +32,7 @@ const cyclePages = () => {
       distinctUntilChanged(),
       filter(Boolean),
       tap((k) => activateNextPage()),
-      repeat()
+      repeat(),
     )
     .subscribe({
       next: (p) => {},

@@ -1,6 +1,6 @@
-import {HttpClient} from '@angular/common/http';
-import {Component, OnInit} from '@angular/core';
-import {map, tap} from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { map, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-devices',
@@ -23,7 +23,7 @@ import {map, tap} from 'rxjs/operators';
 export class DevicesComponent implements OnInit {
   table$ = this.http.get('http://localhost:8001/devices').pipe(
     tap((r) => console.log(r)),
-    map((table: any[]) => table.map((row) => ({...row, ...row.state})))
+    map((table: any[]) => table.map((row) => ({ ...row, ...row.state }))),
   );
   keys$ = this.table$.pipe(
     map((table: any[]) =>
@@ -34,14 +34,14 @@ export class DevicesComponent implements OnInit {
           }
         });
         return fields;
-      }, [])
+      }, []),
     ),
     tap((k) => console.log('keys', k)),
     map((keys) =>
       keys.filter(
-        (key: string) => ['id', 'name', 'type', 'on', 'presence'].findIndex((k) => key.includes(k)) !== -1
-      )
-    )
+        (key: string) => ['id', 'name', 'type', 'on', 'presence'].findIndex((k) => key.includes(k)) !== -1,
+      ),
+    ),
   );
 
   constructor(private http: HttpClient) {}

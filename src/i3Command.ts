@@ -1,4 +1,4 @@
-import {i3} from './utils/i3';
+import { i3 } from './utils/i3';
 export function i3Command(arg) {
   return new Promise((resolve, reject) => {
     i3.command(arg, (err, result) => {
@@ -26,15 +26,15 @@ export function i3Outputs(): Promise<Outputs> {
       try {
         const displays = d
           /** get the active ones */
-          .filter(r => r.active)
+          .filter((r) => r.active)
           /** sort on left to right order */
           .sort((x, y) => (x.rect.x < y.rect.x ? -1 : 1))
           /** extract only the names */
-          .map(r => {
+          .map((r) => {
             return r.name;
           });
         const [left, middle, right, ...rest] = displays;
-        resolve({left, middle, right, rest});
+        resolve({ left, middle, right, rest });
       } catch (e) {
         console.log('i3Outputs catch error', e);
         return reject(e);
