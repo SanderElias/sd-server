@@ -38,6 +38,7 @@ export class WebSocketService {
   private hookUp() {
     try {
       this.wSocket = new WebSocket('ws://localhost:3001');
+      // console.log('websocket connected', this.wSocket.readyState);
       this.wSocket.binaryType = 'arraybuffer';
 
       /** send hello */

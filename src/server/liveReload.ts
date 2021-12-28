@@ -15,7 +15,7 @@ async function enableLiveReloadServer() {
   try {
     log('enable reload on port', settings.reloadPort);
     // tslint:disable-next-line:only-arrow-functions
-    wss = new Server({port: settings.reloadPort, noServer: true});
+    wss = new Server({port: settings.reloadPort});
     wss.on('connection', client => {
       client.binaryType = 'arraybuffer';
       client.addEventListener('message', ev => handleMesage(client, ev as unknown as MessageEvent));
@@ -27,6 +27,7 @@ async function enableLiveReloadServer() {
 The port "${yellow(settings.reloadPort)}" is not available for the websocket server.
 live reload will not be available. You can configure a different port in the config file.
 -----------------------------------`);
+    console.error(e);
     wss = undefined;
   }
 }

@@ -1,11 +1,12 @@
-import {exec} from 'child_process';
+import { exec } from 'child_process';
 import open from 'open';
-import {i3Command, i3Outputs, i3Tree, I3Tree, i3WorksSpaces, moveWP, PurpleNode} from '../i3Command';
-import {Command} from '../streamDeck/Command.interface';
-import {resetDeckConnection} from '../streamDeck/streamDeck';
-import {activateNextPage} from '../utils/activePage';
-import {i3} from '../utils/i3';
-import {setBrightness, videoBright} from '../utils/setBrightness';
+import { pulsateBulb } from '../homeAutomation/deconz';
+import { i3Command, i3Outputs, i3Tree, I3Tree, i3WorksSpaces, moveWP, PurpleNode } from '../i3Command';
+import { Command } from '../streamDeck/Command.interface';
+import { resetDeckConnection } from '../streamDeck/streamDeck';
+import { activateNextPage } from '../utils/activePage';
+import { i3 } from '../utils/i3';
+import { setBrightness, videoBright } from '../utils/setBrightness';
 
 export const page3: Command[] = [
   {
@@ -13,8 +14,8 @@ export const page3: Command[] = [
     image: 'display.png',
     action: async () => {
       const displays = await i3Outputs();
-      const ws = (await i3WorksSpaces()).map(({name, output, num}) => ({num, output}));
-      console.log({displays, ws});
+      const ws = (await i3WorksSpaces()).map(({ name, output, num }) => ({ num, output }));
+      console.log({ displays, ws });
       // : ws.map(({num, output, name}) => ({num, output, name})})
       // i3.workspaces((err, w) => {
       //   // console.log(w.map(({num, output, name}) => ({num, output, name})));
@@ -90,7 +91,7 @@ export const page3: Command[] = [
       const tree = await i3Tree(); //.filter(row => row.name && row.name.includes('Disp'));
       const walkTree = (node: I3Tree, parentId = 0) => {
         // if (node.type && node.type === 'con') {
-        nodes.push(({...node, parentId} as unknown) as MyNode);
+        nodes.push(({ ...node, parentId } as unknown) as MyNode);
         // }
         // tslint:disable-next-line: no-angle-bracket-type-assertion
         node.nodes.forEach((n) => walkTree(<any>n, node.id));
@@ -112,6 +113,11 @@ export const page3: Command[] = [
           .sort((x, y) => (x.parent < y.parent ? -1 : 1))
       );
     },
+  },
+  {
+    tile: 7,
+    image: 'bulbOn.png',
+    action: async () => await pulsateBulb('BuroSignaal')
   },
   {
     tile: 8,

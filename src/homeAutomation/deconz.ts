@@ -1,13 +1,13 @@
-import { EMPTY, Observable, of, Subject, timer } from 'rxjs';
-import { filter, map, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { Observable, of, Subject, timer } from 'rxjs';
+import { filter, shareReplay, switchMap, take, tap } from 'rxjs/operators';
 import WebSocket from 'ws';
 import { broadcast } from '../server';
 import { httpGetJson } from '../utils/httpGetJson';
 import { logWarn } from '../utils/log';
+import { runScript } from '../utils/runScript';
 import { Aak, DeConfig, Sensor, Sensors, State, Whitelist, WsSmartEvent } from './deconz.interfaces';
 import { pool } from './pg-client';
 import { getSettings, updateSettings } from './settings';
-
 
 
 const { deconz } = getSettings();
@@ -320,7 +320,26 @@ function handleZigbeeEvents(sensor: Sensor) {
     });
 }
 
+
 const zigbeeActions: ZigbeeAction[] = [
+  {
+    sensorName: 'Telfon',
+    description: 'Start the Telfon VM',
+    events: [1002],
+    action: async (s) => {
+      console.log('Start Telfon VM');
+      await runScript('vmrun -t ws start "/home/sander/vmware/Windows 7 x64/Windows 7 x64.vmx"').catch(console.error);
+    },
+  },
+  {
+    sensorName: 'Telfon',
+    description: 'Start the Telfon VM',
+    events: [2002],
+    action: async (s) => {
+      console.log('Stop Telfon VM');
+      await runScript('vmrun -t ws stop "/home/sander/vmware/Windows 7 x64/Windows 7 x64.vmx"').catch(console.error);
+    },
+  },
   {
     sensorName: 'BuroControl',
     description: 'Increase brightness of lampen @ buro',
@@ -406,15 +425,17 @@ const zigbeeActions: ZigbeeAction[] = [
     },
   },
   {
-    sensorName: '00:15:8d:00:04:aa:c5:ef-01-0402',
+    sensorName: 'BuroTemprature',
     type: 'temperature',
     events: [(t) => true],
     action: async (sensor: Sensor) => {
       const temp = sensor.state.temperature || 0;
       broadcast({ type: 'temprature', payload: sensor.state });
-      pool.query('INSERT INTO tempratures (date,temp) VALUES ($1,$2)', [sensor.state.lastupdated, temp]);
+      pool.query('INSERT INTO tempratures (date,temp) VALUES ($1,$2)', [sensor.state.lastupdated, temp]).catch(e => {
+        console.log('error while writing to PG', e);
+      });
       const heaterState = (await dcGetState('Heater'))?.state.on;
-      const neededHeaterState = temp > 2100 ? false : temp < 1900 ? true : undefined;
+      const neededHeaterState = temp > 1700 ? false : temp < 1500 ? true : undefined;
       if (neededHeaterState !== undefined && heaterState !== neededHeaterState) {
         dcSetState('Heater', { on: neededHeaterState });
       }
@@ -425,4 +446,54 @@ const zigbeeActions: ZigbeeAction[] = [
 
 export async function addZigbeeAction(action: ZigbeeAction) {
   zigbeeActions.push(action);
+}
+
+addZigbeeAction({
+  sensorName: 'BuroSignaal',
+  events: [(n) => {
+    // console.log('event', n);
+    return true;
+  }],
+  action: async (s) => {
+    console.log(s.state.bri);
+  }
+});
+
+// pulsateBulb('BuroSignaal');
+// dcSetState('BuroSignaal', {transitiontime:20, sat:255 })
+export async function pulsateBulb(lamp: string, direction: 'up' | 'down' = 'up', iter = 4) {
+  const bulb = await dcGetState(lamp);
+  if (!bulb) {
+    return;
+  }
+  const initialState = bulb.state;
+  // await dcSetState(lamp, { on: false, bri: 0 });
+  // await wait(50)
+  dcSetState(lamp, { on: true, bri: 1 });
+  await waitForState(lamp, { bri: 1 });
+  console.log('uit')
+  for (let i = 0; i < iter; i += 1) {
+    await dcSetState(lamp, { transitiontime: 5, bri: 254 });
+    await waitForState(lamp, { bri: 254 });
+    console.log('top')
+    await dcSetState(lamp, { transitiontime: 5, bri: 1 });
+    await waitForState(lamp, { bri: 1 });
+    console.log('low')
+  }
+  await dcSetState(lamp, initialState);
+
+}
+
+function waitForState(name: Sensor['name'], state: Sensor['state']) {
+  return timer(50, 50).pipe(
+    switchMap(() => dcGetState(name)),
+    filter(s => s !== undefined),
+    tap(st => console.log(st!.state?.bri)),
+    filter(e => Object.entries(state).every(([k, v]) => e!.state[k] === v)),
+    take(1),
+  ).toPromise();
+}
+
+function wait(n: number) {
+  return new Promise((r) => setTimeout(r, n));
 }
