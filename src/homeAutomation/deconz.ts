@@ -195,49 +195,6 @@ async function dcGetState(d: string) {
   return dev;
 }
 
-setTimeout(async () => {
-  const p = 9990;
-  const step = 250;
-  let factor = 1;
-  let factory = -1;
-  let x = 100;
-  let y = p;
-  const maxed = (n) => {
-    n += factor * step;
-    if (n > p) {
-      n = p;
-      factor = -1;
-    }
-    if (n < 100) {
-      n = 100;
-      factor = 1;
-    }
-    return n;
-  };
-  const maxedy = (n) => {
-    n += factory * step;
-    if (n > p) {
-      n = p;
-      factory = -1;
-    }
-    if (n < 100) {
-      n = 100;
-      factory = 1;
-    }
-    return n;
-  };
-  const newState = { on: false, transitiontime: 1, bri: 48, sat: 0 } as State;
-  await dcSetState('rgb', newState);
-  // while (true) {
-  //   x = maxed(x);
-  //   y = x < 101 ? maxedy(y) : y;
-  //   newState.xy = [x / p, y / p];
-  //   // console.log(x, y, newState.xy);
-  //   await dcSetState('rgb', newState);
-  //   // await new Promise((r) => setTimeout(r, 500));
-  // }
-}, 2000);
-
 /**
  * https://github.com/usolved/cie-rgb-converter/blob/master/cie_rgb_converter.js
  * Converts RGB color space to CIE color space
@@ -418,18 +375,17 @@ const zigbeeActions: ZigbeeAction[] = [
   {
     sensorName: 'showroomSwitch',
     events: [2002],
-    action: async (s) => {
-      const p = 'rgb';
-      const state = await dcGetState(p);
-      console.log(state);
-    },
+    action: testRGBPulsate,
   },
   {
     sensorName: 'BuroTemprature',
     type: 'temperature',
     events: [(t) => true],
     action: async (sensor: Sensor) => {
-      const temp = sensor.state.temperature || 0;
+      // it fires for every change, so we need to filter out the ones we don't want
+      if (sensor.state.temperature === undefined) { return; }
+      const temp = sensor.state.temperature;
+      // console.dir(sensor.state);
       broadcast({ type: 'temprature', payload: sensor.state });
       pool
         .query('INSERT INTO tempratures (date,temp) VALUES ($1,$2)', [sensor.state.lastupdated, temp])
@@ -441,27 +397,49 @@ const zigbeeActions: ZigbeeAction[] = [
       if (neededHeaterState !== undefined && heaterState !== neededHeaterState) {
         dcSetState('Heater', { on: neededHeaterState });
       }
-      console.log({ temp, neededHeaterState, heaterState });
+      const time = `${new Date().getHours()}:${new Date().getMinutes()}`;
+      console.log({ time, temp, neededHeaterState, heaterState });
     },
   },
 ];
+
+async function testRGBPulsate() {
+
+  console.log('going to try to pulsate')
+  // const p = 'rgb';
+  const p = 'BuroSignaal';
+  const orgState =  ((await dcGetState(p))?.state || {} as State);
+  console.dir(await dcGetState(p));
+  const { on, bri, sat, xy } = orgState;
+  const state = await dcGetState(p);
+  const startState: State = {
+    on: true,
+    bri: 0,
+    sat: 255,
+    transitiontime: 0,
+    xy: rgb_to_cie(255, 0, 0)
+  }
+  dcSetState(p, startState);
+  await waitForState(p, { bri: 0 });
+  let loop = 10
+  while (--loop > 0) {
+    dcSetState(p, { bri: 255, transitiontime: 50 })
+    await wait(500)
+    dcSetState(p, { bri: 0, transitiontime: 50 })
+    await wait(500)
+  }
+  console.log('done pulsing up')
+  await wait(1000)
+  await dcSetState(p, { on, bri, sat, xy })
+
+};
+
+
 
 export async function addZigbeeAction(action: ZigbeeAction) {
   zigbeeActions.push(action);
 }
 
-addZigbeeAction({
-  sensorName: 'BuroSignaal',
-  events: [
-    (n) => {
-      // console.log('event', n);
-      return true;
-    },
-  ],
-  action: async (s) => {
-    console.log(s.state.bri);
-  },
-});
 
 // pulsateBulb('BuroSignaal');
 // dcSetState('BuroSignaal', {transitiontime:20, sat:255 })
@@ -486,6 +464,7 @@ export async function pulsateBulb(lamp: string, direction: 'up' | 'down' = 'up',
   }
   await dcSetState(lamp, initialState);
 }
+
 
 function waitForState(name: Sensor['name'], state: Sensor['state']) {
   return timer(50, 50)
