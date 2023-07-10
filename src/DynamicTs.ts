@@ -1,9 +1,11 @@
-import { join } from 'path';
-import { TranspileOptions, ModuleKind, transpileModule, ScriptTarget } from 'typescript';
-import { readFileSync, writeFileSync, unlinkSync } from 'fs';
+import { readFileSync, unlinkSync, writeFileSync } from 'fs';
 import { jsonc } from 'jsonc';
-import fetch from 'node-fetch';
-import * as vm from 'vm';
+import { join } from 'path';
+import ts, { TranspileOptions } from 'typescript';
+import * as url from 'url';
+const { ModuleKind, ScriptTarget, transpileModule } = ts;
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 export const src = join(__dirname, '../../src');
 
 export const dynamicTs = async (file: string, fnName: string) => {
@@ -20,7 +22,7 @@ export const dynamicTs = async (file: string, fnName: string) => {
   const test = await (await fetch(url)).text();
 
   const result = transpileModule(test, {
-    compilerOptions: { module: ModuleKind.CommonJS, target: ScriptTarget.ES5 },
+    compilerOptions: { module: ModuleKind.NodeNext, target: ScriptTarget.ES5 },
   });
 
   const out = join(__dirname, '/actions/', 'tmp' + Date.now().toString(36) + '.js');

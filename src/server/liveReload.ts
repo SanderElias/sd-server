@@ -1,21 +1,21 @@
 import { Subject } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { Server } from 'ws';
-import { decode, encode } from '../utils/cbor';
-import { log, logError, yellow } from '../utils/log';
-import { settings } from './settings';
-import { WsMessage } from './WsMessage';
+import { WebSocketServer } from 'ws';
+import { decode, encode } from '../utils/cbor.js';
+import { log, logError, yellow } from '../utils/log.js';
+import { WsMessage } from './WsMessage.js';
+import { settings } from './settings.js';
 
 const events = new Subject<WsMessage>();
 export const events$ = events.asObservable();
 export const listenFor = (type: string) => events$.pipe(filter((ev) => ev.type === type));
 
-let wss: Server | undefined;
+let wss: WebSocketServer | undefined;
 async function enableLiveReloadServer() {
   try {
     log('enable reload on port', settings.reloadPort);
     // tslint:disable-next-line:only-arrow-functions
-    wss = new Server({ port: settings.reloadPort });
+    wss = new WebSocketServer({ port: settings.reloadPort });
     wss.on('connection', (client) => {
       client.binaryType = 'arraybuffer';
       client.addEventListener('message', (ev) => handleMesage(client, ev as unknown as MessageEvent));

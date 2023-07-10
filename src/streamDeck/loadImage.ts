@@ -1,9 +1,13 @@
 import { resolve } from 'path';
+import { firstValueFrom } from 'rxjs';
 import { take } from 'rxjs/operators';
 import sharp from 'sharp';
-import { Command } from './Command.interface';
-import { drawText } from './drawtext';
-import { deck$ } from './streamDeck';
+import { Command } from './Command.interface.js';
+import { drawText } from './drawtext.js';
+import { deck$ } from './streamDeck.js';
+import * as url from 'url';
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 export async function loadImage(cmd: Command) {
   const { tile, image: fileName, title }: { tile: number; image?: string; title?: string } = cmd;
@@ -15,7 +19,7 @@ export async function loadImage(cmd: Command) {
   }
   const asset = resolve(__dirname, '../../../assets', fileName);
 
-  const streamDeck = await deck$.pipe(take(1)).toPromise();
+  const streamDeck = await firstValueFrom( deck$.pipe(take(1)))!;
 
   // const writableStreamBuffer = drawText('hello',1)
 

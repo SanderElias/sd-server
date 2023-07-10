@@ -1,4 +1,4 @@
-import { i3 } from './utils/i3';
+import { i3 } from './utils/i3.js';
 export function i3Command(arg) {
   return new Promise((resolve, reject) => {
     i3.command(arg, (err, result) => {

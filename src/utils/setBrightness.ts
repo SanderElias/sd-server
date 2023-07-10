@@ -1,5 +1,5 @@
 import { exec } from 'child_process';
-import { toggleDevice } from '../homeAutomation/tradfri';
+import { toggleDevice } from '../homeAutomation/tradfri.js';
 
 let brightness = 1;
 const setIt = (b1 = brightness, b2 = b1, b3 = b1) =>

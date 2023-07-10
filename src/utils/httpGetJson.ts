@@ -1,6 +1,5 @@
-import { get, request, RequestOptions } from 'http';
-import { get as getHttps } from 'https';
-import { logError } from './log';
+import { request, RequestOptions } from 'http';
+import { logError } from './log.js';
 
 export interface HeadersObject {
   [headerName: string]: string;

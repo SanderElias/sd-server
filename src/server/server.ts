@@ -2,11 +2,11 @@ import compression from 'compression';
 import cors from 'cors';
 import express from 'express';
 import { join, resolve } from 'path';
-import { src } from '../DynamicTs';
-import { getTable } from '../homeAutomation/deconz';
-import { pool } from '../homeAutomation/pg-client';
-import { log, logError, yellow } from '../utils/log';
-import { settings } from './settings';
+import { src } from '../DynamicTs.js';
+import { getTable } from '../homeAutomation/deconz.js';
+import { pool } from '../homeAutomation/pg-client.js';
+import { log, logError, yellow } from '../utils/log.js';
+import { settings } from './settings.js';
 
 export async function sdServer() {
   try {

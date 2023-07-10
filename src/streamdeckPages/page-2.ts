@@ -1,9 +1,9 @@
-import { Command } from '../streamDeck/Command.interface';
-import { resetDeck } from '../streamDeck/installCommand';
-import { dblClick } from '../streamDeck/streamDeck';
-import { activateNextPage, activatePage } from '../utils/activePage';
-import { getFiles } from '../utils/getFiles';
-import { clearCountDown, countDown } from '../utils/timer';
+import { Command } from '../streamDeck/Command.interface.js';
+import { resetDeck } from '../streamDeck/installCommand.js';
+import { dblClick } from '../streamDeck/streamDeck.js';
+import { activateNextPage, activatePage } from '../utils/activePage.js';
+import { getFiles } from '../utils/getFiles.js';
+import { clearCountDown, countDown } from '../utils/timer.js';
 
 export const page2: Command[] = [];
 export const page2Base: Command[] = [

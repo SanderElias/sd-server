@@ -1,13 +1,14 @@
+
 import { Observable, of, Subject, timer } from 'rxjs';
 import { filter, shareReplay, switchMap, take, tap } from 'rxjs/operators';
 import WebSocket from 'ws';
-import { broadcast } from '../server';
-import { httpGetJson } from '../utils/httpGetJson';
-import { logWarn } from '../utils/log';
-import { runScript } from '../utils/runScript';
-import { Aak, DeConfig, Sensor, Sensors, State, Whitelist, WsSmartEvent } from './deconz.interfaces';
-import { pool } from './pg-client';
-import { getSettings, updateSettings } from './settings';
+import { broadcast } from '../server/liveReload.js';
+import { httpGetJson } from '../utils/httpGetJson.js';
+import { logWarn } from '../utils/log.js';
+import { runScript } from '../utils/runScript.js';
+import { Aak, DeConfig, Sensor, Sensors, State, Whitelist, WsSmartEvent } from './deconz.interfaces.js';
+import { pool } from './pg-client.js';
+import { getSettings, updateSettings } from './settings.js';
 
 const { deconz } = getSettings();
 const url = (part) => `http://localhost:180/api/${deconz.apiKey}/${part}`;
@@ -18,7 +19,7 @@ export const zigbeeEvents$ = events$$.pipe(
   filter((ev) => devices.has(ev.uniqueid)),
   switchMap((ev: WsSmartEvent): Observable<Sensor | undefined> => {
     // tslint:disable-next-line: no-non-null-assertion
-    const device = devices.get(ev.uniqueid)!;
+    const device = devices.get(ev.uniqueid)! as Sensor;
     if (ev.state) {
       device.state = { ...device.state, ...ev.state };
       return of(device);
@@ -408,7 +409,7 @@ async function testRGBPulsate() {
   console.log('going to try to pulsate')
   // const p = 'rgb';
   const p = 'BuroSignaal';
-  const orgState =  ((await dcGetState(p))?.state || {} as State);
+  const orgState = ((await dcGetState(p))?.state || {} as State);
   console.dir(await dcGetState(p));
   const { on, bri, sat, xy } = orgState;
   const state = await dcGetState(p);

@@ -1,12 +1,12 @@
 import { exec, execSync } from 'child_process';
 import open from 'open';
-import { pulsateBulb } from '../homeAutomation/deconz';
-import { i3Command, i3Outputs, i3Tree, I3Tree, i3WorksSpaces, moveWP, PurpleNode } from '../i3Command';
-import { Command } from '../streamDeck/Command.interface';
-import { resetDeckConnection } from '../streamDeck/streamDeck';
-import { activateNextPage } from '../utils/activePage';
-import { i3 } from '../utils/i3';
-import { setBrightness, videoBright } from '../utils/setBrightness';
+import { pulsateBulb } from '../homeAutomation/deconz.js';
+import { i3Command, i3Outputs, i3Tree, I3Tree, i3WorksSpaces, moveWP, PurpleNode } from '../i3Command.js';
+import { Command } from '../streamDeck/Command.interface.js';
+import { resetDeckConnection } from '../streamDeck/streamDeck.js';
+import { activateNextPage } from '../utils/activePage.js';
+import { i3 } from '../utils/i3.js';
+import { setBrightness, videoBright } from '../utils/setBrightness.js';
 
 export const page3: Command[] = [
   {

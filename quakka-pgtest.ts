@@ -1,4 +1,4 @@
-import { pool } from './src/homeAutomation/pg-client';
+import { pool } from './src/homeAutomation/pg-client.js';
 import { types } from 'pg';
 
 const query = {

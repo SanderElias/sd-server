@@ -1,6 +1,6 @@
-import { pages } from '../commands';
-import { installCommand, resetDeck } from '../streamDeck/installCommand';
-import { logWarn } from './log';
+import { pages } from '../commands.js';
+import { installCommand, resetDeck } from '../streamDeck/installCommand.js';
+import { logWarn } from './log.js';
 
 let activePage = 0;
 

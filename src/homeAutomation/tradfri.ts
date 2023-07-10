@@ -8,9 +8,9 @@ import {
 } from 'node-tradfri-client';
 import { merge, Subject } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { dailyTimer } from '../scheduledTaks/simpleTimer';
-import { logWarn } from '../utils/log';
-import { getSettings, updateSettings } from './settings';
+import { dailyTimer } from '../scheduledTaks/simpleTimer.js';
+import { logWarn } from '../utils/log.js';
+import { getSettings, updateSettings } from './settings.js';
 
 const settings = getSettings();
 const inits = new Subject<void>();

@@ -1,10 +1,11 @@
-import { repeat, tap, takeUntil, take } from 'rxjs/operators';
-import { broadcast, listenFor, send } from '../server';
-import { logWarn } from '../utils/log';
-import { Command } from './Command.interface';
-import { loadImage } from './loadImage';
-import { click, deck$, resetDeckConnection } from './streamDeck';
 import { Subject } from 'rxjs';
+import { repeat, take, takeUntil, tap } from 'rxjs/operators';
+// import { broadcast, listenFor, send } from '../server.js';
+import { logWarn } from '../utils/log.js';
+import { Command } from './Command.interface.js';
+import { loadImage } from './loadImage.js';
+import { click, deck$, resetDeckConnection } from './streamDeck.js';
+import { broadcast, listenFor, send } from '../server/liveReload.js';
 
 export const cmdList = new Map<string, Command>();
 const flush = new Subject<void>();

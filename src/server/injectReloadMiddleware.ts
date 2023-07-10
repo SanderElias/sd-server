@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { settings } from './settings';
+import { settings } from './settings.js';
 import { existsSync, readFileSync } from 'fs';
 
 export function injectReloadMiddleware(req, res, next) {

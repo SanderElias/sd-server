@@ -1,8 +1,8 @@
 import { exec } from 'child_process';
 import { readdir } from 'fs';
 import { basename, extname } from 'path';
-import { page2 } from '../streamdeckPages/page-2';
-import { i3 } from './i3';
+import { page2 } from '../streamdeckPages/page-2.js';
+import { i3 } from './i3.js';
 
 export async function getFiles(folder) {
   const files: string[] = await new Promise((r) => readdir(folder, (_, f) => r(f)));

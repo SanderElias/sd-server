@@ -1,11 +1,11 @@
 import { distinctUntilChanged, filter, map, repeat, tap } from 'rxjs/operators';
-import { disco, discoff } from './homeAutomation/tradfri';
-import { Command } from './streamDeck/Command.interface';
-import { loadImage } from './streamDeck/loadImage';
-import { longPress } from './streamDeck/streamDeck';
-import { commands } from './streamdeckPages/page-1';
-import { page3 } from './streamdeckPages/page-3';
-import { activateNextPage, activatePage } from './utils/activePage';
+import { disco, discoff } from './homeAutomation/tradfri.js';
+import { Command } from './streamDeck/Command.interface.js';
+import { loadImage } from './streamDeck/loadImage.js';
+import { longPress } from './streamDeck/streamDeck.js';
+import { commands } from './streamdeckPages/page-1.js';
+import { page3 } from './streamdeckPages/page-3.js';
+import { activateNextPage, activatePage } from './utils/activePage.js';
 
 export const pages = [commands, page3];
 

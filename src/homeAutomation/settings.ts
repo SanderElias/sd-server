@@ -1,5 +1,8 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import * as url from 'url';
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 let settings: Settings;
 const settingsFile = join(__dirname, '../../../serials.json');

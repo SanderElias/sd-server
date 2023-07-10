@@ -1,5 +1,6 @@
+import { log } from 'console';
 import { listStreamDecks, openStreamDeck, StreamDeck } from 'elgato-stream-deck';
-import { interval, merge, race, ReplaySubject, Subject, BehaviorSubject, Observable, timer } from 'rxjs';
+import { BehaviorSubject, interval, merge, Observable, race, Subject, timer } from 'rxjs';
 import {
   bufferCount,
   debounceTime,
@@ -8,13 +9,11 @@ import {
   map,
   repeat,
   switchMap,
-  takeWhile,
-  tap,
-  mergeMap,
   take,
+  takeWhile,
+  tap
 } from 'rxjs/operators';
-import { logWarn, logError } from '../utils/log';
-import { log } from 'console';
+import { logError, logWarn } from '../utils/log.js';
 
 // const i3 = I3
 const deck = new BehaviorSubject<StreamDeck | undefined>(undefined);

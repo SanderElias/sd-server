@@ -1,7 +1,8 @@
-import './commands';
-import './homeAutomation/deconz';
-import { reloadAll, sdServer, hookServer } from './server/';
-import './utils/exitHandler';
+import './commands.js';
+import './homeAutomation/deconz.js';
+import { reloadAll } from './server/liveReload.js';
+import { hookServer, sdServer } from './server/server.js';
+import './utils/exitHandler.js';
 
 sdServer();
 hookServer();

@@ -10,15 +10,16 @@
     "dev": "",
     "build:server": ""
   },
+  "type": "module",
   "dependencies": {
-    "@angular/animations": "^15.2.9",
-    "@angular/common": "^15.2.9",
-    "@angular/compiler": "^15.2.9",
-    "@angular/core": "^15.2.9",
-    "@angular/forms": "^15.2.9",
-    "@angular/platform-browser": "^15.2.9",
-    "@angular/platform-browser-dynamic": "^15.2.9",
-    "@angular/router": "^15.2.9",
+    "@angular/animations": "^16.1.4",
+    "@angular/common": "^16.1.4",
+    "@angular/compiler": "^16.1.4",
+    "@angular/core": "^16.1.4",
+    "@angular/forms": "^16.1.4",
+    "@angular/platform-browser": "^16.1.4",
+    "@angular/platform-browser-dynamic": "^16.1.4",
+    "@angular/router": "^16.1.4",
     "@google-cloud/text-to-speech": "^4.2.3",
     "@julusian/jpeg-turbo": "^2.1.0",
     "@octokit/rest": "^19.0.13",
@@ -47,13 +48,13 @@
     "stream-buffers": "^3.0.2",
     "tslib": "^2.1.0",
     "ws": "^8.13.0",
-    "zone.js": "~0.11.4"
+    "zone.js": "~0.13.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^15.2.9",
-    "@angular/cli": "^15.2.9",
-    "@angular/compiler-cli": "^15.2.9",
-    "@angular/language-service": "^15.2.9",
+    "@angular-devkit/build-angular": "^16.1.4",
+    "@angular/cli": "^16.1.4",
+    "@angular/compiler-cli": "^16.1.4",
+    "@angular/language-service": "^16.1.4",
     "@types/jasmine": "~3.6.0",
     "@types/jasminewd2": "~2.0.8",
     "@types/node": "^20.4.1",
@@ -61,6 +62,6 @@
     "ts-node": "~10.9.1",
     "tsc-watch": "^6.0.4",
     "tslint": "~6.1.3",
-    "typescript": "~4.9.5"
+    "typescript": "^5.1.6"
   }
 }

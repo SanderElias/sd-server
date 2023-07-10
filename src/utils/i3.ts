@@ -1,5 +1,6 @@
 // import * as i3 from 'node-i3';
-export const i3 = require('i3').createClient();
+import i3m from 'i3';
+export const i3 = i3m.createClient();
 
 export interface TentacledNode {
   id: number;

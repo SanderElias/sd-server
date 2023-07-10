@@ -1,9 +1,9 @@
 import { exec } from 'child_process';
 import open from 'open';
-import { dblClick } from '../streamDeck/streamDeck';
-import { activateNextPage } from '../utils/activePage';
-import { getFiles } from '../utils/getFiles';
-import { i3 } from '../utils/i3';
+import { dblClick } from '../streamDeck/streamDeck.js';
+import { activateNextPage } from '../utils/activePage.js';
+import { getFiles } from '../utils/getFiles.js';
+import { i3 } from '../utils/i3.js';
 
 export const commands = [
   {

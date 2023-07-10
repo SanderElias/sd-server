@@ -1,17 +1,20 @@
-import { deck$ } from './streamDeck';
-import { take } from 'rxjs/operators';
-import sharp from 'sharp';
-import * as PImage from 'pureimage';
 import { resolve } from 'path';
-import * as streamBuffers from 'stream-buffers';
-
+import * as PImage from 'pureimage';
+import { firstValueFrom, take } from 'rxjs';
+import { deck$ } from './streamDeck.js';
+import * as url from 'url';
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 const createCanvas = PImage.make.bind(PImage);
 
 const fontFolder = resolve(__dirname, '../../../assets');
+const sans = resolve(fontFolder, 'SourceSansPro-Regular.ttf');
+const verdana = resolve(fontFolder, 'Verdana.ttf');
 console.log(fontFolder);
-const font = PImage.registerFont(resolve(fontFolder, 'SourceSansPro-Regular.ttf'), 'Source Sans Pro');
-
-const font1 = PImage.registerFont(resolve(fontFolder, 'Verdana.ttf'), 'verdana');
+// @ts-ignore
+const font = PImage.registerFont(sans, 'Source Sans Pro');
+// @ts-ignore
+const font1 = PImage.registerFont(verdana, 'verdana');
 
 const loadFont = new Promise<void>((res) =>
   font.load(() => {
@@ -24,10 +27,12 @@ const loadFont = new Promise<void>((res) =>
 
 export async function drawText(txt: string, tile: number) {
   try {
-    const streamDeck = await deck$.pipe(take(1)).toPromise();
+    const streamDeck = await firstValueFrom( deck$.pipe(take(1)))!;
     await loadFont;
 
+    // @ts-ignore
     const canvas = createCanvas(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE);
+    // @ts-ignore
     const context = canvas.getContext('2d', { pixelFormat: 'RGB24' });
     context.strokeStyle = 'black';
     context.fillStyle = '#ffffff';
@@ -60,10 +65,12 @@ export async function drawText(txt: string, tile: number) {
       context.fillText(text, 0, yPosition);
     }
 
+    // @ts-ignore
     const { data } = context.getImageData();
     const out: number[] = [];
     let c = 0;
-    for (let x of data) {
+    for (let i=0; i<data.byteLength; i+=4) {
+      const x = data[i];
       if (++c === 4) {
         c = 0;
         continue;
