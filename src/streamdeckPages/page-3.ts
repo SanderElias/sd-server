@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { exec, execSync } from 'child_process';
 import open from 'open';
 import { pulsateBulb } from '../homeAutomation/deconz';
 import { i3Command, i3Outputs, i3Tree, I3Tree, i3WorksSpaces, moveWP, PurpleNode } from '../i3Command';
@@ -59,10 +59,15 @@ export const page3: Command[] = [
   },
   {
     tile: 3,
-    image: 'hdHangout.png',
-    action: () => {
-      i3Command('workspace number 8');
-      open('https://meet.google.com/srw-ehtf-bof?authuser=1&hs=122');
+    image: 'Bluetooth.png',
+    action: async () => {
+      // i3Command('workspace number 8');
+      // open('https://meet.google.com/srw-ehtf-bof?authuser=1&hs=122');
+      const stopNotice= execSync('sudo service bluetooth stop')
+      console.log({stopNotice})
+      await new Promise(r => setTimeout(r, 2000));
+      const startNotice = execSync('sudo service bluetooth start')
+      console.log({startNotice})
     },
   },
   {
@@ -76,7 +81,7 @@ export const page3: Command[] = [
     tile: 5,
     image: 'drive.png',
     action: () => {
-      exec('nautilus');
+      exec('nautilus').unref();
     },
   },
   {

@@ -102,6 +102,5 @@
   },
   "cli": {
     "analytics": "1ee7009e-d170-41c6-b965-db7f8b2a7a85"
-  },
-  "defaultProject": "StreamDeckApp"
+  }
 }
