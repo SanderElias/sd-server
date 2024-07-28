@@ -9,8 +9,8 @@ describe('ButtonsComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [ButtonsComponent],
-      }).compileComponents();
+    imports: [ButtonsComponent],
+}).compileComponents();
     }),
   );
 

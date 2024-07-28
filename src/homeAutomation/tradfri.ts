@@ -24,22 +24,22 @@ export async function tradfriInit() {
 }
 
 async function init(tr = 0) {
-  const { identity: tdId, psk, id } = await getIdPsk();
-  const tradfri = new TradfriClient(id!, { watchConnection: true });
-  try {
-    await tradfri.connect(tdId!, psk!);
-  } catch (e) {
-    handleTradfriError(e as unknown as TradfriError);
-  }
-  devices.clear();
-  await tradfri
-    .on('device updated', tradfri_deviceUpdated)
-    .on('device removed', tradfri_deviceRemoved)
-    .observeDevices();
-  await tradfri
-    .on('group updated', tradfri_groupUpdated)
-    .on('group removed', tradfri_deviceRemoved)
-    .observeGroupsAndScenes();
+  // const { identity: tdId, psk, id } = await getIdPsk();
+  // const tradfri = new TradfriClient(id!, { watchConnection: true });
+  // try {
+  //   await tradfri.connect(tdId!, psk!);
+  // } catch (e) {
+  //   handleTradfriError(e as unknown as TradfriError);
+  // }
+  // devices.clear();
+  // await tradfri
+  //   .on('device updated', tradfri_deviceUpdated)
+  //   .on('device removed', tradfri_deviceRemoved)
+  //   .observeDevices();
+  // await tradfri
+  //   .on('group updated', tradfri_groupUpdated)
+  //   .on('group removed', tradfri_deviceRemoved)
+  //   .observeGroupsAndScenes();
 
   return true;
 }

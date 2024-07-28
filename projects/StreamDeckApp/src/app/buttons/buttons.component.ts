@@ -2,11 +2,18 @@ import { Component, OnInit } from '@angular/core';
 import { combineLatest } from 'rxjs';
 import { tap, map } from 'rxjs/operators';
 import { WebSocketService } from '../web-socket.service';
+import { SdButtonComponent } from './button/button.component';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
-  selector: 'app-buttons',
-  templateUrl: './buttons.component.html',
-  styleUrls: ['./buttons.component.css'],
+    selector: 'app-buttons',
+    templateUrl: './buttons.component.html',
+    styleUrls: ['./buttons.component.css'],
+    standalone: true,
+    imports: [
+    SdButtonComponent,
+    AsyncPipe
+],
 })
 export class ButtonsComponent implements OnInit {
   pressedButtons$ = this.wss.listenFor('sdButton');

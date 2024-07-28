@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { decode, encode } from 'src/utils/cbor';
 import { WsMessage } from 'src/server/WsMessage';
+import { decode, encode } from 'src/utils/cbor';
 
 interface WSocketHandlers {
   type: string;
@@ -23,9 +23,13 @@ export class WebSocketService {
   addHandler = (type: string, action: (payload?: any, type?: string) => void) =>
     this.handlers.push({ type, action });
 
-  constructor() {
-    this.hookUp();
-    this.addHandler('reload', () => document.location.reload());
+  constructor() {}
+
+  init(url = 'ws://localhost:3001') {
+    this.hookUp(url);
+    if (url === 'ws://localhost:3001') {
+      this.addHandler('reload', () => document.location.reload());
+    }
   }
 
   send(msg: WsMessage) {
@@ -35,7 +39,7 @@ export class WebSocketService {
   }
 
   /** crude, blindly retry on anything websocket connection. */
-  private hookUp() {
+  private hookUp(url: string) {
     try {
       this.wSocket = new WebSocket('ws://localhost:3001');
       // console.log('websocket connected', this.wSocket.readyState);
@@ -68,25 +72,27 @@ export class WebSocketService {
 
       /** reattach on close */
       this.wSocket.addEventListener('close', () => {
-        this.reConnect();
+        this.reConnect(url);
       });
 
       /** reattach on error */
-      this.wSocket.addEventListener('error', (e) => {
+      this.wSocket.addEventListener('error', (err) => {
         try {
           this.wSocket.close();
-        } catch (e) {}
-        this.reConnect();
+        } catch (e) {
+          console.log(`[websocket error], ${err} ${e}`);
+        }
+        this.reConnect(url);
       });
     } catch (e) {
-      this.reConnect();
+      this.reConnect(url);
     }
   }
 
-  reConnect() {
+  reConnect(url) {
     this.wSocket = undefined;
     if (++this.tries < 100) {
-      setTimeout(() => this.hookUp(), 750);
+      setTimeout(() => this.hookUp(url), 750);
     }
   }
 }

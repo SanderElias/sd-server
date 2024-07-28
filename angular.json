@@ -11,21 +11,26 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/StreamDeckApp",
+            "outputPath": {
+              "base": "dist/StreamDeckApp"
+            },
             "index": "projects/StreamDeckApp/src/index.html",
-            "main": "projects/StreamDeckApp/src/main.ts",
-            "polyfills": "projects/StreamDeckApp/src/polyfills.ts",
+            "polyfills": [],
             "tsConfig": "projects/StreamDeckApp/tsconfig.app.json",
-            "assets": ["projects/StreamDeckApp/src/favicon.ico", "projects/StreamDeckApp/src/assets"],
-            "styles": ["projects/StreamDeckApp/src/styles.css"],
+            "assets": [
+              "projects/StreamDeckApp/src/favicon.ico",
+              "projects/StreamDeckApp/src/assets"
+            ],
+            "styles": [
+              "projects/StreamDeckApp/src/styles.css"
+            ],
             "scripts": [],
-            "vendorChunk": false,
-            "buildOptimizer": true,
             "sourceMap": true,
             "optimization": true,
-            "aot": true
+            "aot": true,
+            "browser": "projects/StreamDeckApp/src/main.ts"
           },
           "configurations": {
             "production": {
@@ -39,7 +44,6 @@
               "outputHashing": "all",
               "sourceMap": false,
               "namedChunks": true,
-              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -59,18 +63,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "StreamDeckApp:build"
+            "buildTarget": "StreamDeckApp:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "StreamDeckApp:build:production"
+              "buildTarget": "StreamDeckApp:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "StreamDeckApp:build"
+            "buildTarget": "StreamDeckApp:build"
           }
         },
         "test": {
@@ -80,8 +84,13 @@
             "polyfills": "projects/StreamDeckApp/src/polyfills.ts",
             "tsConfig": "projects/StreamDeckApp/tsconfig.spec.json",
             "karmaConfig": "projects/StreamDeckApp/karma.conf.js",
-            "assets": ["projects/StreamDeckApp/src/favicon.ico", "projects/StreamDeckApp/src/assets"],
-            "styles": ["projects/StreamDeckApp/src/styles.css"],
+            "assets": [
+              "projects/StreamDeckApp/src/favicon.ico",
+              "projects/StreamDeckApp/src/assets"
+            ],
+            "styles": [
+              "projects/StreamDeckApp/src/styles.css"
+            ],
             "scripts": []
           }
         },
@@ -96,11 +105,23 @@
               "devServerTarget": "StreamDeckApp:serve:production"
             }
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/StreamDeckApp/**/*.ts",
+              "projects/StreamDeckApp/**/*.html"
+            ]
+          }
         }
       }
     }
   },
   "cli": {
-    "analytics": "1ee7009e-d170-41c6-b965-db7f8b2a7a85"
+    "analytics": "1ee7009e-d170-41c6-b965-db7f8b2a7a85",
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
   }
 }

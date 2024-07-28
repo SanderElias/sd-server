@@ -1,6 +1,35 @@
 // import * as i3 from 'node-i3';
 import i3m from 'i3';
+
+const sock = process.env.SWAYSOCK;
+// const sock = undefined;
+
+console.log(`sock: ${sock}`);
+
+const handler2 = {
+  get(target, prop, receiver) {
+    console.log(`I3 socket not found, stubbing ${prop}`);
+    return undefined;
+  },
+};
+
 export const i3 = i3m.createClient();
+// export const i3 = new Proxy({}, handler2) //i3m.createClient();
+// export const i3 = (() => {
+//   try {
+//     return i3m.createClient({
+//       path: sock,
+//     });
+//   } catch {
+//     console.log(`couldn't not open sway IPC socket for I3`);
+//   }
+//   try {
+//     return i3m.createClient();
+//   } catch {
+//     console.log(`couldn't not open IPC socket for I3`);
+//   }
+//   return new Proxy({}, handler2);
+// })();
 
 export interface TentacledNode {
   id: number;

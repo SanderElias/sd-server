@@ -1,5 +1,4 @@
-
-import { Observable, of, Subject, timer } from 'rxjs';
+import { firstValueFrom, Observable, of, Subject, timer } from 'rxjs';
 import { filter, shareReplay, switchMap, take, tap } from 'rxjs/operators';
 import WebSocket from 'ws';
 import { broadcast } from '../server/liveReload.js';
@@ -9,9 +8,10 @@ import { runScript } from '../utils/runScript.js';
 import { Aak, DeConfig, Sensor, Sensors, State, Whitelist, WsSmartEvent } from './deconz.interfaces.js';
 import { pool } from './pg-client.js';
 import { getSettings, updateSettings } from './settings.js';
+import { resetHelper } from './resetHelper.js';
 
 const { deconz } = getSettings();
-const url = (part) => `http://localhost:180/api/${deconz.apiKey}/${part}`;
+const url = (part) => `http://10.0.0.188:180/api/${deconz.apiKey}/${part}`;
 const events$$ = new Subject<WsSmartEvent>();
 const devices = new Map<string, Sensor>();
 let logEvents = false;
@@ -173,7 +173,7 @@ const onState = true;
 
 // turnOn(65579)
 
-async function dcSetState(d: string, state: State) {
+export async function dcSetState(d: string, state: State) {
   const dev = await dcGetState(d);
   if (dev === undefined) {
     logWarn(`device ${d} not found`);
@@ -185,7 +185,7 @@ async function dcSetState(d: string, state: State) {
   // console.log('new device state', r);
 }
 
-async function dcGetState(d: string) {
+export async function dcGetState(d: string) {
   await isInit;
   const dev = devices.has(d) ? devices.get(d) : [...devices.values()].find((device) => device.name === d);
   if (dev === undefined) {
@@ -353,18 +353,7 @@ const zigbeeActions: ZigbeeAction[] = [
           await dcSetState(p, { on: !on });
           break;
         case 1001:
-          console.log('start reset');
-          await dcSetState(p, { on: true });
-          await wait(10);
-          for (let x = 0; x < 6; x += 1) {
-            console.log('cycle', x);
-            await dcSetState(p, { on: false });
-            await wait(1);
-            await dcSetState(p, { on: true });
-            await wait(1);
-          }
-          // await dcSetState(p, {on: true});
-
+          await resetHelper();
           break;
         default:
           break;
@@ -384,7 +373,9 @@ const zigbeeActions: ZigbeeAction[] = [
     events: [(t) => true],
     action: async (sensor: Sensor) => {
       // it fires for every change, so we need to filter out the ones we don't want
-      if (sensor.state.temperature === undefined) { return; }
+      if (sensor.state.temperature === undefined) {
+        return;
+      }
       const temp = sensor.state.temperature;
       // console.dir(sensor.state);
       broadcast({ type: 'temprature', payload: sensor.state });
@@ -405,11 +396,10 @@ const zigbeeActions: ZigbeeAction[] = [
 ];
 
 async function testRGBPulsate() {
-
-  console.log('going to try to pulsate')
+  console.log('going to try to pulsate');
   // const p = 'rgb';
   const p = 'BuroSignaal';
-  const orgState = ((await dcGetState(p))?.state || {} as State);
+  const orgState = (await dcGetState(p))?.state || ({} as State);
   console.dir(await dcGetState(p));
   const { on, bri, sat, xy } = orgState;
   const state = await dcGetState(p);
@@ -418,29 +408,25 @@ async function testRGBPulsate() {
     bri: 0,
     sat: 255,
     transitiontime: 0,
-    xy: rgb_to_cie(255, 0, 0)
-  }
+    xy: rgb_to_cie(255, 0, 0),
+  };
   dcSetState(p, startState);
   await waitForState(p, { bri: 0 });
-  let loop = 10
+  let loop = 10;
   while (--loop > 0) {
-    dcSetState(p, { bri: 255, transitiontime: 50 })
-    await wait(500)
-    dcSetState(p, { bri: 0, transitiontime: 50 })
-    await wait(500)
+    dcSetState(p, { bri: 255, transitiontime: 50 });
+    await wait(500);
+    dcSetState(p, { bri: 0, transitiontime: 50 });
+    await wait(500);
   }
-  console.log('done pulsing up')
-  await wait(1000)
-  await dcSetState(p, { on, bri, sat, xy })
-
-};
-
-
+  console.log('done pulsing up');
+  await wait(1000);
+  await dcSetState(p, { on, bri, sat, xy });
+}
 
 export async function addZigbeeAction(action: ZigbeeAction) {
   zigbeeActions.push(action);
 }
-
 
 // pulsateBulb('BuroSignaal');
 // dcSetState('BuroSignaal', {transitiontime:20, sat:255 })
@@ -466,17 +452,16 @@ export async function pulsateBulb(lamp: string, direction: 'up' | 'down' = 'up',
   await dcSetState(lamp, initialState);
 }
 
-
 function waitForState(name: Sensor['name'], state: Sensor['state']) {
-  return timer(50, 50)
-    .pipe(
+  return firstValueFrom(
+    timer(50, 50).pipe(
       switchMap(() => dcGetState(name)),
       filter((s) => s !== undefined),
       tap((st) => console.log(st!.state?.bri)),
       filter((e) => Object.entries(state).every(([k, v]) => e!.state[k] === v)),
       take(1),
-    )
-    .toPromise();
+    ),
+  );
 }
 
 function wait(n: number) {

@@ -1,12 +1,21 @@
 import { exec, execSync } from 'child_process';
-import open from 'open';
-import { pulsateBulb } from '../homeAutomation/deconz.js';
-import { i3Command, i3Outputs, i3Tree, I3Tree, i3WorksSpaces, moveWP, PurpleNode } from '../i3Command.js';
+import { dimRelative } from '../homeAutomation/dimRelative.js';
+import { resetHelper } from '../homeAutomation/resetHelper.js';
+import {
+  I3Tree,
+  PurpleNode,
+  focusWP,
+  i3Command,
+  i3Outputs,
+  i3Tree,
+  i3WorksSpaces,
+  moveWP,
+} from '../i3Command.js';
 import { Command } from '../streamDeck/Command.interface.js';
 import { resetDeckConnection } from '../streamDeck/streamDeck.js';
 import { activateNextPage } from '../utils/activePage.js';
 import { i3 } from '../utils/i3.js';
-import { setBrightness, videoBright } from '../utils/setBrightness.js';
+import { videoBright } from '../utils/setBrightness.js';
 
 export const page3: Command[] = [
   {
@@ -27,9 +36,9 @@ export const page3: Command[] = [
       // await i3Command(`[workspace="3"] move workspace  to output "DisplayPort-1"`).then(log);
       // await i3Command(`[workspace="10"] move workspace  to output "DisplayPort-2"`).then(log);
       // await i3Command(`[workspace="19"] move workspace  to output "DisplayPort-2"`).then(log);
-      // await i3Command(`workspace 1 focus`);
-      // await i3Command(`workspace 3 focus`);
-      // await i3Command(`workspace 19 focus`);
+      await i3Command(`workspace 1 focus`);
+      await i3Command(`workspace 3 focus`);
+      await i3Command(`workspace 19 focus`);
     },
   },
   {
@@ -38,16 +47,26 @@ export const page3: Command[] = [
     action: async () => {
       const log = (err?, result?) => console.log(err, result) as unknown as any;
       await exec('/home/sander/.screenlayout/default.sh');
-      await moveWP(4, 'middle');
-      await moveWP(3, 'middle');
-      await moveWP(2, 'middle');
-      await moveWP(5, 'left');
       await moveWP(1, 'left');
+      await moveWP(5, 'left');
+      await moveWP(7, 'left');
+
+      await moveWP(2, 'middle');
+      await moveWP(3, 'middle');
+      await moveWP(4, 'middle');
+      await moveWP(9, 'middle');
+      await moveWP(15, 'middle');
+
       await moveWP(8, 'right');
       await moveWP(10, 'right');
-      await moveWP(18, 'right');
+      await moveWP(16, 'right');
       await moveWP(17, 'right');
+      await moveWP(18, 'right');
       await moveWP(19, 'right');
+
+      await focusWP(1, 'left');
+      await focusWP(3, 'middle');
+      await focusWP(19, 'right');
     },
   },
   {
@@ -63,11 +82,11 @@ export const page3: Command[] = [
     action: async () => {
       // i3Command('workspace number 8');
       // open('https://meet.google.com/srw-ehtf-bof?authuser=1&hs=122');
-      const stopNotice= execSync('sudo service bluetooth stop')
-      console.log({stopNotice})
-      await new Promise(r => setTimeout(r, 2000));
-      const startNotice = execSync('sudo service bluetooth start')
-      console.log({startNotice})
+      const stopNotice = execSync('sudo service bluetooth stop');
+      console.log({ stopNotice });
+      await new Promise((r) => setTimeout(r, 2000));
+      const startNotice = execSync('sudo service bluetooth start');
+      console.log({ startNotice });
     },
   },
   {
@@ -122,7 +141,7 @@ export const page3: Command[] = [
   {
     tile: 7,
     image: 'bulbOn.png',
-    action: async () => await pulsateBulb('BuroSignaal'),
+    action: resetHelper,
   },
   {
     tile: 8,
@@ -156,12 +175,13 @@ export const page3: Command[] = [
   {
     tile: 12,
     image: 'contrast.png',
-    action: setBrightness(0.5),
+    action: () => dimRelative('BuroSanderLamp', -10),
   },
   {
     tile: 13,
     image: 'contrast.png',
-    action: setBrightness(-0.5),
+    // action: setBrightness(-0.5),
+    action: () => dimRelative('BuroSanderLamp', 10),
   },
   {
     tile: 14,

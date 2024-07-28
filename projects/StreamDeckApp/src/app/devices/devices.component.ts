@@ -1,6 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { AsyncPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
-import { map, tap } from 'rxjs/operators';
+import { Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs/operators';
+import { DndListComponent } from './dnd-list/dnd-list.component';
 
 @Component({
   selector: 'app-devices',
@@ -8,43 +12,59 @@ import { map, tap } from 'rxjs/operators';
     <table>
       <thead>
         <tr>
-          <th *ngFor="let key of keys$ | async">{{ key }}</th>
+          @for (key of $keys(); track key) {
+            <th>{{ key }}</th>
+          }
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let row of table$ | async">
-          <th *ngFor="let key of keys$ | async">{{ row[key] }}</th>
-        </tr>
+        @for (row of $table(); track row) {
+          <tr>
+            @for (key of $keys(); track key) {
+              <td>{{ row[key] }}</td>
+            }
+          </tr>
+        }
       </tbody>
     </table>
+    <dnd-list
+      [available]="$available_keys()"
+      [(selected)]="$selected"
+    ></dnd-list>
   `,
   styleUrls: ['./devices.component.css'],
+  standalone: true,
+  imports: [AsyncPipe, DndListComponent],
 })
-export class DevicesComponent implements OnInit {
-  table$ = this.http.get('http://localhost:8001/devices').pipe(
-    tap((r) => console.log(r)),
-    map((table: any[]) => table.map((row) => ({ ...row, ...row.state }))),
-  );
-  keys$ = this.table$.pipe(
-    map((table: any[]) =>
-      table.reduce((fields, row) => {
-        Object.keys(row).forEach((key) => {
-          if (!fields.includes(key)) {
-            fields.push(key);
-          }
-        });
-        return fields;
-      }, []),
-    ),
-    tap((k) => console.log('keys', k)),
-    map((keys) =>
-      keys.filter(
-        (key: string) => ['id', 'name', 'type', 'on', 'presence'].findIndex((k) => key.includes(k)) !== -1,
+export class DevicesComponent {
+  http = inject(HttpClient);
+  $table = toSignal(
+    this.http.get<unknown[]>('http://localhost:8001/devices').pipe(
+      map((table) =>
+        table.map((row) => {
+          const { state, ...rest } = row as any;
+          return { ...rest, ...state };
+        }),
       ),
     ),
   );
-
-  constructor(private http: HttpClient) {}
-
-  ngOnInit(): void {}
+  $selected = signal(['etag', 'modelid', 'name', 'type', 'on', 'presence']);
+  $available_keys = computed(() => {
+    const data = this.$table();
+    if (!data) return [];
+    const keys: string[] = data.reduce((fields, row) => {
+      Object.keys(row).forEach((key) => {
+        if (!fields.includes(key)) {
+          fields.push(key);
+        }
+      });
+      return fields;
+    }, [] as string[]);
+    console.log(keys);
+    return keys;
+  });
+  $keys = computed(() => {
+    const sel = this.$selected();
+    return this.$available_keys().filter((key: string) => sel.findIndex((k) => key.startsWith(k)) !== -1);
+  });
 }

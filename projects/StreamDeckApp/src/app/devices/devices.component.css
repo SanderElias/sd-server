@@ -1,7 +1,40 @@
-tr:nth-child(odd) {
-  background-color: #afafaf;
+tr:nth-child(even) > td {
+  background-color: var(--surface-3);
 }
 
 table {
   text-align: left;
+  width: fit-content;
+  td {
+    text-align: left;
+  }
+  td,
+  th {
+    white-space: nowrap;
+    width: fit-content;
+    padding: 2px 5px;
+  }
+}
+
+div {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: var(--size-2);
+  padding: var(--size-2);
+
+  a {
+    display: block;
+    background-color: var(--surface-2);
+    padding: var(--size-1) var(--size-2);
+    border-radius: var(--size-1);
+    user-select: none;
+
+    :-webkit-user-drag {
+      opacity: .1;
+    }
+  }
+  .picked {
+    background-color: var(--surface-4);
+  }
 }

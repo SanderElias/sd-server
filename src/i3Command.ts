@@ -1,4 +1,6 @@
 import { i3 } from './utils/i3.js';
+
+// import { i3 } from './utils/i3.js';
 export function i3Command(arg) {
   return new Promise((resolve, reject) => {
     i3.command(arg, (err, result) => {
@@ -83,6 +85,13 @@ export async function moveWP(num: number, mon: keyof Outputs) {
   await i3Command(`workspace number ${num}`);
   return await i3Command(`move workspace to output "${display}"`);
 }
+
+export async function focusWP(num: number, mon: keyof Outputs) {
+  const display = (await i3Outputs())[mon];
+  await i3Command(`workspace number ${num}`);
+  return await i3Command(`focus ${display}, workspace number ${num} `);
+}
+
 
 export interface I3Tree {
   id: number;

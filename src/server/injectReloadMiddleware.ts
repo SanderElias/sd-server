@@ -1,6 +1,9 @@
+import { existsSync, readFileSync } from 'fs';
+import { fileURLToPath } from 'node:url';
 import { join } from 'path';
 import { settings } from './settings.js';
-import { existsSync, readFileSync } from 'fs';
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 export function injectReloadMiddleware(req, res, next) {
   const url = req.url;

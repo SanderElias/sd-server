@@ -3,5 +3,7 @@
   "trailingComma": "all",
   "bracketSpacing": true,
   "printWidth": 110,
-  "semi": true
+  "semi": true,
+  "singleAttributePerLine": true
+
 }

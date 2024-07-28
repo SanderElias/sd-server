@@ -7,6 +7,9 @@ import { getTable } from '../homeAutomation/deconz.js';
 import { pool } from '../homeAutomation/pg-client.js';
 import { log, logError, yellow } from '../utils/log.js';
 import { settings } from './settings.js';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 export async function sdServer() {
   try {

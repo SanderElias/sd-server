@@ -3,7 +3,10 @@ import open from 'open';
 import { dblClick } from '../streamDeck/streamDeck.js';
 import { activateNextPage } from '../utils/activePage.js';
 import { getFiles } from '../utils/getFiles.js';
-import { i3 } from '../utils/i3.js';
+// import { i3 } from '../utils/i3.js';
+const i3 = {
+  command(x:string) {console.log(`i3 command ${x}`)}
+}
 
 export const commands = [
   {

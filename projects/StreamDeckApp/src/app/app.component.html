@@ -1,5 +1,6 @@
 <header>
   <h1>Promitor, the smart helper.</h1>
+  <app-nav></app-nav>
 </header>
 <main>
   <router-outlet></router-outlet>
@@ -11,7 +12,7 @@
 <style>
   :host {
     display: grid;
-    height: 100vh;
+    /* height: 100vh; */
     grid-template-rows: 80px 1fr 60px;
   }
 
@@ -23,11 +24,16 @@
     padding: 0px 10px;
     grid-template-columns: 1fr 40px;
     place-items: center center;
+
+    h1 {
+      font-size: 1.5rem;
+    }
   }
 
   header h1,
   footer h3 {
     margin: 0;
+    font-size: 1.2rem;
   }
   :host > footer {
     display: grid;
@@ -40,8 +46,8 @@
   }
 
   main {
-    background-color: whitesmoke;
-    color: rgb(4, 12, 36);
     padding: 10px;
+    height: calc(100vh - 80px - 60px);
+    overflow: auto;
   }
 </style>

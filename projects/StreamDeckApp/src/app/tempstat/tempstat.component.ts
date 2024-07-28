@@ -3,39 +3,47 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { of } from 'rxjs';
 import { filter, map, pluck, tap } from 'rxjs/operators';
 import { WebSocketService } from '../web-socket.service';
+import { AsyncPipe, DatePipe } from '@angular/common';
 
 @Component({
-  selector: 'app-tempstat',
-  template: `
+    selector: 'app-tempstat',
+    template: `
     <h1>Temprature right now</h1>
     <p>{{ (temp$ | async)?.temp }}°</p>
     <div class="graph">
-      <div class="temp" *ngFor="let row of hist" [style.background]="bg(row.temp)">
-        {{ row.time | date: 'dd-MM hh:mm' }}
-        - {{ row.temp }}
-      </div>
+      @for (row of hist; track row) {
+        <div class="temp" [style.background]="bg(row.temp)">
+          {{ row.time | date: 'dd-MM hh:mm' }}
+          - {{ row.temp }}
+        </div>
+      }
     </div>
     <style>
       p {
-        font-size: 128px;
-      }
-      .graph {
-        display: grid;
-        width: 96vw;
-        height: 400px;
-        gap: 4px;
-        padding: 10px;
-        margin: 10px;
-        grid-template-columns: repeat(auto-fit, minmax(1.5rem, 1fr));
-        /* transform: rotate(270deg); */
-      }
-      .temp {
-        display: block;
-        writing-mode: vertical-rl;
-        padding: 3px;
-      }
+      font-size: 128px;
+    }
+    .graph {
+    display: grid;
+    width: 96vw;
+    height: 400px;
+    gap: 4px;
+    padding: 10px;
+    margin: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(1.5rem, 1fr));
+    /* transform: rotate(270deg); */
+    }
+    .temp {
+    display: block;
+    writing-mode: vertical-rl;
+    padding: 3px;
+    }
     </style>
-  `,
+    `,
+    standalone: true,
+    imports: [
+    AsyncPipe,
+    DatePipe
+],
 })
 export class TempstatComponent implements OnDestroy {
   hist: { time: Date; temp: number }[] = [];

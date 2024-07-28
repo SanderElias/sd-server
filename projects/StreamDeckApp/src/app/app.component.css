@@ -1,0 +1,779 @@
+:where(:root) {
+  --icon-error: url(https://api.iconify.design/ic:baseline-error.svg?color=%23ff6b6b);
+  --icon-search: url(https://api.iconify.design/ic:search.svg?color=%2300000077);
+  --icon-email: url(https://api.iconify.design/ic:email.svg?color=%2300000077);
+  --icon-url: url(https://api.iconify.design/ic:link.svg?color=%2300000077);
+  --icon-user: url(https://api.iconify.design/ic:person.svg?color=%2300000077);
+  --icon-user-editing: url(https://api.iconify.design/ic:person-outline.svg?color=%2300000077);
+  --icon-tel: url(https://api.iconify.design/ic:phone.svg?color=%2300000077);
+  --icon-tel-editing: url(https://api.iconify.design/ic:phone-in-talk.svg?color=%2300000077);
+  --icon-password: url(https://api.iconify.design/ic:baseline-lock.svg?color=%2300000077);
+  --icon-password-editing: url(https://api.iconify.design/ic:baseline-lock-open.svg?color=%2300000077);
+  --icon-no-edit: url(https://api.iconify.design/ic:baseline-edit-off.svg?color=%2300000077);
+  --icon-arrow-down: url(https://api.iconify.design/ic:keyboard-arrow-down.svg?color=%2300000077);
+  --icon-arrow-up: url(https://api.iconify.design/ic:keyboard-arrow-up.svg?color=%2300000077);
+}
+@media (prefers-color-scheme: dark) {
+  :where(:root) {
+    --icon-error: url(https://api.iconify.design/ic:baseline-error.svg?color=%23ff6b6b);
+    --icon-search: url(https://api.iconify.design/ic:search.svg?color=%23ffffff77);
+    --icon-email: url(https://api.iconify.design/ic:email.svg?color=%23ffffff77);
+    --icon-url: url(https://api.iconify.design/ic:link.svg?color=%23ffffff77);
+    --icon-user: url(https://api.iconify.design/ic:person.svg?color=%23ffffff77);
+    --icon-user-editing: url(https://api.iconify.design/ic:person-outline.svg?color=%23ffffff77);
+    --icon-tel: url(https://api.iconify.design/ic:phone.svg?color=%23ffffff77);
+    --icon-tel-editing: url(https://api.iconify.design/ic:phone-in-talk.svg?color=%23ffffff77);
+    --icon-password: url(https://api.iconify.design/ic:baseline-lock.svg?color=%23ffffff77);
+    --icon-password-editing: url(https://api.iconify.design/ic:baseline-lock-open.svg?color=%23ffffff77);
+    --icon-no-edit: url(https://api.iconify.design/ic:baseline-edit-off.svg?color=%23ffffff77);
+    --icon-arrow-down: url(https://api.iconify.design/ic:keyboard-arrow-down.svg?color=%23ffffff77);
+    --icon-arrow-up: url(https://api.iconify.design/ic:keyboard-arrow-up.svg?color=%23ffffff77);
+  }
+}
+@keyframes drop-zone {
+  0% {
+    box-shadow: 0 0 0 0 oklch(70% 100% var(--palette-hue) / 80%);
+  }
+  to {
+    box-shadow: 0 0 0 25pxoklch (70% 100% var(--palette-hue) / 0%);
+  }
+}
+:where(body):after {
+  content: var(--icon-tel-editing) var(--icon-password-editing) var(--icon-user-editing) var(--icon-arrow-up);
+  opacity: 0;
+  z-index: -1;
+  position: absolute;
+}
+:where(fieldset) {
+  gap: var(--size-2);
+  counter-reset: errors;
+  border-color: var(--surface-2);
+  box-shadow: var(--shadow-3);
+  padding-inline: var(--size-4);
+  padding-block: var(--size-2) var(--size-3);
+  transition: box-shadow 0.4s var(--ease-out-4);
+  max-inline-size: max-content;
+  display: grid;
+}
+:where(fieldset):where(:focus-within) {
+  box-shadow: var(--shadow-6);
+}
+:where(fieldset):where(:focus-within) > :where(legend) {
+  color: var(--link);
+}
+:where(fieldset)
+  > :where(
+    div:has(:placeholder-shown:required, :not(:placeholder-shown):invalid, :not([placeholder]):required)
+  )
+  > label {
+  position: relative;
+}
+:where(fieldset)
+  > :where(
+    div:has(:placeholder-shown:required, :not(:placeholder-shown):invalid, :not([placeholder]):required)
+  )
+  > label:after {
+  content: 'required';
+  text-indent: -200vw;
+  border-radius: var(--radius-round);
+  background-color: var(--red-4, #ff8787);
+  box-shadow: 0 0 var(--size-2) var(--red-4, #ff8787);
+  block-size: 6px;
+  inline-size: 6px;
+  margin-block-start: 0.5ex;
+  margin-inline-start: 1ex;
+  position: absolute;
+}
+:where(fieldset):where(:has(:not(:placeholder-shown):invalid)) :where(legend):after {
+  text-transform: initial;
+  color: var(--red-5, #ff6b6b);
+  content: ' (' counter(errors) ' errors)';
+}
+:where(fieldset):where(:has(:not(:placeholder-shown):invalid)) {
+  counter-increment: errors;
+}
+:where(fieldset) > :where(div) {
+  gap: var(--size-2) var(--size-3);
+  grid-auto-columns: 1fr;
+  align-items: center;
+  display: grid;
+}
+@media (min-width: 720.001px) {
+  :where(fieldset) > :where(div) {
+    grid-template-columns: var(--size-content-1) auto;
+  }
+}
+:where(fieldset) > :where(div) > :where(label) {
+  justify-self: start;
+}
+:where(fieldset) > :where(footer) {
+  justify-content: space-between;
+  gap: var(--size-3);
+  flex-wrap: wrap;
+  margin-block-start: var(--size-6);
+  display: flex;
+}
+:where(fieldset) > :where(footer) > :where(menu:only-child) {
+  margin-inline-start: auto;
+}
+:where(fieldset) > :where(ul) {
+  gap: var(--size-2);
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  display: grid;
+}
+:where(fieldset) > :where(ul) > :where(li) {
+  padding: 0;
+}
+:where(fieldset) > :where(ul) > :where(li) > :where(label) {
+  align-items: baseline;
+  gap: var(--size-4);
+  max-inline-size: var(--size-content-1);
+  display: inline-flex;
+}
+:where(fieldset) > :where(ul) > :where(li) > :where(label) > :where(input) {
+  flex-shrink: 0;
+  margin-inline-start: 0;
+}
+:where(legend) {
+  gap: var(--size-2);
+  border: 1px solid var(--surface-2);
+  border-radius: var(--radius-round);
+  text-transform: uppercase;
+  letter-spacing: var(--font-letterspacing-3);
+  font-size: var(--font-size-0);
+  font-weight: var(--font-weight-6);
+  color: var(--text-2);
+  align-items: center;
+  min-block-size: 3ch;
+  margin-inline-start: -2px;
+  padding-inline: 1.5ch;
+  display: inline-flex;
+}
+@media (prefers-color-scheme: light) {
+  :where(legend) {
+    background: var(--surface-1);
+  }
+}
+:where(
+    input:not(
+        button,
+        [type='button'],
+        [type='file'],
+        [type='number'],
+        [type='range'],
+        [type='color'],
+        [type='checkbox'],
+        [type='radio']
+      )
+  ) {
+  transition:
+    background-color 0.5s var(--ease-3),
+    outline-offset 0.145s var(--ease-2);
+  padding-block: 0;
+  padding-inline: 1.75ch;
+  line-height: 2.5;
+}
+:where(
+    input:not(
+        button,
+        [type='button'],
+        [type='file'],
+        [type='number'],
+        [type='range'],
+        [type='color'],
+        [type='checkbox'],
+        [type='radio']
+      )
+  ):where(:placeholder-shown) {
+  text-overflow: ellipsis;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :where(
+      input:not(
+          button,
+          [type='button'],
+          [type='file'],
+          [type='number'],
+          [type='range'],
+          [type='color'],
+          [type='checkbox'],
+          [type='radio']
+        )
+    ):where(:not(:placeholder-shown)):where(:invalid:not(:focus)) {
+    animation: var(--animation-shake-x);
+    animation-duration: 0.4s;
+  }
+}
+:where(
+    input:not(
+        button,
+        input[type='button'],
+        input[type='range'],
+        input[type='color'],
+        input[type='checkbox'],
+        input[type='radio']
+      ),
+    textarea
+  ) {
+  box-shadow: var(--inner-shadow-1);
+}
+@media (prefers-color-scheme: dark) {
+  :where(
+      input:not(
+          button,
+          input[type='button'],
+          input[type='range'],
+          input[type='color'],
+          input[type='checkbox'],
+          input[type='radio']
+        ),
+      textarea
+    ) {
+    box-shadow: var(--inner-shadow-2);
+  }
+}
+:where(input:is([type='password'], [type='url'], [type='email'], [type='tel'])) {
+  padding-inline-end: 3.5ch;
+}
+:where(
+    input:is([type='text'], [type='password'], [type='url'], [type='email'], [type='tel'], [type='search'])
+  ) {
+  flex-shrink: 1;
+  min-inline-size: 5ch;
+  max-inline-size: 100%;
+}
+:where(input, textarea) {
+  background-color: var(--well-1);
+}
+:where([readonly]:focus) {
+  outline: none;
+}
+:where(
+    input:not(
+        button,
+        [disabled],
+        [readonly],
+        [type='file'],
+        [type='button'],
+        [type='submit'],
+        [type='reset'],
+        [type='checkbox'],
+        [type='radio']
+      ),
+    textarea,
+    select
+  ) {
+  color: var(--text-1);
+}
+@media (prefers-color-scheme: dark) {
+  :where(
+      input:not(
+          button,
+          [disabled],
+          [readonly],
+          [type='file'],
+          [type='button'],
+          [type='submit'],
+          [type='reset'],
+          [type='checkbox'],
+          [type='radio']
+        ),
+      textarea,
+      select
+    ):where(:hover, :focus-within) {
+    background-color: var(--well-2);
+  }
+}
+:where(
+    input:not(
+        button,
+        [disabled],
+        [readonly],
+        [type='file'],
+        [type='button'],
+        [type='submit'],
+        [type='reset'],
+        [type='checkbox'],
+        [type='radio']
+      ),
+    textarea,
+    select
+  ):where(:not(:placeholder-shown, :not([placeholder])):invalid) {
+  background-image: var(--icon-error);
+  background-position: calc(100% - 1.5ch);
+}
+:where(
+    input:not(
+        button,
+        [disabled],
+        [readonly],
+        [type='file'],
+        [type='button'],
+        [type='submit'],
+        [type='reset'],
+        [type='checkbox'],
+        [type='radio']
+      ),
+    textarea,
+    select
+  ):where(:not(:focus-within):not(:placeholder-shown):invalid) {
+  -webkit-text-decoration: underline wavy var(--red-6, #fa5252);
+  text-decoration: underline wavy var(--red-6, #fa5252);
+}
+@media (prefers-color-scheme: dark) {
+  :where(
+      input:not(
+          button,
+          [disabled],
+          [readonly],
+          [type='file'],
+          [type='button'],
+          [type='submit'],
+          [type='reset'],
+          [type='checkbox'],
+          [type='radio']
+        ),
+      textarea,
+      select
+    ):where(:not(:focus-within):not(:placeholder-shown):invalid) {
+    -webkit-text-decoration: underline wavy var(--red-4, #ff8787);
+    text-decoration: underline wavy var(--red-4, #ff8787);
+  }
+}
+:where(input[readonly], input[disabled]) {
+  cursor: not-allowed;
+}
+:where([disabled]) {
+  opacity: 0.5;
+  box-shadow: none;
+  cursor: auto;
+}
+@media (prefers-color-scheme: light) {
+  :where(input[type='file']) {
+    box-shadow: none;
+  }
+}
+:where(input[type='file']):where(.dropping) {
+  outline: 2px dashed oklch(70% 100% var(--palette-hue));
+}
+@media (prefers-reduced-motion: no-preference) {
+  :where(input[type='file']):where(.dropping) {
+    animation: drop-zone 1.5s var(--ease-out-5) infinite;
+  }
+}
+:where(input[type='file'])::-webkit-file-upload-button {
+  margin: var(--size-3);
+}
+:where(input[type='file'])::file-selector-button {
+  margin: var(--size-3);
+}
+@media (prefers-color-scheme: dark) {
+  :where(input[type='file'])::-webkit-file-upload-button {
+    border-color: #0000;
+  }
+  :where(input[type='file'])::file-selector-button {
+    border-color: #0000;
+  }
+}
+:where(input[type='number']) {
+  min-inline-size: 10ch;
+  padding-block: 0.75ch;
+  padding-inline: 1.75ch 0.75ch;
+}
+::placeholder {
+  color: var(--text-2);
+  font-style: italic;
+}
+::-moz-placeholder {
+  opacity: 1;
+}
+:where(search) > :where(form) {
+  gap: var(--size-3);
+  grid-template-columns: minmax(20ch, 1fr) auto;
+  display: grid;
+}
+:where(search) > :where(form) > :where(label) {
+  grid-column: span 2;
+}
+:where(input[type='search']) {
+  background-image: var(--icon-search);
+  border-radius: var(--radius-round);
+  background-position: 1.5ch;
+  padding-inline: 4ch 1.25ch;
+}
+:where(input[type='search'])::-webkit-search-cancel-button {
+  margin-right: -16px;
+}
+:where(input[type='search'])::-webkit-calendar-picker-indicator {
+  color: #0000;
+}
+:where(input[type='search']):where([list]):placeholder-shown {
+  background-image: var(--icon-search), var(--icon-arrow-down);
+  background-position: 1.5ch, calc(100% - 1.25ch);
+  background-size: auto, 2.25ch;
+}
+:where(input[type='search']):where([list]):placeholder-shown:focus {
+  background-image: var(--icon-search), var(--icon-arrow-up);
+}
+:where(input[type='text'][list]) {
+  background-image: var(--icon-arrow-down);
+  background-position: calc(100% - 1.25ch);
+  background-size: 2.25ch;
+}
+:where(input[type='text'][list]):focus {
+  background-image: var(--icon-arrow-up);
+}
+:where(input[type='text'][list])::-webkit-calendar-picker-indicator {
+  color: #0000;
+}
+:where(input[type='password']) {
+  background-image: var(--icon-password);
+  background-position: calc(100% - 1.5ch);
+}
+:where(input[type='password']):focus {
+  background-image: var(--icon-password-editing);
+}
+:where(input[type='email']) {
+  background-image: var(--icon-email);
+  background-position: calc(100% - 1.5ch);
+}
+:where(input[readonly]) {
+  background-image: var(--icon-no-edit);
+  background-position: calc(100% - 1.5ch);
+}
+:where(input[type='url']) {
+  background-image: var(--icon-url);
+  background-position: calc(100% - 1.5ch);
+}
+:where(input[type='tel']) {
+  background-image: var(--icon-tel);
+  background-position: calc(100% - 1.5ch);
+}
+:where(input[type='tel']):focus {
+  background-image: var(--icon-tel-editing);
+}
+:where(input:where([name*='username'], [id*='username'])) {
+  background-image: var(--icon-user);
+  background-position: calc(100% - 1.5ch);
+  background-size: 1.75ch;
+}
+:where(input:where([name*='username'], [id*='username'])):focus {
+  background-image: var(--icon-user-editing);
+}
+:where(input[type='color']) {
+  appearance: none;
+  inline-size: var(--size-8);
+  block-size: var(--size-8);
+  border-radius: var(--radius-round);
+  box-shadow: var(--shadow-5);
+  background: 0 0;
+  border: none;
+  padding: 0;
+  overflow: hidden;
+}
+:where(input[type='color'])::-webkit-color-swatch {
+  border: none;
+}
+:where(input[type='color'])::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+:where(textarea) {
+  transition: background-color 0.5s var(--ease-3);
+}
+:where(select) {
+  background-color: var(--surface-3);
+  box-shadow:
+    var(--shadow-3),
+    0 1px var(--surface-3);
+  appearance: none;
+  background-image: var(--icon-arrow-down);
+  background-position: calc(100% - 1ch);
+  background-size: 3ex;
+  padding-block: 0.75ch;
+  padding-inline: 1.75ch 3ch;
+  line-height: 1.5;
+}
+:where(select):where(:hover, :focus) {
+  background-color: var(--surface-1);
+  background-image: var(--icon-arrow-up);
+}
+:where(input[type='checkbox'], input[type='radio']) {
+  aspect-ratio: 1;
+  box-shadow: var(--shadow-6);
+  transform-style: preserve-3d;
+  cursor: pointer;
+  --isLTR: 1;
+  --isRTL: -1;
+}
+:where(input[type='checkbox'], input[type='radio']):is(
+    :lang(ae),
+    :lang(ar),
+    :lang(arc),
+    :lang(bcc),
+    :lang(bqi),
+    :lang(ckb),
+    :lang(dv),
+    :lang(fa),
+    :lang(glk),
+    :lang(he),
+    :lang(ku),
+    :lang(mzn),
+    :lang(nqo),
+    :lang(pnb),
+    :lang(ps),
+    :lang(sd),
+    :lang(ug),
+    :lang(ur),
+    :lang(yi)
+  ) {
+  --isLTR: -1;
+  --isRTL: 1;
+}
+:where(input[type='checkbox'], input[type='radio']):hover:before {
+  --thumb-scale: 1;
+}
+@media (hover: none) {
+  :where(input[type='checkbox'], input[type='radio']) {
+    block-size: 1.5rem;
+    inline-size: 1.5rem;
+  }
+}
+:where(input[type='checkbox'], input[type='radio']):before {
+  --thumb-scale: 0.01;
+  --thumb-highlight-size: 225%;
+  content: '';
+  inline-size: var(--thumb-highlight-size);
+  block-size: var(--thumb-highlight-size);
+  clip-path: circle(50%);
+  transform-origin: 50%;
+  transform: translateX(calc(var(--isRTL) * 50%)) translateY(-50%) translateZ(-1px) scale(var(--thumb-scale));
+  will-change: transform;
+  background: #80808033;
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :where(input[type='checkbox'], input[type='radio']):before {
+    transition: transform 0.2s;
+  }
+}
+input[type='range'] {
+  --track-height: 0.5ex;
+  --track-fill: 0%;
+  --track-color: var(--well-1);
+  --thumb-size: 3ex;
+  --thumb-offset: -1.25ex;
+  --thumb-highlight-color: oklch(70% 100% var(--palette-hue) / 20%);
+  --thumb-highlight-size: 0px;
+  appearance: none;
+  outline-offset: 5px;
+  background: 0 0;
+  inline-size: 100%;
+  margin: 1ex 0;
+  display: block;
+}
+@media (hover: none) {
+  input[type='range'] {
+    --thumb-size: 30px;
+    --thumb-offset: -14px;
+  }
+}
+input[type='range']::-webkit-slider-runnable-track {
+  appearance: none;
+  block-size: var(--track-height);
+  box-shadow: var(--inner-shadow-2);
+  background: linear-gradient(to right, transparent var(--track-fill), var(--track-color) 0%), var(--link);
+  border-radius: 5ex;
+}
+input[type='range']::-moz-range-track {
+  appearance: none;
+  block-size: var(--track-height);
+  box-shadow: var(--inner-shadow-2);
+  background: linear-gradient(to right, transparent var(--track-fill), var(--track-color) 0%), var(--link);
+  border-radius: 5ex;
+}
+input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  cursor: ew-resize;
+  border: 3px solid var(--surface-1);
+  block-size: var(--thumb-size);
+  inline-size: var(--thumb-size);
+  background: var(--link);
+  box-shadow: 0 0 0 var(--thumb-highlight-size) var(--thumb-highlight-color);
+  border-radius: 50%;
+  margin-block-start: var(--thumb-offset);
+}
+@media (prefers-reduced-motion: no-preference) {
+  input[type='range']::-webkit-slider-thumb {
+    transition: box-shadow 0.1s;
+  }
+}
+.fieldset-item:focus-within input[type='range']::-webkit-slider-thumb {
+  border-color: var(--surface-2);
+}
+input[type='range']::-moz-range-thumb {
+  appearance: none;
+  cursor: ew-resize;
+  border: 3px solid var(--surface-1);
+  block-size: var(--thumb-size);
+  inline-size: var(--thumb-size);
+  background: var(--link);
+  box-shadow: 0 0 0 var(--thumb-highlight-size) var(--thumb-highlight-color);
+  border-radius: 50%;
+  margin-block-start: var(--thumb-offset);
+}
+@media (prefers-reduced-motion: no-preference) {
+  input[type='range']::-moz-range-thumb {
+    transition: box-shadow 0.1s;
+  }
+}
+.fieldset-item:focus-within input[type='range']::-moz-range-thumb {
+  border-color: var(--surface-2);
+}
+input[type='range']:where(:hover, :active) {
+  --thumb-highlight-size: 10px;
+}
+@media (pointer: coarse) {
+  :where(input[type='checkbox'], input[type='radio']) {
+    inline-size: var(--size-4);
+    block-size: var(--size-4);
+  }
+}
+:where(input):-webkit-autofill {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(input):-webkit-autofill:hover {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(input):-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(textarea):-webkit-autofill {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(textarea):-webkit-autofill:hover {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(textarea):-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(select):-webkit-autofill {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(select):-webkit-autofill:hover {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(select):-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(input):-webkit-autofill {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(input):autofill {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(input):-webkit-autofill:hover {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(input):autofill:hover {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(input):-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(input):autofill:focus {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(textarea):-webkit-autofill {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(textarea):autofill {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(textarea):-webkit-autofill:hover {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(textarea):autofill:hover {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(textarea):-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(textarea):autofill:focus {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(select):-webkit-autofill {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(select):autofill {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(select):-webkit-autofill:hover {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(select):autofill:hover {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(select):-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}
+:where(select):autofill:focus {
+  -webkit-text-fill-color: var(--text-1);
+  -webkit-box-shadow: 0 0 0px 100000px var(--well-1) inset;
+  transition: background-color 5000s ease-in-out;
+}

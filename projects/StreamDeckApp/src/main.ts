@@ -1,13 +1,22 @@
-import { enableProdMode } from '@angular/core';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { enableProdMode, importProvidersFrom, provideExperimentalZonelessChangeDetection } from '@angular/core';
 
-import { AppModule } from './app/app.module.js';
+import { provideHttpClient } from '@angular/common/http';
+import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
+import { provideRouter } from '@angular/router';
+import 'iconify-icon';
+import { AppComponent } from './app/app.component';
+import { routes } from './app/app.routing.js';
 import { environment } from './environments/environment.js';
 
 if (environment.production) {
   enableProdMode();
 }
 
-platformBrowserDynamic()
-  .bootstrapModule(AppModule)
-  .catch((err) => console.error(err));
+bootstrapApplication(AppComponent, {
+  providers: [
+    importProvidersFrom(BrowserModule),
+    provideHttpClient(),
+    provideRouter(routes),
+    provideExperimentalZonelessChangeDetection()
+  ],
+}).catch((err) => console.error(err));
