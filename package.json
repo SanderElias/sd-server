@@ -7,9 +7,16 @@
     "start": "wireit",
     "dev": "wireit",
     "build": "wireit",
+    "install": "wireit",
     "lint": "ng lint"
   },
   "wireit": {
+    "install": {
+      "command": "pm2 start pm2.config.json",
+      "dependencies": [
+        "build"
+      ]
+    },
     "build": {
       "command": "ng build",
       "dependencies": [
