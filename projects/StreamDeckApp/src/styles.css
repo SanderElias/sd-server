@@ -1,12 +1,10 @@
 @charset "UTF-8";
 @import url('https://fonts.googleapis.com/css?family=Comfortaa|PT+Mono&display=swap');
-@import "https://unpkg.com/open-props";
+@import 'https://unpkg.com/open-props';
 
 /* optional imports that use the props */
-@import "https://unpkg.com/open-props/normalize.min.css";
-@import "https://unpkg.com/open-props/buttons.min.css";
-
-
+@import 'https://unpkg.com/open-props/normalize.min.css';
+@import 'https://unpkg.com/open-props/buttons.min.css';
 
 .tabs label,
 .text-center {

@@ -1,6 +1,12 @@
 import { log } from 'console';
-import { listStreamDecks, openStreamDeck, StreamDeck } from 'elgato-stream-deck';
-import { BehaviorSubject, interval, merge, Observable, race, Subject, timer } from 'rxjs';
+// import { listStreamDecks, openStreamDeck, StreamDeck } from 'elgato-stream-deck';
+import {
+  StreamDeck,
+  listStreamDecks,
+  openStreamDeck,
+  type StreamDeckButtonControlDefinition,
+} from '@elgato-stream-deck/node';
+import { BehaviorSubject, firstValueFrom, interval, merge, Observable, race, Subject, timer } from 'rxjs';
 import {
   bufferCount,
   debounceTime,
@@ -11,7 +17,7 @@ import {
   switchMap,
   take,
   takeWhile,
-  tap
+  tap,
 } from 'rxjs/operators';
 import { logError, logWarn } from '../utils/log.js';
 
@@ -25,7 +31,7 @@ let pollInterval = 250;
 // tslint:disable-next-line: variable-name
 let _deck: StreamDeck | undefined;
 let counter = 0;
-function pollIt(lastInterval = 0) {
+async function pollIt(lastInterval = 0) {
   pollInterval = Math.max(pollInterval + 50, 2500);
   if (lastInterval === 5000) {
     /** cancel retry and leave it to watchdog to restart */
@@ -35,15 +41,12 @@ function pollIt(lastInterval = 0) {
   pollTimeOut !== undefined && clearTimeout(pollTimeOut);
   if (_deck) {
     try {
-      // tslint:disable-next-line: whitespace
-      // tslint:disable-next-line: no-string-literal
-      _deck['removeAllListeners']();
+      _deck.removeAllListeners();
       _deck.close();
       _deck = undefined;
       logWarn('closed deck from poll');
     } catch (e) {
       _deck = undefined;
-      // console.log(e);
     }
     return pollIt();
   }
@@ -53,7 +56,7 @@ function pollIt(lastInterval = 0) {
     logError('exited by kill switch in streamdeck.ts');
     process.exit(15);
   }
-  const decks = listStreamDecks();
+  const decks = await listStreamDecks();
   if (decks.length === 0) {
     pollTimeOut = setTimeout(() => pollIt(pollInterval), pollInterval);
     return;
@@ -62,7 +65,7 @@ function pollIt(lastInterval = 0) {
   // TODO: add support for multiple decks!
   const { path } = decks[0];
   try {
-    _deck = openStreamDeck(path);
+    _deck = await openStreamDeck(path);
     deck.next(_deck);
     log('StreamDeck assigned from poll');
   } catch (e) {
@@ -78,9 +81,9 @@ merge(timer(0, 10 * 1000).pipe(map(() => undefined)), deck)
   .pipe(
     tap(async () => {
       try {
-        const currentDeck = await deck.pipe(take(1)).toPromise();
+        const currentDeck = await firstValueFrom(deck.pipe(take(1)));
         if (currentDeck === undefined) {
-          return pollIt();
+          return await pollIt();
         }
       } catch (e) {
         console.error(e);
@@ -100,19 +103,21 @@ const down$ = new Subject<number>();
 const up$ = new Subject<number>();
 
 deck$.subscribe({
-  next: (strDeck) => {
+  next: async (strDeck) => {
     if (!strDeck) {
       return;
     }
-    strDeck.clearAllKeys();
-    strDeck.on('down', (keyNumber: number) => down$.next(keyNumber));
-    strDeck.on('up', (keyNumber: number) => up$.next(keyNumber));
-    strDeck.on('error', (error: any) => {
+    await strDeck.clearPanel();
+    strDeck.on('down', (keyNumber) => down$.next(keyNumber.index));
+    strDeck.on('up', (keyNumber) => up$.next(keyNumber.index));
+    strDeck.on('error', () => {
       logWarn('stream-deck Error, start polling for device');
       try {
         strDeck['removeAllListeners']();
         strDeck.close();
-      } catch {}
+      } catch {
+        logWarn('failed to close deck');
+      }
       deck.next(undefined);
       // pollIt();
     });

@@ -29,11 +29,11 @@ li {
 }
 
 li > a {
-  all:unset
+  all: unset;
 }
 
 :host.selected ul {
   display: flex;
   flex-direction: column;
-  gap: var(--size-1)
+  gap: var(--size-1);
 }

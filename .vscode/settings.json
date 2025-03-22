@@ -11,7 +11,7 @@
     "statusBarItem.hoverBackground": "#e5ee59",
     "statusBar.foreground": "#15202b"
   },
-  "peacock.color": "#ecf387"
+  "peacock.color": "#ecf387",
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,

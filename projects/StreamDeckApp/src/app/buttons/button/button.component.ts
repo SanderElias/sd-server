@@ -1,13 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Command } from 'src/streamDeck/Command.interface';
 
-
 @Component({
-    selector: 'sd-button',
-    templateUrl: './button.component.html',
-    styleUrls: ['./button.component.css'],
-    standalone: true,
-    imports: [],
+  selector: 'sd-button',
+  templateUrl: './button.component.html',
+  styleUrls: ['./button.component.css'],
+  imports: [],
 })
 export class SdButtonComponent implements OnInit {
   @Input() buttonData: Command;

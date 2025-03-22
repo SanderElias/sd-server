@@ -3,7 +3,6 @@ import { Component, DestroyRef, ElementRef, inject, model } from '@angular/core'
 
 @Component({
   selector: 'dnd-list',
-  standalone: true,
   imports: [],
   template: `
     @for (key of available(); track key) {
@@ -16,8 +15,7 @@ import { Component, DestroyRef, ElementRef, inject, model } from '@angular/core'
         [attr.data-pos]="$index"
         [attr.data-key]="key"
         >{{ key }}
-    </a>
-
+      </a>
     }
   `,
   styleUrl: './dnd-list.component.css',
@@ -59,27 +57,27 @@ export class DndListComponent {
       const draggable = document.querySelector('.dragging') as HTMLAnchorElement;
       if (afterElement == null) {
         container.appendChild(draggable);
-        draggable.dataset.before=undefined
+        draggable.dataset.before = undefined;
       } else {
         container.insertBefore(draggable, afterElement);
-        draggable.dataset.before=afterElement.dataset.pos
+        draggable.dataset.before = afterElement.dataset.pos;
       }
     });
     container.addEventListener('drop', (ev) => {
-        const datalist = this.available();
-        const tar = ev.target as HTMLAnchorElement
-        const {before, pos} = tar.dataset||{}
-        const orgText = datalist.splice(+pos!,1)[0] // read and remove from original position.
-        if (before) {
-          datalist.splice(+before,0,orgText)
-        } else {
-          datalist.push(orgText)
-        }
-        this.available.set(undefined)
-        this.available.set(datalist);
-        const selected = this.selected();
-        this.selected.set(undefined)
-        this.selected.set(datalist.filter((t) => selected.includes(t)));
+      const datalist = this.available();
+      const tar = ev.target as HTMLAnchorElement;
+      const { before, pos } = tar.dataset || {};
+      const orgText = datalist.splice(+pos!, 1)[0]; // read and remove from original position.
+      if (before) {
+        datalist.splice(+before, 0, orgText);
+      } else {
+        datalist.push(orgText);
+      }
+      this.available.set(undefined);
+      this.available.set(datalist);
+      const selected = this.selected();
+      this.selected.set(undefined);
+      this.selected.set(datalist.filter((t) => selected.includes(t)));
     });
   }
 }

@@ -49,7 +49,10 @@ export const successResult = (payload?: SuccessActionResult['payload']): Success
   success: true,
   payload,
 });
-export const errorResult = (error?: ErrorActionResult['error']): ErrorActionResult => ({ success: false, error });
+export const errorResult = (error?: ErrorActionResult['error']): ErrorActionResult => ({
+  success: false,
+  error,
+});
 
 export const setToPending = <T>(dataResult: WritableSignal<DataResult<T>>) =>
   dataResult.update((dr) => ({ ...dr, pendingAction: true }));

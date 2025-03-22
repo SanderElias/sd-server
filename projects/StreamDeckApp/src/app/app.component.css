@@ -157,17 +157,17 @@
   }
 }
 :where(
-    input:not(
-        button,
-        [type='button'],
-        [type='file'],
-        [type='number'],
-        [type='range'],
-        [type='color'],
-        [type='checkbox'],
-        [type='radio']
-      )
-  ) {
+  input:not(
+      button,
+      [type='button'],
+      [type='file'],
+      [type='number'],
+      [type='range'],
+      [type='color'],
+      [type='checkbox'],
+      [type='radio']
+    )
+) {
   transition:
     background-color 0.5s var(--ease-3),
     outline-offset 0.145s var(--ease-2);
@@ -207,6 +207,20 @@
   }
 }
 :where(
+  input:not(
+      button,
+      input[type='button'],
+      input[type='range'],
+      input[type='color'],
+      input[type='checkbox'],
+      input[type='radio']
+    ),
+  textarea
+) {
+  box-shadow: var(--inner-shadow-1);
+}
+@media (prefers-color-scheme: dark) {
+  :where(
     input:not(
         button,
         input[type='button'],
@@ -217,20 +231,6 @@
       ),
     textarea
   ) {
-  box-shadow: var(--inner-shadow-1);
-}
-@media (prefers-color-scheme: dark) {
-  :where(
-      input:not(
-          button,
-          input[type='button'],
-          input[type='range'],
-          input[type='color'],
-          input[type='checkbox'],
-          input[type='radio']
-        ),
-      textarea
-    ) {
     box-shadow: var(--inner-shadow-2);
   }
 }
@@ -238,8 +238,8 @@
   padding-inline-end: 3.5ch;
 }
 :where(
-    input:is([type='text'], [type='password'], [type='url'], [type='email'], [type='tel'], [type='search'])
-  ) {
+  input:is([type='text'], [type='password'], [type='url'], [type='email'], [type='tel'], [type='search'])
+) {
   flex-shrink: 1;
   min-inline-size: 5ch;
   max-inline-size: 100%;
@@ -251,20 +251,20 @@
   outline: none;
 }
 :where(
-    input:not(
-        button,
-        [disabled],
-        [readonly],
-        [type='file'],
-        [type='button'],
-        [type='submit'],
-        [type='reset'],
-        [type='checkbox'],
-        [type='radio']
-      ),
-    textarea,
-    select
-  ) {
+  input:not(
+      button,
+      [disabled],
+      [readonly],
+      [type='file'],
+      [type='button'],
+      [type='submit'],
+      [type='reset'],
+      [type='checkbox'],
+      [type='radio']
+    ),
+  textarea,
+  select
+) {
   color: var(--text-1);
 }
 @media (prefers-color-scheme: dark) {

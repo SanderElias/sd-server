@@ -2,7 +2,9 @@
 <ul>
   @for (route of $routes(); track route.title) {
     @if (route.title !== undefined) {
-      <li><a [routerLink]="[route.path]">{{route.title}}</a></li>
+      <li>
+        <a [routerLink]="[route.path]">{{ route.title }}</a>
+      </li>
     }
   }
 </ul>

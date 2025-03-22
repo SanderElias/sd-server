@@ -6,14 +6,10 @@ import { SdButtonComponent } from './button/button.component';
 import { AsyncPipe } from '@angular/common';
 
 @Component({
-    selector: 'app-buttons',
-    templateUrl: './buttons.component.html',
-    styleUrls: ['./buttons.component.css'],
-    standalone: true,
-    imports: [
-    SdButtonComponent,
-    AsyncPipe
-],
+  selector: 'app-buttons',
+  templateUrl: './buttons.component.html',
+  styleUrls: ['./buttons.component.css'],
+  imports: [SdButtonComponent, AsyncPipe],
 })
 export class ButtonsComponent implements OnInit {
   pressedButtons$ = this.wss.listenFor('sdButton');

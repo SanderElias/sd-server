@@ -18,8 +18,8 @@ export const routes: Routes = [
   },
   {
     path: 'mqtt',
-    loadComponent: () => import('./mqtt/mqtt.component').then(m => m.MqttComponent),
-    title: 'Mqtt'
+    loadComponent: () => import('./mqtt/mqtt.component').then((m) => m.MqttComponent),
+    title: 'Mqtt',
   },
   { path: '**', redirectTo: 'mqtt' },
 ];

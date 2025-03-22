@@ -1,21 +1,24 @@
 <div>
   @if (buttonData.image) {
-    <img [src]="'image/' + buttonData.image" alt="" />
+    <img
+      [src]="'image/' + buttonData.image"
+      alt=""
+    />
   }
 </div>
 
 <style>
   :host {
-  display: grid;
-  height: 100%;
-  width: 100%;
-  background-color: #010101;
-  color: wheat;
-  align-items: center;
-  justify-items: center;
-}
-img {
-width: 100%;
-height: 100%;
-}
+    display: grid;
+    height: 100%;
+    width: 100%;
+    background-color: #010101;
+    color: wheat;
+    align-items: center;
+    justify-items: center;
+  }
+  img {
+    width: 100%;
+    height: 100%;
+  }
 </style>

@@ -8,10 +8,9 @@ describe('DndListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DndListComponent]
-    })
-    .compileComponents();
-    
+      imports: [DndListComponent],
+    }).compileComponents();
+
     fixture = TestBed.createComponent(DndListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

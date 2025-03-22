@@ -8,8 +8,8 @@ describe('TempstatComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [TempstatComponent],
-}).compileComponents();
+      imports: [TempstatComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

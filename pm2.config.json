@@ -3,6 +3,6 @@
     "name": "Promitor app",
     "script": "./dist/server/index.js",
     "watch": "./dist/server/**/*.js",
-    "ignore_watch" : ["node_modules", "src", "\\.git", "*.log"]
+    "ignore_watch": ["node_modules", "src", "\\.git", "*.log"]
   }
 }

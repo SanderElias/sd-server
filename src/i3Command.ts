@@ -92,7 +92,6 @@ export async function focusWP(num: number, mon: keyof Outputs) {
   return await i3Command(`focus ${display}, workspace number ${num} `);
 }
 
-
 export interface I3Tree {
   id: number;
   type: string;

@@ -35,4 +35,6 @@ export const toDataResult =
  * @returns Promise<DataResult<X>
  */
 export const promiseToDataResult = <T>(prom: Promise<T>): Promise<DataResult<T>> =>
-  prom.then((result) => ({ loading: false, data: result })).catch((reason) => ({ loading: false, error: reason }));
+  prom
+    .then((result) => ({ loading: false, data: result }))
+    .catch((reason) => ({ loading: false, error: reason }));

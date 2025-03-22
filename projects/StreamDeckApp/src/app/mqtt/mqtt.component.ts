@@ -18,7 +18,6 @@ import { JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-mqtt',
-  standalone: true,
   imports: [JsonPipe],
   templateUrl: './mqtt.component.html',
   styleUrl: './mqtt.component.css',
@@ -37,7 +36,12 @@ export class MqttComponent implements OnDestroy {
   brightDown_down$ = this.button$.pipe(filter((msg) => msg === 'brightness_down_hold'));
   brightDown_up$ = this.button$.pipe(filter((msg) => msg === 'brightness_down_release'));
 
-  $state = observableComputed<Z2MDevices[]>(() => this.mqtt.listenFor('bridge/devices').pipe(map((s) => JSON.parse(s) as Z2MDevices[]),tap(console.log)));
+  $state = observableComputed<Z2MDevices[]>(() =>
+    this.mqtt.listenFor('bridge/devices').pipe(
+      map((s) => JSON.parse(s) as Z2MDevices[]),
+      tap(console.log),
+    ),
+  );
 
   sub = this.brightDown_down$
     .pipe(
@@ -50,8 +54,8 @@ export class MqttComponent implements OnDestroy {
     });
 
   ngOnDestroy() {
-    this.sub.unsubscribe()
-    this.lamp$.unsubscribe()
+    this.sub.unsubscribe();
+    this.lamp$.unsubscribe();
   }
 }
 
@@ -80,10 +84,12 @@ export class MqttService {
       console.log('stop listening for MQTT messages');
       this.client.then((client) => client.off('message', cb));
     };
-  }).pipe(share({
-    connector: () => new Subject(),
-    resetOnComplete: true
-  }));
+  }).pipe(
+    share({
+      connector: () => new Subject(),
+      resetOnComplete: true,
+    }),
+  );
 
   state = signal<Record<string, unknown>>({});
 
@@ -123,179 +129,179 @@ export class MqttService {
 }
 
 export interface Z2MDevices {
-  definition:          Definition | null;
-  disabled:            boolean;
-  endpoints:           { [key: string]: Endpoint };
-  friendly_name:       string;
-  ieee_address:        string;
+  definition: Definition | null;
+  disabled: boolean;
+  endpoints: { [key: string]: Endpoint };
+  friendly_name: string;
+  ieee_address: string;
   interview_completed: boolean;
-  interviewing:        boolean;
-  network_address:     number;
-  supported:           boolean;
-  type:                Z2MDeviceType;
-  date_code?:          string;
-  manufacturer?:       Manufacturer;
-  model_id?:           string;
-  power_source?:       PowerSource;
-  software_build_id?:  string;
+  interviewing: boolean;
+  network_address: number;
+  supported: boolean;
+  type: Z2MDeviceType;
+  date_code?: string;
+  manufacturer?: Manufacturer;
+  model_id?: string;
+  power_source?: PowerSource;
+  software_build_id?: string;
 }
 
 export interface Definition {
-  description:  string;
-  exposes:      Expose[];
-  icon:         string;
-  model:        string;
-  options:      Option[];
+  description: string;
+  exposes: Expose[];
+  icon: string;
+  model: string;
+  options: Option[];
   supports_ota: boolean;
-  vendor:       Vendor;
+  vendor: Vendor;
 }
 
 export interface Expose {
-  access?:      number;
+  access?: number;
   description?: string;
-  label?:       string;
-  name?:        string;
-  property?:    string;
-  type:         ItemTypeType;
-  value_off?:   boolean;
-  value_on?:    boolean;
-  category?:    Category;
-  unit?:        string;
-  value_max?:   number;
-  value_min?:   number;
-  features?:    Feature[];
-  values?:      string[];
+  label?: string;
+  name?: string;
+  property?: string;
+  type: ItemTypeType;
+  value_off?: boolean;
+  value_on?: boolean;
+  category?: Category;
+  unit?: string;
+  value_max?: number;
+  value_min?: number;
+  features?: Feature[];
+  values?: string[];
 }
 
 export enum Category {
-  Config = "config",
-  Diagnostic = "diagnostic",
+  Config = 'config',
+  Diagnostic = 'diagnostic',
 }
 
 export interface Feature {
-  access:        number;
-  description:   string;
-  label:         string;
-  name:          string;
-  property:      string;
-  type:          ItemTypeType;
-  value_off?:    boolean | string;
-  value_on?:     boolean | string;
+  access: number;
+  description: string;
+  label: string;
+  name: string;
+  property: string;
+  type: ItemTypeType;
+  value_off?: boolean | string;
+  value_on?: boolean | string;
   value_toggle?: string;
-  value_max?:    number;
-  value_min?:    number;
-  presets?:      Preset[];
-  unit?:         string;
-  features?:     ItemType[];
+  value_max?: number;
+  value_min?: number;
+  presets?: Preset[];
+  unit?: string;
+  features?: ItemType[];
 }
 
 export interface ItemType {
-  access:    number;
-  label:     string;
-  name:      string;
+  access: number;
+  label: string;
+  name: string;
   property?: string;
-  type:      ItemTypeType;
+  type: ItemTypeType;
 }
 
 export enum ItemTypeType {
-  Binary = "binary",
-  Composite = "composite",
-  Enum = "enum",
-  Light = "light",
-  Numeric = "numeric",
-  Switch = "switch",
+  Binary = 'binary',
+  Composite = 'composite',
+  Enum = 'enum',
+  Light = 'light',
+  Numeric = 'numeric',
+  Switch = 'switch',
 }
 
 export interface Preset {
   description: string;
-  name:        string;
-  value:       number;
+  name: string;
+  value: number;
 }
 
 export interface Option {
-  access:      number;
+  access: number;
   description: string;
-  label:       string;
-  name:        string;
-  property:    string;
-  type:        OptionType;
-  value_max?:  number;
-  value_min?:  number;
-  value_off?:  boolean;
-  value_on?:   boolean;
-  item_type?:  ItemType;
+  label: string;
+  name: string;
+  property: string;
+  type: OptionType;
+  value_max?: number;
+  value_min?: number;
+  value_off?: boolean;
+  value_on?: boolean;
+  item_type?: ItemType;
 }
 
 export enum OptionType {
-  Binary = "binary",
-  List = "list",
-  Numeric = "numeric",
+  Binary = 'binary',
+  List = 'list',
+  Numeric = 'numeric',
 }
 
 export enum Vendor {
-  Ikea = "IKEA",
-  TuYa = "TuYa",
-  Xiaomi = "Xiaomi",
+  Ikea = 'IKEA',
+  TuYa = 'TuYa',
+  Xiaomi = 'Xiaomi',
 }
 
 export interface Endpoint {
-  bindings:              Binding[];
-  clusters:              Clusters;
+  bindings: Binding[];
+  clusters: Clusters;
   configured_reportings: ConfiguredReporting[];
-  scenes:                any[];
+  scenes: any[];
 }
 
 export interface Binding {
   cluster: string;
-  target:  Target;
+  target: Target;
 }
 
 export interface Target {
-  endpoint:     number;
+  endpoint: number;
   ieee_address: IEEEAddress;
-  type:         TargetType;
+  type: TargetType;
 }
 
 export enum IEEEAddress {
-  The0Xe0798Dfffebc6E5D = "0xe0798dfffebc6e5d",
+  The0Xe0798Dfffebc6E5D = '0xe0798dfffebc6e5d',
 }
 
 export enum TargetType {
-  Endpoint = "endpoint",
+  Endpoint = 'endpoint',
 }
 
 export interface Clusters {
-  input:  string[];
+  input: string[];
   output: string[];
 }
 
 export interface ConfiguredReporting {
-  attribute:               Attribute;
-  cluster:                 string;
+  attribute: Attribute;
+  cluster: string;
   maximum_report_interval: number;
   minimum_report_interval: number;
-  reportable_change:       number;
+  reportable_change: number;
 }
 
 export enum Attribute {
-  BatteryPercentageRemaining = "batteryPercentageRemaining",
-  MeasuredValue = "measuredValue",
-  OnOff = "onOff",
+  BatteryPercentageRemaining = 'batteryPercentageRemaining',
+  MeasuredValue = 'measuredValue',
+  OnOff = 'onOff',
 }
 
 export enum Manufacturer {
-  IKEAOfSweden = "IKEA of Sweden",
-  Lumi = "LUMI",
-  TZE204Ntcy3Xu1 = "_TZE204_ntcy3xu1",
+  IKEAOfSweden = 'IKEA of Sweden',
+  Lumi = 'LUMI',
+  TZE204Ntcy3Xu1 = '_TZE204_ntcy3xu1',
 }
 
 export enum PowerSource {
-  Battery = "Battery",
-  MainsSinglePhase = "Mains (single phase)",
+  Battery = 'Battery',
+  MainsSinglePhase = 'Mains (single phase)',
 }
 
 export enum Z2MDeviceType {
-  Coordinator = "Coordinator",
-  EndDevice = "EndDevice",
-  Router = "Router",
+  Coordinator = 'Coordinator',
+  EndDevice = 'EndDevice',
+  Router = 'Router',
 }

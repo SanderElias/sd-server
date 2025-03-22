@@ -1,4 +1,12 @@
-import { CreateComputedOptions, DestroyRef, inject, isSignal, Signal, signal, WritableSignal } from '@angular/core';
+import {
+  CreateComputedOptions,
+  DestroyRef,
+  inject,
+  isSignal,
+  Signal,
+  signal,
+  WritableSignal,
+} from '@angular/core';
 import { toObservable, ToObservableOptions } from '@angular/core/rxjs-interop';
 import { from, isObservable, Observable, of, switchMap } from 'rxjs';
 
@@ -44,7 +52,9 @@ export function asyncToSignal<I, T>(
   }
 }
 
-const convertToObservable = <I>(x: Signal<I> | WritableSignal<I> | Observable<I> | Promise<I> | I): Observable<I> => {
+const convertToObservable = <I>(
+  x: Signal<I> | WritableSignal<I> | Observable<I> | Promise<I> | I,
+): Observable<I> => {
   if (isSignal(x)) {
     return toObservable(x);
   }

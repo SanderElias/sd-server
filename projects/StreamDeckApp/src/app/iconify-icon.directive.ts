@@ -1,6 +1,6 @@
 /* eslint-disable @angular-eslint/component-selector */
 import { Component, input } from '@angular/core';
-import "iconify-icon"
+import 'iconify-icon';
 
 @Component({
   selector: 'iconify-icon',

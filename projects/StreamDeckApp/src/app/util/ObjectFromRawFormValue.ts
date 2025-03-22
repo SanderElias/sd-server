@@ -19,7 +19,10 @@ interface ObjectFromFormEngineOptions {
  * @param data is the value as returned from `FromGroup.getRawValue()`
  * @returns an object where all the paths are converted and merged into a single object
  */
-export const ObjectFromFormEngine = (data: FeData, options: ObjectFromFormEngineOptions = {}): {} | [] | undefined => {
+export const ObjectFromFormEngine = (
+  data: FeData,
+  options: ObjectFromFormEngineOptions = {},
+): {} | [] | undefined => {
   const propToRead = options.propToRead ?? 'value';
   const skipNonSubmit_able = options.propToRead ?? true;
   const prefix = options.prefix ?? '';
@@ -41,7 +44,9 @@ export const ObjectFromFormEngine = (data: FeData, options: ObjectFromFormEngine
       acc,
       objFromPath(
         key,
-        isSignal(value[propToRead]) ? (value[propToRead] as Signal<EntryKeys>)() : value[propToRead] ?? null,
+        isSignal(value[propToRead])
+          ? (value[propToRead] as Signal<EntryKeys>)()
+          : (value[propToRead] ?? null),
       ),
     );
   }, initialValue);

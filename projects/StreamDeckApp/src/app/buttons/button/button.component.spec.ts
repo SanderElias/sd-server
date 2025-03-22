@@ -6,13 +6,11 @@ describe('ButtonComponent', () => {
   let component: SdButtonComponent;
   let fixture: ComponentFixture<SdButtonComponent>;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-    imports: [SdButtonComponent],
-}).compileComponents();
-    }),
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [SdButtonComponent],
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SdButtonComponent);

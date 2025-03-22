@@ -33,7 +33,6 @@ import { DndListComponent } from './dnd-list/dnd-list.component';
     ></dnd-list>
   `,
   styleUrls: ['./devices.component.css'],
-  standalone: true,
   imports: [AsyncPipe, DndListComponent],
 })
 export class DevicesComponent {

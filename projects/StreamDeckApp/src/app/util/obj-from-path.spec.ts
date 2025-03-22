@@ -27,8 +27,12 @@ describe('Objects from path', () => {
     expect(objFromPath('[1].a.b', 'c')).toEqual([, { a: { b: 'c' } }]);
   });
   it('should throw on an invalid path', () => {
-    expect(() => objFromPath('', 1)).toThrowError(`[@fedex/formEngine] Invalid path: a path can not be empty`);
-    expect(() => objFromPath('.', 1)).toThrowError(`[@fedex/formEngine] Invalid path: a path can not be empty`);
+    expect(() => objFromPath('', 1)).toThrowError(
+      `[@fedex/formEngine] Invalid path: a path can not be empty`,
+    );
+    expect(() => objFromPath('.', 1)).toThrowError(
+      `[@fedex/formEngine] Invalid path: a path can not be empty`,
+    );
     expect(() => objFromPath('a. .b', 1)).toThrowError(
       `[@fedex/formEngine] Invalid path: "a. .b", should not contain whitespace between the dots or brackets`,
     );

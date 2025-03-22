@@ -8,10 +8,9 @@ describe('MqttComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MqttComponent]
-    })
-    .compileComponents();
-    
+      imports: [MqttComponent],
+    }).compileComponents();
+
     fixture = TestBed.createComponent(MqttComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

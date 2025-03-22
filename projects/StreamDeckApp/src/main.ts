@@ -1,4 +1,8 @@
-import { enableProdMode, importProvidersFrom, provideExperimentalZonelessChangeDetection } from '@angular/core';
+import {
+  enableProdMode,
+  importProvidersFrom,
+  provideExperimentalZonelessChangeDetection,
+} from '@angular/core';
 
 import { provideHttpClient } from '@angular/common/http';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
@@ -17,6 +21,6 @@ bootstrapApplication(AppComponent, {
     importProvidersFrom(BrowserModule),
     provideHttpClient(),
     provideRouter(routes),
-    provideExperimentalZonelessChangeDetection()
+    provideExperimentalZonelessChangeDetection(),
   ],
 }).catch((err) => console.error(err));

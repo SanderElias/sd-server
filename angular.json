@@ -19,13 +19,8 @@
             "index": "projects/StreamDeckApp/src/index.html",
             "polyfills": [],
             "tsConfig": "projects/StreamDeckApp/tsconfig.app.json",
-            "assets": [
-              "projects/StreamDeckApp/src/favicon.ico",
-              "projects/StreamDeckApp/src/assets"
-            ],
-            "styles": [
-              "projects/StreamDeckApp/src/styles.css"
-            ],
+            "assets": ["projects/StreamDeckApp/src/favicon.ico", "projects/StreamDeckApp/src/assets"],
+            "styles": ["projects/StreamDeckApp/src/styles.css"],
             "scripts": [],
             "sourceMap": true,
             "optimization": true,
@@ -84,13 +79,8 @@
             "polyfills": "projects/StreamDeckApp/src/polyfills.ts",
             "tsConfig": "projects/StreamDeckApp/tsconfig.spec.json",
             "karmaConfig": "projects/StreamDeckApp/karma.conf.js",
-            "assets": [
-              "projects/StreamDeckApp/src/favicon.ico",
-              "projects/StreamDeckApp/src/assets"
-            ],
-            "styles": [
-              "projects/StreamDeckApp/src/styles.css"
-            ],
+            "assets": ["projects/StreamDeckApp/src/favicon.ico", "projects/StreamDeckApp/src/assets"],
+            "styles": ["projects/StreamDeckApp/src/styles.css"],
             "scripts": []
           }
         },
@@ -109,10 +99,7 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/StreamDeckApp/**/*.ts",
-              "projects/StreamDeckApp/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/StreamDeckApp/**/*.ts", "projects/StreamDeckApp/**/*.html"]
           }
         }
       }
@@ -120,8 +107,6 @@
   },
   "cli": {
     "analytics": "1ee7009e-d170-41c6-b965-db7f8b2a7a85",
-    "schematicCollections": [
-      "@angular-eslint/schematics"
-    ]
+    "schematicCollections": ["@angular-eslint/schematics"]
   }
 }

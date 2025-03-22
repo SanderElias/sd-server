@@ -1,7 +1,10 @@
 <script type="nomodule">
   console.log('lazy-load es5 here! (make sure to take order in account)')
 </script>
-<script defer async>
+<script
+  defer
+  async
+>
   async function lazyLoad() {
     const sr = ['runtime-es2015.js', 'polyfills-es2015.js', 'main-es2015.js'];
     for (const i of sr) {

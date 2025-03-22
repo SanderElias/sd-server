@@ -5,7 +5,6 @@ import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-nav',
-  standalone: true,
   templateUrl: './nav.component.html',
   styleUrl: './nav.component.css',
   imports: [IconifyIconComponent, RouterLink],
@@ -17,9 +16,11 @@ import { RouterLink } from '@angular/router';
 })
 export class NavComponent {
   $selected = signal(false);
-  $routes = signal(routes)
-  $titles = this.$routes().map(route => route.title).filter(r => !!r)
-  $icon = () =>  {
-    return this.$selected() ? 'line-md:menu-to-close-transition' : 'line-md:close-to-menu-transition'
-  }
+  $routes = signal(routes);
+  $titles = this.$routes()
+    .map((route) => route.title)
+    .filter((r) => !!r);
+  $icon = () => {
+    return this.$selected() ? 'line-md:menu-to-close-transition' : 'line-md:close-to-menu-transition';
+  };
 }

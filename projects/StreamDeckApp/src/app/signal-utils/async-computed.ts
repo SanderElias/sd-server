@@ -15,7 +15,10 @@ interface AsyncComputed {
  * @param initialValue. optional, if not provided the initial value of the signal will be undefined.
  * @returns
  */
-export const asyncComputed: AsyncComputed = <T>(cb: AsyncComputedFn<T>, initialValue?: T): Signal<T | undefined> => {
+export const asyncComputed: AsyncComputed = <T>(
+  cb: AsyncComputedFn<T>,
+  initialValue?: T,
+): Signal<T | undefined> => {
   const result = signal<T>(initialValue as T, { equal: deep_equal });
   inject(DestroyRef).onDestroy(() => ref.destroy());
   const ref = effect(

@@ -19,7 +19,7 @@ export async function loadImage(cmd: Command) {
   }
   const asset = resolve(__dirname, '../../../assets', fileName);
 
-  const streamDeck = await firstValueFrom( deck$.pipe(take(1)))!;
+  const streamDeck = await firstValueFrom(deck$.pipe(take(1)))!;
 
   // const writableStreamBuffer = drawText('hello',1)
 

@@ -11,17 +11,13 @@
     padding: var(--size-1) var(--size-2);
     border-radius: var(--size-1);
     user-select: none;
-
   }
   .picked {
     background-color: var(--surface-4);
   }
 
-  a.dragging{
+  a.dragging {
     background-color: var(--surface-1);
     border: 1px solid var(--surface-4);
   }
 }
-
-
-
