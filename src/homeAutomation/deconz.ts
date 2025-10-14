@@ -77,12 +77,12 @@ const removeOthers = async (apiKey) => {
 
 const connect = async () => {
   const { websocketport } = await getConfig();
-  const ws = new WebSocket(`ws://localhost:${websocketport}`);
-  ws.onmessage = (m) => {
-    const data = JSON.parse(m.data.toString());
-    events$$.next(data as WsSmartEvent);
-  };
-  ws.onerror = (e) => console.error(e);
+  // const ws = new WebSocket(`ws://localhost:${websocketport}`);
+  // ws.onmessage = (m) => {
+  //   const data = JSON.parse(m.data.toString());
+  //   events$$.next(data as WsSmartEvent);
+  // };
+  // ws.onerror = (e) => console.error(e);
 };
 
 const init = async () => {

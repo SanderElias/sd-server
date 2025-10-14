@@ -1,7 +1,7 @@
 import { DestroyRef, effect, inject, type Signal, signal } from '@angular/core';
 import { firstValueFrom, isObservable, Observable } from 'rxjs';
 
-import { deep_equal } from '../util/deep-equal';
+import { deepEqual } from '../util/deep-equal';
 
 type AsyncComputedFn<T> = () => Promise<T> | Observable<T>;
 interface AsyncComputed {
@@ -19,7 +19,7 @@ export const asyncComputed: AsyncComputed = <T>(
   cb: AsyncComputedFn<T>,
   initialValue?: T,
 ): Signal<T | undefined> => {
-  const result = signal<T>(initialValue as T, { equal: deep_equal });
+  const result = signal<T>(initialValue as T, { equal: deepEqual });
   inject(DestroyRef).onDestroy(() => ref.destroy());
   const ref = effect(
     async () => {

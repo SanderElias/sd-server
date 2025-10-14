@@ -28,22 +28,22 @@ describe('Objects from path', () => {
   });
   it('should throw on an invalid path', () => {
     expect(() => objFromPath('', 1)).toThrowError(
-      `[@fedex/formEngine] Invalid path: a path can not be empty`,
+      `[objFromPath] Invalid path: a path can not be empty`,
     );
     expect(() => objFromPath('.', 1)).toThrowError(
-      `[@fedex/formEngine] Invalid path: a path can not be empty`,
+      `[objFromPath] Invalid path: a path can not be empty`,
     );
     expect(() => objFromPath('a. .b', 1)).toThrowError(
-      `[@fedex/formEngine] Invalid path: "a. .b", should not contain whitespace between the dots or brackets`,
+      `[objFromPath] Invalid path: "a. .b", should not contain whitespace between the dots or brackets`,
     );
     expect(() => objFromPath('a..b', 1)).toThrowError(
-      `[@fedex/formEngine] Invalid path: "a..b", it contains two dots in a row`,
+      `[objFromPath] Invalid path: "a..b", it contains two dots in a row`,
     );
     expect(() => objFromPath('[ ]', 1)).toThrowError(
-      `[@fedex/formEngine] Invalid path: "[ ]", should not contain whitespace between the dots or brackets`,
+      `[objFromPath] Invalid path: "[ ]", should not contain whitespace between the dots or brackets`,
     );
     expect(() => objFromPath('a.[ \n].b', 1)).toThrowError(
-      `[@fedex/formEngine] Invalid path: "a.[ \n].b", should not contain whitespace between the dots or brackets`,
+      `[objFromPath] Invalid path: "a.[ \n].b", should not contain whitespace between the dots or brackets`,
     );
   });
 });

@@ -2,7 +2,7 @@ import pg from 'pg';
 const { Pool } = pg;
 
 export const pool = new Pool({
-  host: 'localhost',
+  host: 'kapow',
   database: 'promitor',
   user: 'promitor',
   password: 'postgresDBforPromitor',

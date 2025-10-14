@@ -4,8 +4,8 @@ import { reloadAll } from './server/liveReload.js';
 import { hookServer, sdServer } from './server/server.js';
 import './utils/exitHandler.js';
 
-sdServer();
-hookServer();
+await sdServer();
+await hookServer();
 
 console.log('start your engine');
 setTimeout(() => {

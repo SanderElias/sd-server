@@ -1,12 +1,7 @@
 import { log } from 'console';
 // import { listStreamDecks, openStreamDeck, StreamDeck } from 'elgato-stream-deck';
-import {
-  StreamDeck,
-  listStreamDecks,
-  openStreamDeck,
-  type StreamDeckButtonControlDefinition,
-} from '@elgato-stream-deck/node';
-import { BehaviorSubject, firstValueFrom, interval, merge, Observable, race, Subject, timer } from 'rxjs';
+import { listStreamDecks, openStreamDeck, StreamDeck } from '@elgato-stream-deck/node';
+import { BehaviorSubject, interval, merge, Observable, race, Subject, timer } from 'rxjs';
 import {
   bufferCount,
   debounceTime,
@@ -15,7 +10,6 @@ import {
   map,
   repeat,
   switchMap,
-  take,
   takeWhile,
   tap,
 } from 'rxjs/operators';
@@ -30,7 +24,15 @@ let pollTimeOut: NodeJS.Timeout | undefined;
 let pollInterval = 250;
 // tslint:disable-next-line: variable-name
 let _deck: StreamDeck | undefined;
-let counter = 0;
+const counter = 0;
+
+/**
+ * function to poll for stream deck. takes care of the case when the stream deck is not connected, or other issues.
+ * it will iterate slower with each interval until it finds the deck, or times out.
+ * when it times out, it will leave it to the watchdog to restart the stream deck.
+ * @param lastInterval
+ * @returns
+ */
 async function pollIt(lastInterval = 0) {
   pollInterval = Math.max(pollInterval + 50, 2500);
   if (lastInterval === 5000) {
@@ -51,11 +53,11 @@ async function pollIt(lastInterval = 0) {
     return pollIt();
   }
 
-  if (++counter > 25) {
-    /** temporary kill switch */
-    logError('exited by kill switch in streamdeck.ts');
-    process.exit(15);
-  }
+  // if (++counter > 25) {
+  //   /** temporary kill switch */
+  //   logError('exited by kill switch in streamdeck.ts');
+  //   process.exit(15);
+  // }
   const decks = await listStreamDecks();
   if (decks.length === 0) {
     pollTimeOut = setTimeout(() => pollIt(pollInterval), pollInterval);
@@ -76,27 +78,20 @@ async function pollIt(lastInterval = 0) {
   pollInterval = 250;
 }
 
-/** watchdog, check if deck is up */
-merge(timer(0, 10 * 1000).pipe(map(() => undefined)), deck)
+/** watchdog, check if deck is up, check every 10 seconds if the deck is there, if not, restart polling. */
+timer(0, 10 * 1000)
   .pipe(
-    tap(async () => {
-      try {
-        const currentDeck = await firstValueFrom(deck.pipe(take(1)));
-        if (currentDeck === undefined) {
-          return await pollIt();
-        }
-      } catch (e) {
-        console.error(e);
-        pollIt();
-      }
+    filter(() => deck.value === undefined), // only poll if deck is not connected
+    tap(() => {
+      logWarn('start polling for streamDeck');
+      pollIt();
     }),
   )
   .subscribe();
 
-// pollIt()
+// pollIt();
 export const resetDeckConnection = async () => {
   deck.next(undefined);
-  // pollIt();
 };
 
 const down$ = new Subject<number>();
@@ -104,17 +99,21 @@ const up$ = new Subject<number>();
 
 deck$.subscribe({
   next: async (strDeck) => {
-    if (!strDeck) {
-      return;
-    }
+    await strDeck.removeAllListeners();
     await strDeck.clearPanel();
-    strDeck.on('down', (keyNumber) => down$.next(keyNumber.index));
-    strDeck.on('up', (keyNumber) => up$.next(keyNumber.index));
-    strDeck.on('error', () => {
+    strDeck.on('down', (keyNumber) => {
+      // console.log('key down', keyNumber);
+      down$.next(keyNumber.index);
+    });
+    strDeck.on('up', (keyNumber) => {
+      // console.log('key up', keyNumber);
+      up$.next(keyNumber.index);
+    });
+    strDeck.on('error', async () => {
       logWarn('stream-deck Error, start polling for device');
       try {
-        strDeck['removeAllListeners']();
-        strDeck.close();
+        await strDeck.removeAllListeners();
+        await strDeck.close();
       } catch {
         logWarn('failed to close deck');
       }

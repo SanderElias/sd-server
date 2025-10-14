@@ -2,3 +2,7 @@ img {
   width: 75px;
   aspect-ratio: 1;
 }
+
+td:has(code) {
+  text-align: left;;
+}

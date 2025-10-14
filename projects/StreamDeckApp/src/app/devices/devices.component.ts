@@ -33,7 +33,7 @@ import { DndListComponent } from './dnd-list/dnd-list.component';
     ></dnd-list>
   `,
   styleUrls: ['./devices.component.css'],
-  imports: [AsyncPipe, DndListComponent],
+  imports: [DndListComponent],
 })
 export class DevicesComponent {
   http = inject(HttpClient);

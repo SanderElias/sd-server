@@ -16,7 +16,7 @@ export const resetDeck = async () => {
   return deck$
     .pipe(
       take(1),
-      tap((dck) => dck.clearAllKeys()),
+      tap((dck) => dck.clearPanel()),
     )
     .toPromise();
 };

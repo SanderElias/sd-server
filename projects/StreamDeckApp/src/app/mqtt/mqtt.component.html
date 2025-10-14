@@ -5,14 +5,21 @@
     <tr>
       <td>
         <img
-          [src]="device.definition?.icon"
+          [src]="`http://localhost:8080/${device.definition?.icon}`"
           alt="icon"
         />
       </td>
-      <td>{{ device.friendly_name }}</td>
-      <td>{{ device.definition?.exposes | json }}</td>
+      <td>{{ device.friendly_name }}<br>{{device.model_id}}</td>
+      <td>
+        <!-- <pre><code>{{ device.definition?.exposes | json }} </code></pre> -->
+         <button (click)="inspect(device)">inspect</button>
+         <button (click)="setState(device.friendly_name,'on')">on</button>
+         <button (click)="setState(device.friendly_name,'off')">off</button>
+      </td>
+      <td>
+        <pre><code>{{ device.state()|json }}</code></pre>
+      </td>
     </tr>
   }
 </table>
 
-<pre><code>{{$state() | json}}</code></pre>

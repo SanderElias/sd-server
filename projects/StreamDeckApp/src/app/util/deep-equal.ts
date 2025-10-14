@@ -2,7 +2,15 @@
 /* eslint-disable complexity */
 'use strict';
 
-export function deep_equal(a: unknown, b: unknown) {
+/**
+ * Deeply compares two values for equality.
+ * Traverses objects, arrays, maps, sets, dates, and other types.
+ *
+ * @param a
+ * @param b
+ * @returns boolean
+ */
+export function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true;
 
   if (a && b && typeof a == 'object' && typeof b == 'object') {
@@ -13,14 +21,14 @@ export function deep_equal(a: unknown, b: unknown) {
       if (!Array.isArray(b)) return false;
       length = a.length;
       if (length != b.length) return false;
-      for (i = length; i-- !== 0; ) if (!deep_equal(a[i], b[i])) return false;
+      for (i = length; i-- !== 0; ) if (!deepEqual(a[i], b[i])) return false;
       return true;
     }
 
     if (a instanceof Map && b instanceof Map) {
       if (a.size !== b.size) return false;
       for (i of a.entries()) if (!b.has(i[0])) return false;
-      for (i of a.entries()) if (!deep_equal(i[1], b.get(i[0]))) return false;
+      for (i of a.entries()) if (!deepEqual(i[1], b.get(i[0]))) return false;
       return true;
     }
 
@@ -56,7 +64,7 @@ export function deep_equal(a: unknown, b: unknown) {
 
     for (i = length; i-- !== 0; ) {
       const key = keys[i] as keyof typeof a;
-      if (!deep_equal(a[key], b[key])) return false;
+      if (!deepEqual(a[key], b[key])) return false;
     }
 
     return true;

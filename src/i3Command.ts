@@ -1,24 +1,34 @@
-import { i3 } from './utils/i3.js';
+import { i3, Node, Workspace } from './utils/i3.js';
 
-// import { i3 } from './utils/i3.js';
-export function i3Command(arg) {
-  return new Promise((resolve, reject) => {
-    i3.command(arg, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(result);
-    });
+export type I3Tree = Node;
+export type Command = `${AvailableI3Commands} ${string}`;
+
+export function i3Command(arg: Command): Promise<boolean> {
+  return new Promise<boolean>((resolve, reject) => {
+    i3.command(
+      arg as string,
+      (err, result: { success: boolean; error?: string; parse_error?: boolean }[]) => {
+        if (err) {
+          return reject(err);
+        }
+        const parseError = result.some((r) => r.parse_error);
+        if (result.some((r) => r.error)) {
+          const errorStr = result.map((r) => r.error).join(', ');
+          return reject(parseError ? 'Error parsing command: ' + errorStr : errorStr);
+        }
+        resolve(result.every((r) => r.success));
+      },
+    );
   });
 }
-interface Outputs {
+export interface Outputs {
   left: string;
   middle: string;
   right: string;
   rest: string[];
 }
 
-export function i3Outputs(): Promise<Outputs> {
+function _i3Outputs(): Promise<Outputs> {
   return new Promise((resolve, reject) => {
     i3.outputs((err, d) => {
       if (err) {
@@ -44,22 +54,10 @@ export function i3Outputs(): Promise<Outputs> {
     });
   });
 }
-export interface WorkSpace {
-  num: number;
-  name: string;
-  visible: boolean;
-  focused: boolean;
-  rect: Rect;
-  output: string;
-  urgent: boolean;
-}
-export interface Rect {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-export function i3WorksSpaces(): Promise<WorkSpace[]> {
+
+export const i3Outputs = _i3Outputs();
+
+export function i3WorksSpaces(): Promise<Workspace[]> {
   return new Promise((resolve, reject) => {
     i3.workspaces((err, result) => {
       if (err) {
@@ -69,7 +67,7 @@ export function i3WorksSpaces(): Promise<WorkSpace[]> {
     });
   });
 }
-export function i3Tree(): Promise<I3Tree> {
+export function i3Tree(): Promise<Node> {
   return new Promise((resolve, reject) => {
     i3.tree((err, result) => {
       if (err) {
@@ -81,196 +79,63 @@ export function i3Tree(): Promise<I3Tree> {
 }
 
 export async function moveWP(num: number, mon: keyof Outputs) {
-  const display = (await i3Outputs())[mon];
-  await i3Command(`workspace number ${num}`);
+  const display = (await i3Outputs)[mon];
+  await i3Command(`workspace number ${num} `);
   return await i3Command(`move workspace to output "${display}"`);
 }
 
 export async function focusWP(num: number, mon: keyof Outputs) {
-  const display = (await i3Outputs())[mon];
-  await i3Command(`workspace number ${num}`);
-  return await i3Command(`focus ${display}, workspace number ${num} `);
-}
-
-export interface I3Tree {
-  id: number;
-  type: string;
-  orientation: Border;
-  scratchpad_state: Border;
-  percent: number;
-  urgent: boolean;
-  focused: boolean;
-  layout: string;
-  workspace_layout: WorkspaceLayout;
-  last_split_layout: Layout;
-  border: Border;
-  current_border_width: number;
-  rect: DecoRect;
-  deco_rect: DecoRect;
-  window_rect: DecoRect;
-  geometry: DecoRect;
-  name: Name;
-  window: null;
-  nodes: I3TreeNode[];
-  floating_nodes: any[];
-  focus: number[];
-  fullscreen_mode: number;
-  sticky: boolean;
-  floating: Floating;
-  swallows: any[];
-}
-
-export enum Border {
-  None = 'none',
-  Pixel = 'pixel',
-}
-
-export interface DecoRect {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-export enum Floating {
-  AutoOff = 'auto_off',
-}
-
-export enum Layout {
-  Splith = 'splith',
-  Splitv = 'splitv',
+  await moveWP(num, mon);
+  const workspaces = await i3WorksSpaces();
+  const { output } = workspaces.find((ws) => ws.num === num)??{};
+  return await i3Command(`focus output ${output}`);
 }
 
 export enum Name {
   DisplayPort0 = 'DisplayPort-0',
-  DisplayPort1 = 'DisplayPort-1',
+  // DisplayPort1 = 'DisplayPort-1',
   DisplayPort2 = 'DisplayPort-2',
+  HDMI0 = 'HDMI-A-0',
 }
 
-export interface I3TreeNode {
-  id: number;
-  type: string;
-  orientation: Orientation;
-  scratchpad_state: Border;
-  percent: null;
-  urgent: boolean;
-  focused: boolean;
-  output: Name;
-  layout: string;
-  workspace_layout: WorkspaceLayout;
-  last_split_layout: Layout;
-  border: Border;
-  current_border_width: number;
-  rect: DecoRect;
-  deco_rect: DecoRect;
-  window_rect: DecoRect;
-  geometry: DecoRect;
-  name: string;
-  window: null;
-  nodes: PurpleNode[];
-  floating_nodes: any[];
-  focus: number[];
-  fullscreen_mode: number;
-  sticky: boolean;
-  floating: Floating;
-  swallows: Swallow[];
-}
+/**
+ * this list is used to check if the command is valid
+ * @see https://i3wm.org/docs/userguide.html#_command_reference
+ */
+type AvailableI3Commands =
+  | 'move'
+  | 'exec'
+  | 'exit'
+  | 'restart'
+  | 'reload'
+  | 'shmlog'
+  | 'debuglog'
+  | 'border'
+  | 'layout'
+  | 'append_layout'
+  | 'workspace'
+  | 'focus'
+  | 'kill'
+  | 'open'
+  | 'fullscreen'
+  | 'sticky'
+  | 'split'
+  | 'floating'
+  | 'mark'
+  | 'unmark'
+  | 'resize'
+  | 'rename'
+  | 'nop'
+  | 'scratchpad'
+  | 'swap'
+  | 'title_format'
+  | 'title_window_icon'
+  | 'mode'
+  | 'bar'
+  | 'gaps';
 
-export interface PurpleNode {
-  id: number;
-  type: Type;
-  orientation: Orientation;
-  scratchpad_state: Border;
-  percent: number;
-  urgent: boolean;
-  focused: boolean;
-  output: Name;
-  layout: Layout;
-  workspace_layout: WorkspaceLayout;
-  last_split_layout: Layout;
-  border: Border;
-  current_border_width: number;
-  rect: DecoRect;
-  deco_rect: DecoRect;
-  window_rect: DecoRect;
-  geometry: DecoRect;
-  name: string;
-  num?: number;
-  gaps?: Gaps;
-  window: number | null;
-  nodes: FluffyNode[];
-  floating_nodes: any[];
-  focus: number[];
-  fullscreen_mode: number;
-  sticky: boolean;
-  floating: Floating;
-  swallows: any[];
-  window_properties?: WindowProperties;
-}
-
-export interface Gaps {
-  inner: number;
-  outer: number;
-  top: number;
-  right: number;
-  bottom: number;
-  left: number;
-}
-
-export interface FluffyNode {
-  id: number;
-  type: Type;
-  orientation: Orientation;
-  scratchpad_state: Border;
-  percent: number;
-  urgent: boolean;
-  focused: boolean;
-  output: Name;
-  layout: Layout;
-  workspace_layout: WorkspaceLayout;
-  last_split_layout: Layout;
-  border: Border;
-  current_border_width: number;
-  rect: DecoRect;
-  deco_rect: DecoRect;
-  window_rect: DecoRect;
-  geometry: DecoRect;
-  name: null | string;
-  window: number | null;
-  window_properties?: WindowProperties;
-  nodes: FluffyNode[];
-  floating_nodes: any[];
-  focus: number[];
-  fullscreen_mode: number;
-  sticky: boolean;
-  floating: Floating;
-  swallows: any[];
-}
-
-export enum Orientation {
-  Horizontal = 'horizontal',
-  None = 'none',
-  Vertical = 'vertical',
-}
-
-export enum Type {
-  Con = 'con',
-  Workspace = 'workspace',
-}
-
-export interface WindowProperties {
-  class: string;
-  instance: string;
-  title: string;
-  transient_for: null;
-  window_role?: string;
-}
-
-export enum WorkspaceLayout {
-  Default = 'default',
-}
-
-export interface Swallow {
-  dock: number;
-  insert_where: number;
-}
+/* the list is generated by running the following command
+ * ```bash
+ *  i3-msg blah  # this will error out, and print a list of commands
+ * ```
+ */

@@ -18,8 +18,11 @@ async function enableLiveReloadServer() {
     wss = new WebSocketServer({ port: settings.reloadPort });
     wss.on('connection', (client) => {
       client.binaryType = 'arraybuffer';
-      client.addEventListener('message', (ev) => handleMesage(client, ev as unknown as MessageEvent));
+      client.addEventListener('message', (ev) => handleMessage(client, ev as unknown as MessageEvent));
       client.send(encode({ type: 'hello' }));
+    });
+    wss.on('error', (err) => {
+      logError('websocket error', err);
     });
   } catch (e) {
     logError(`
@@ -57,9 +60,9 @@ export const send = (msg: WsMessage) => {
   client.send(encode(outMsg));
 };
 
-function handleMesage(client, message: MessageEvent) {
+function handleMessage(client, message: MessageEvent) {
   try {
-    console.log(decode(message.data));
+    // console.log(decode(message.data));
     events.next({ ...decode(message.data), client });
   } catch (e) {
     console.error(e);

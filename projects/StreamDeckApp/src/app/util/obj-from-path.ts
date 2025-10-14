@@ -16,11 +16,11 @@ export const objFromPath = <T>(path: string, value?: unknown): T => {
     .reverse();
   if (parts.some((p) => p.trim() === '')) {
     throw new Error(
-      `[@fedex/formEngine] Invalid path: "${path}", should not contain whitespace between the dots or brackets`,
+      `[objFromPath] Invalid path: "${path}", should not contain whitespace between the dots or brackets`,
     );
   }
   if (parts.length === 0) {
-    throw new Error(`[@fedex/formEngine] Invalid path: a path can not be empty`);
+    throw new Error(`[objFromPath] Invalid path: a path can not be empty`);
   }
   return parts.reduce((acc, part) => {
     const index = parseInt(part, 10);
